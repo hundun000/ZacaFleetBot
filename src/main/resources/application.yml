@@ -1,0 +1,56 @@
+
+        
+server:
+    port: 10099
+
+# overwrite this in application-account.yml
+account:
+    bot:
+        account: 11111111
+        pwd: password123
+    group:
+        arknights: 11111111
+        kancolle: 11111111
+    
+spring:
+    profiles:
+        include: "account"
+    data:
+        mongodb:
+            uri: mongodb://localhost:27017/mirai
+feign:
+    hystrix:
+        enabled: true
+    client:
+        config:
+          default:
+            connectTimeout: 3000
+            readTimeout: 50000
+                        
+hystrix:
+    threadpool:
+        default: 
+            coreSize: 3 # scale = 0.1
+            maximumSize: 5
+            allowMaximumSizeToDivergeFromCoreSize: true
+            queueSizeRejectionThreshold: 55
+    command:
+        default:
+            execution:
+                timeout:
+                    enabled: true
+                isolation:
+                    thread:
+                        timeoutInMilliseconds: 30000
+            
+logging:
+    #config: 'classpath:log4j2.yml'
+    level:
+        root: "INFO"
+        com.mirai.hundun.weibo.feign: "DEBUG"
+        com.mirai.hundun.quiz.feign: "DEBUG"
+        org.springframework.web: "INFO"
+        org.springframework.data: "INFO"
+        org.springframework.web.client: "DEBUG"
+
+        
