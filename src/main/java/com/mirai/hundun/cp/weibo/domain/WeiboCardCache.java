@@ -1,4 +1,4 @@
-package com.mirai.hundun.weibo.domain;
+package com.mirai.hundun.cp.weibo.domain;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;

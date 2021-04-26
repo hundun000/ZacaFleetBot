@@ -1,4 +1,4 @@
-package com.mirai.hundun.weibo.feign;
+package com.mirai.hundun.cp.weibo.feign;
 
 
 import feign.hystrix.FallbackFactory;

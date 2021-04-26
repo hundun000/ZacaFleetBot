@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.bot.Amiya;
 import com.mirai.hundun.bot.IPlainTextHandler;
+import com.mirai.hundun.cp.weibo.WeiboService;
+import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 import com.mirai.hundun.service.BotService;
-import com.mirai.hundun.weibo.WeiboService;
-import com.mirai.hundun.weibo.domain.WeiboCardCache;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;

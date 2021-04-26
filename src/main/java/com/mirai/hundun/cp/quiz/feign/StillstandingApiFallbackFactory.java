@@ -1,4 +1,4 @@
-package com.mirai.hundun.quiz.feign;
+package com.mirai.hundun.cp.quiz.feign;
 
 
 import feign.hystrix.FallbackFactory;

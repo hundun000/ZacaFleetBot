@@ -1,4 +1,4 @@
-package com.mirai.hundun.quiz;
+package com.mirai.hundun.cp.quiz;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mirai.hundun.quiz.feign.StillstandingApiService;
-import com.mirai.hundun.weibo.WeiboService;
+import com.mirai.hundun.cp.quiz.feign.StillstandingApiService;
+import com.mirai.hundun.cp.weibo.WeiboService;
 
 import lombok.extern.slf4j.Slf4j;
 

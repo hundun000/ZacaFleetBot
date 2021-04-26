@@ -1,4 +1,4 @@
-package com.mirai.hundun.weibo.domain;
+package com.mirai.hundun.cp.weibo.domain;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

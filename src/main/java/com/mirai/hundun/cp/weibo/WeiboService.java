@@ -1,4 +1,4 @@
-package com.mirai.hundun.weibo;
+package com.mirai.hundun.cp.weibo;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mirai.hundun.weibo.domain.WeiboCardCache;
-import com.mirai.hundun.weibo.domain.WeiboUserInfoCache;
-import com.mirai.hundun.weibo.feign.WeiboApiService;
+import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
+import com.mirai.hundun.cp.weibo.domain.WeiboUserInfoCache;
+import com.mirai.hundun.cp.weibo.feign.WeiboApiService;
 
 import lombok.extern.slf4j.Slf4j;
 

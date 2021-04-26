@@ -47,8 +47,9 @@ logging:
     #config: 'classpath:log4j2.yml'
     level:
         root: "INFO"
-        com.mirai.hundun.weibo.feign: "DEBUG"
-        com.mirai.hundun.quiz.feign: "DEBUG"
+        com.mirai.hundun.cp.penguin.feign: "DEBUG"
+        com.mirai.hundun.cp.weibo.feign: "DEBUG"
+        com.mirai.hundun.cp.quiz.feign: "DEBUG"
         org.springframework.web: "INFO"
         org.springframework.data: "INFO"
         org.springframework.web.client: "DEBUG"

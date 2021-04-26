@@ -1,10 +1,10 @@
-package com.mirai.hundun.weibo;
+package com.mirai.hundun.cp.weibo;
 
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.mirai.hundun.weibo.domain.WeiboUserInfoCache;
+import com.mirai.hundun.cp.weibo.domain.WeiboUserInfoCache;
 
 import java.util.List;
 

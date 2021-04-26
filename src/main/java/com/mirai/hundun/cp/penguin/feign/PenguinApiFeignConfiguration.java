@@ -1,17 +1,16 @@
-package com.mirai.hundun.weibo.feign;
-
-
+package com.mirai.hundun.cp.penguin.feign;
 
 import org.springframework.context.annotation.Bean;
 
 import feign.Logger;
-import feign.Request;
 
-public class WeiboApiFeignConfiguration {
-
+/**
+ * @author hundun
+ * Created on 2021/04/26
+ */
+public class PenguinApiFeignConfiguration {
     @Bean
     Logger.Level level() {
         return Logger.Level.BASIC;
     }
-    
 }

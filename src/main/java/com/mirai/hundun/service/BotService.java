@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.bot.Amiya;
 import com.mirai.hundun.bot.RepeatConsumer;
-import com.mirai.hundun.weibo.WeiboService;
-import com.mirai.hundun.weibo.domain.WeiboCardCache;
+import com.mirai.hundun.cp.weibo.WeiboService;
+import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 
 import lombok.extern.slf4j.Slf4j;
 

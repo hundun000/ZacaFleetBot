@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mirai.hundun.quiz.Question;
-import com.mirai.hundun.quiz.QuizService;
+import com.mirai.hundun.cp.quiz.Question;
+import com.mirai.hundun.cp.quiz.QuizService;
+import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.service.BotService;
-import com.mirai.hundun.weibo.WeiboService;
 
 /**
  * @author hundun

@@ -1,4 +1,4 @@
-package com.mirai.hundun.quiz;
+package com.mirai.hundun.cp.quiz;
 
 import java.util.List;
 

@@ -14,10 +14,11 @@ import org.springframework.stereotype.Component;
 import com.mirai.hundun.bot.RepeatConsumer.CountNode;
 import com.mirai.hundun.bot.amiya.AmiyaTalkHandler;
 import com.mirai.hundun.bot.amiya.AmiyaWeiboHandler;
+import com.mirai.hundun.bot.amiya.PenguinHandler;
 import com.mirai.hundun.bot.amiya.QuizHandler;
+import com.mirai.hundun.cp.weibo.WeiboService;
+import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 import com.mirai.hundun.service.BotService;
-import com.mirai.hundun.weibo.WeiboService;
-import com.mirai.hundun.weibo.domain.WeiboCardCache;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
@@ -50,6 +51,9 @@ public class Amiya implements Consumer<GroupMessageEvent> {
     @Autowired
     QuizHandler quizHandler;
     
+    @Autowired
+    PenguinHandler penguinHandler;
+    
     private boolean acceptAtByAllComponents(GroupMessageEvent event) {
         At at = (At) event.getMessage().stream().filter(At.class::isInstance).findFirst().orElse(null);
         boolean done = amiyaTalkHandler.acceptAt(event, at);
@@ -67,18 +71,21 @@ public class Amiya implements Consumer<GroupMessageEvent> {
         if (!done) {
             done = quizHandler.acceptPlainText(event, plainText);
         }
+        if (!done) {
+            done = penguinHandler.acceptPlainText(event, plainText);
+        }
         return done;
     }
     
     @Override
     public void accept(GroupMessageEvent event) {
         synchronized (this) {
-            if (!enable || event.getSender().getId() == arknightsGroupId) {
+            if (!enable || event.getSender().getId() == getSelfAccount()) {
                 return;
             }
             
-            Long groupId = event.getGroup().getId();
-            Long senderId = event.getSender().getId();
+            long groupId = event.getGroup().getId();
+            long senderId = event.getSender().getId();
             boolean done = false;
             if (!done) {
                 done = acceptPlainTextByAllComponents(event);
