@@ -4,6 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+
+import com.mirai.hundun.parser.statement.AtStatement;
+import com.mirai.hundun.parser.statement.LiteralValueStatement;
+import com.mirai.hundun.parser.statement.Statement;
+
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.PlainText;
@@ -13,15 +21,17 @@ import net.mamoe.mirai.message.data.PlainText;
  * Created on 2021/04/21
  */
 @Slf4j
-public class RepeatConsumer implements IPlainTextHandler {
+@Component
+public class RepeatConsumer implements IFunction {
 
+    @Autowired
+    Amiya parent;
     
-    CountNode countNode;
     
     //private final long groupId;
-
+    Map<Long, SessionData> groupIdToData = new HashMap<>();
     
-    public class CountNode {
+    public class SessionData {
         public String message = "";
         public int count = 0;
     }
@@ -29,38 +39,72 @@ public class RepeatConsumer implements IPlainTextHandler {
         
     }
     
-    public RepeatConsumer(long groupId) {
-        countNode = new CountNode();
+    public RepeatConsumer() {
+        //countNode = new CountNode();
         //this.groupId = groupId;
     }
 
-    @Override
     public boolean acceptPlainText(GroupMessageEvent event, PlainText plainText) {
         String newMessage = plainText != null ? plainText.contentToString() : null;
         
         if (newMessage == null) {
             return false;
         }
-        
+        long groupId = event.getGroup().getId();
+        SessionData sessionData = groupIdToData.get(groupId);
+        if (sessionData == null) {
+            sessionData = new SessionData();
+            groupIdToData.put(groupId, sessionData);
+        } 
         
             
-        if (countNode.message.equals(newMessage)) {
-            countNode.count++;
+        if (sessionData.message.equals(newMessage)) {
+            sessionData.count++;
         } else {
-            countNode.count = 1;
-            countNode.message = newMessage;
+            sessionData.count = 1;
+            sessionData.message = newMessage;
         }
 
         
-        if (countNode.count == 3) {
+        if (sessionData.count == 3) {
             //countNode.count = 0;
-            event.getSubject().sendMessage(countNode.message);
+            parent.sendToEventSubject(event, sessionData.message);
             //log.info("RepeatConsumer update sendMessage, groupId = {}, sendMessage = {}", groupId, countNode.message);
         }
             
             
             //log.info("RepeatConsumer update Count, groupId = {}, sneder = {}, newCount = {}", groupId, countNode.count);
         return true;
+    }
+
+    @Override
+    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+        if (statement instanceof LiteralValueStatement) {
+            String newMessage = ((LiteralValueStatement)statement).getValue();
+            long groupId = event.getGroup().getId();
+            SessionData sessionData = groupIdToData.get(groupId);
+            if (sessionData == null) {
+                sessionData = new SessionData();
+                groupIdToData.put(groupId, sessionData);
+            } 
+            
+                
+            if (sessionData.message.equals(newMessage)) {
+                sessionData.count++;
+            } else {
+                sessionData.count = 1;
+                sessionData.message = newMessage;
+            }
+
+            
+            if (sessionData.count == 3) {
+                parent.sendToEventSubject(event, sessionData.message);
+            }
+                
+                
+            return true;
+        }
+        return false;
     }
 
 }

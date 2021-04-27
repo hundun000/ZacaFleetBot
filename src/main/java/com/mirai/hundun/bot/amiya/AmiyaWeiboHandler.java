@@ -7,9 +7,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.bot.Amiya;
+import com.mirai.hundun.bot.IFunction;
 import com.mirai.hundun.bot.IPlainTextHandler;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
+import com.mirai.hundun.parser.statement.LiteralValueStatement;
+import com.mirai.hundun.parser.statement.Statement;
+import com.mirai.hundun.parser.statement.amiya.AmiyaFunctionCallStatement;
 import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +26,9 @@ import net.mamoe.mirai.message.data.PlainText;
  */
 @Slf4j
 @Component
-public class AmiyaWeiboHandler implements IPlainTextHandler{
+public class AmiyaWeiboHandler implements IFunction {
     
-    
+    public String functionName = "看看饼";
     
     @Autowired
     WeiboService weiboService;
@@ -49,7 +53,6 @@ public class AmiyaWeiboHandler implements IPlainTextHandler{
 
 
 
-    @Override
     public boolean acceptPlainText(GroupMessageEvent event, PlainText plainText) {
         String newMessage = plainText != null ? plainText.contentToString() : null;
         
@@ -75,6 +78,33 @@ public class AmiyaWeiboHandler implements IPlainTextHandler{
             return true;
         }
         
+        return false;
+    }
+
+
+
+    @Override
+    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+        if (statement instanceof AmiyaFunctionCallStatement) {
+            AmiyaFunctionCallStatement functionCallStatement = (AmiyaFunctionCallStatement)statement;
+            if (!functionCallStatement.getFunctionName().equals(this.functionName)) {
+                return false;
+            }
+            long now = System.currentTimeMillis();
+            long time = now - lastAsk;
+            if (time > 5 * 1000) {
+                lastAsk = now;
+                String firstBlog = weiboService.getFirstBlogInfo(weiboService.yjUid);
+                if (firstBlog != null) {
+                    parent.sendToEventSubject(event, firstBlog);
+                } else {
+                    parent.sendToEventSubject(event, "现在还没有饼哦~");
+                }
+            } else {
+                parent.sendToEventSubject(event, "刚刚已经看过了，晚点再来吧~");
+            }
+            return true;
+        }
         return false;
     }
     

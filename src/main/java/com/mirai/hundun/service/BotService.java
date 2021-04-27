@@ -3,9 +3,12 @@ package com.mirai.hundun.service;
 
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.event.events.NudgeEvent;
+import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.utils.BotConfiguration;
 
 import java.util.List;
@@ -36,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class BotService {
     
-    boolean isLogined = false;
+    boolean isBotOnline = false;
     
     @Value("${account.bot.account}")
     public Long amiyAccount;
@@ -87,19 +90,18 @@ public class BotService {
         
         
         //repeaterListener = GlobalEventChannel.INSTANCE.subscribeAlways(GroupMessageEvent.class, repeatConsumer);
-        GlobalEventChannel.INSTANCE.subscribeAlways(GroupMessageEvent.class, amiya);
-        
+        GlobalEventChannel.INSTANCE.registerListenerHost(amiya);
         
     }
     
     
     public void login() {
-        if (!isLogined) {
+        if (!isBotOnline) {
             // the new thread will blocked by Bot.join()
             Thread thread = new Thread(){
                 public void run(){
                     amiyBot.login();
-                    isLogined = true;
+                    isBotOnline = true;
                     amiyBot.join();
                 }
             };
@@ -109,16 +111,43 @@ public class BotService {
 
 
     public void sendToGroup(long groupId, String message) {
-        if (isLogined) {
+        if (isBotOnline) {
             amiyBot.getGroupOrFail(groupId).sendMessage(message);
         } else {
-            log.info("[not isLogined]sendToGroup groupId = {}, message = {}", groupId, message);
+            log.info("[offline mode]sendToGroup groupId = {}, message = {}", groupId, message);
         }
     }
 
 
     public long getSelfAccount() {
         return amiyAccount;
+    }
+
+
+    public void sendToEventSubject(GroupMessageEvent event, String message) {
+        if (isBotOnline) {
+            event.getSubject().sendMessage(message);
+        } else {
+            log.info("[offline mode]sendToEventSubject message = {}", message);
+        }
+    }
+
+
+    public void sendToEventSubject(GroupMessageEvent event, MessageChain messageChain) {
+        if (isBotOnline) {
+            event.getSubject().sendMessage(messageChain);
+        } else {
+            log.info("[offline mode]messageChain messageChain = {}", messageChain);
+        }
+    }
+
+
+    public void sendToContact(Contact contact, MessageChain messageChain) {
+        if (isBotOnline) {
+            contact.sendMessage(messageChain);
+        } else {
+            log.info("[offline mode]sendToContact messageChain = {}", messageChain);
+        }
     }
     
     

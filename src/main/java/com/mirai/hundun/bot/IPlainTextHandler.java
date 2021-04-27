@@ -7,6 +7,7 @@ import net.mamoe.mirai.message.data.PlainText;
  * @author hundun
  * Created on 2021/04/25
  */
+@Deprecated
 public interface IPlainTextHandler {
     boolean acceptPlainText(GroupMessageEvent event, PlainText plainText);
 }
