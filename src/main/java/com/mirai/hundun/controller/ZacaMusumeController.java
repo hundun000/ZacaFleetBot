@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mirai.hundun.character.Amiya;
+import com.mirai.hundun.character.ZacaMusume;
 import com.mirai.hundun.cp.penguin.PenguinService;
 import com.mirai.hundun.cp.penguin.domain.MatrixReport;
 import com.mirai.hundun.cp.penguin.domain.MatrixReportNode;
@@ -20,14 +21,14 @@ import com.mirai.hundun.parser.statement.Statement;
  * Created on 2021/04/26
  */
 @RestController
-@RequestMapping("/api/amiya")
-public class AmiyaController {
+@RequestMapping("/api/zaca-musume")
+public class ZacaMusumeController {
     @Autowired
-    Amiya amiya;
+    ZacaMusume zacaMusume;
     
     @RequestMapping(value="/testParse", method=RequestMethod.GET)
     public Statement testParse(@RequestParam("msg") String msg) {
-        return amiya.testParse(msg);
+        return zacaMusume.testParse(msg);
     }
     
     

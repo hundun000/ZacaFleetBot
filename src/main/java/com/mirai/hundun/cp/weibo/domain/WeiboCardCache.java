@@ -21,6 +21,8 @@ public class WeiboCardCache {
     String itemid;
     @Indexed
     String uid;
+    String screenName;
+    
     String mblog_id;
     LocalDateTime mblogCreatedDateTime;
     String mblog_text;

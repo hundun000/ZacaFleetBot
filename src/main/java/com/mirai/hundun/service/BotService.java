@@ -24,8 +24,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.bot.Amiya;
-import com.mirai.hundun.bot.RepeatConsumer;
+import com.mirai.hundun.character.Amiya;
+import com.mirai.hundun.character.CharacterRouter;
+import com.mirai.hundun.character.function.RepeatConsumer;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 
@@ -42,20 +43,14 @@ public class BotService {
     boolean isBotOnline = false;
     
     @Value("${account.bot.account}")
-    public Long amiyAccount;
+    public Long qqAccount;
     @Value("${account.bot.pwd}")
-    public String amiyPwd;
+    public String qqPwd;
 
     @Autowired
-    Amiya amiya;
+    CharacterRouter characterRouter;
     
-    @Autowired
-    WeiboService weiboService;
-    
-
-    
-    
-    private Bot amiyBot;
+    private Bot miraiBot;
     //Listener<?> repeaterListener;
     //public RepeatConsumer repeatConsumer = new RepeatConsumer();
     
@@ -71,14 +66,14 @@ public class BotService {
      * 启动BOT
      */
     public void init() {
-        if (null == amiyAccount || null == amiyPwd) {
+        if (null == qqAccount || null == qqPwd) {
             System.err.println("*****未配置账号或密码*****");
             log.warn("*****未配置账号或密码*****");
             return;
         }
 
         
-        amiyBot = BotFactory.INSTANCE.newBot(amiyAccount, amiyPwd, new BotConfiguration() {
+        miraiBot = BotFactory.INSTANCE.newBot(qqAccount, qqPwd, new BotConfiguration() {
             {
                 //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
                 fileBasedDeviceInfo(deviceInfoPath);
@@ -90,7 +85,7 @@ public class BotService {
         
         
         //repeaterListener = GlobalEventChannel.INSTANCE.subscribeAlways(GroupMessageEvent.class, repeatConsumer);
-        GlobalEventChannel.INSTANCE.registerListenerHost(amiya);
+        GlobalEventChannel.INSTANCE.registerListenerHost(characterRouter);
         
     }
     
@@ -100,9 +95,9 @@ public class BotService {
             // the new thread will blocked by Bot.join()
             Thread thread = new Thread(){
                 public void run(){
-                    amiyBot.login();
+                    miraiBot.login();
                     isBotOnline = true;
-                    amiyBot.join();
+                    miraiBot.join();
                 }
             };
             thread.start();
@@ -112,7 +107,7 @@ public class BotService {
 
     public void sendToGroup(long groupId, String message) {
         if (isBotOnline) {
-            amiyBot.getGroupOrFail(groupId).sendMessage(message);
+            miraiBot.getGroupOrFail(groupId).sendMessage(message);
         } else {
             log.info("[offline mode]sendToGroup groupId = {}, message = {}", groupId, message);
         }
@@ -120,7 +115,7 @@ public class BotService {
 
 
     public long getSelfAccount() {
-        return amiyAccount;
+        return qqAccount;
     }
 
 

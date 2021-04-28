@@ -42,10 +42,13 @@ public class WeiboService {
     
     
     
-    public String yjUid = "6279793937";
+    public static final String yjUid = "6279793937";
+    public static final String CHOSSHANLAND_UID = "6441489862";
+    
+    
     String API_TYPE_PARAM = "uid"; 
     
-    public void updateBlogDetail(WeiboCardCache cardCache) {
+    private void updateBlogDetail(WeiboCardCache cardCache) {
 
         if (cardCache.getMblog_textDetail() == null) {
             String responseString = weiboApiService.blogDetail(cardCache.getMblog_id());
@@ -77,7 +80,7 @@ public class WeiboService {
         return detailText;
     }
     
-    public void updateContainerid(String uid) {
+    public void updateUserInfoCache(String uid) {
         
         String responseString = weiboApiService.get(uid, API_TYPE_PARAM, uid, null);
         log.info("updateContainerid get response.");
@@ -138,7 +141,7 @@ public class WeiboService {
 //            if (cardCache.getMblog_textDetail() == null) {
 //                updateBlogDetail(cardCache);
 //            }
-            text = "最新的饼的时间是：" + cardCaches.get(0).getMblogCreatedDateTime().toString();
+            text = "来自：" + cardCaches.get(0).getScreenName() + "，最新的饼的时间是：" + cardCaches.get(0).getMblogCreatedDateTime().toString();
         }
         return text;
     }
@@ -157,12 +160,10 @@ public class WeiboService {
     public List<WeiboCardCache> updateBlog(String uid) {
         List<WeiboCardCache> newBlogs = new ArrayList<>(0);
         WeiboUserInfoCache userInfoCacahe;
-        if (userInfoCacheRepository.existsById(uid)) {
-            userInfoCacahe = userInfoCacheRepository.findById(uid).get();
-        } else {
-            log.warn("updateBlog but no userInfoCacahe: {}", uid);
-            return newBlogs;
+        if (!userInfoCacheRepository.existsById(uid)) {
+            updateUserInfoCache(uid);
         }
+        userInfoCacahe = userInfoCacheRepository.findById(uid).get();
         
         String responseString = weiboApiService.get(uid, API_TYPE_PARAM, uid, userInfoCacahe.getWeibo_containerid());
         try {
@@ -186,7 +187,7 @@ public class WeiboService {
                         cardCache.setMblogCreatedDateTime(localDateTime);
                         cardCache.setMblog_text(mblog_text);
                         cardCache.setMblog_id(mblog_id);
-                        
+                        cardCache.setScreenName(userInfoCacahe.getScreen_name());
                         updateBlogDetail(cardCache);
                         
                         cardCacheRepository.save(cardCache);

@@ -1,4 +1,4 @@
-package com.mirai.hundun.bot;
+package com.mirai.hundun.character.function;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,10 +7,11 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-
+import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.parser.statement.AtStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
+import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
@@ -25,7 +26,7 @@ import net.mamoe.mirai.message.data.PlainText;
 public class RepeatConsumer implements IFunction {
 
     @Autowired
-    Amiya parent;
+    BotService botService;
     
     
     //private final long groupId;
@@ -68,7 +69,7 @@ public class RepeatConsumer implements IFunction {
         
         if (sessionData.count == 3) {
             //countNode.count = 0;
-            parent.sendToEventSubject(event, sessionData.message);
+            botService.sendToEventSubject(event, sessionData.message);
             //log.info("RepeatConsumer update sendMessage, groupId = {}, sendMessage = {}", groupId, countNode.message);
         }
             
@@ -98,11 +99,9 @@ public class RepeatConsumer implements IFunction {
 
             
             if (sessionData.count == 3) {
-                parent.sendToEventSubject(event, sessionData.message);
+                botService.sendToEventSubject(event, sessionData.message);
+                return true;
             }
-                
-                
-            return true;
         }
         return false;
     }

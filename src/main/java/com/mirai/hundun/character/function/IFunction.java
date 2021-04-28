@@ -1,7 +1,7 @@
-package com.mirai.hundun.bot;
+package com.mirai.hundun.character.function;
 
+import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
-import com.mirai.hundun.parser.statement.amiya.AmiyaFunctionCallStatement;
 
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.PlainText;

@@ -35,7 +35,7 @@ public class BotController {
     
     @RequestMapping(value="/updateContainerid", method=RequestMethod.GET)
     public String updateContainerid() {
-        weiboService.updateContainerid(weiboService.yjUid);
+        weiboService.updateUserInfoCache(weiboService.yjUid);
         return "OK";
     }
     

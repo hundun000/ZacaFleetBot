@@ -19,7 +19,7 @@ import net.mamoe.mirai.message.data.PlainText;
  */
 public class Tokenizer {
 
-    public String KEYWORD_WAKE_UP;
+    public String KEYWORD_WAKE_UP = "UNSETTED";
     
     public Map<String, TokenType> keywords = new HashMap<>();
     public Set<String> functionNames = new HashSet<>();

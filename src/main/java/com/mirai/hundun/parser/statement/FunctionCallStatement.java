@@ -1,4 +1,4 @@
-package com.mirai.hundun.parser.statement.amiya;
+package com.mirai.hundun.parser.statement;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.mirai.hundun.parser.Token;
 import com.mirai.hundun.parser.TokenType;
-import com.mirai.hundun.parser.statement.Statement;
 
 import lombok.Getter;
 
@@ -16,7 +15,7 @@ import lombok.Getter;
  * Created on 2021/04/27
  */
 @Getter
-public class AmiyaFunctionCallStatement extends Statement {
+public class FunctionCallStatement extends Statement {
     
     public static List<List<TokenType>> syntaxs = new ArrayList<>();
     static {
@@ -29,7 +28,7 @@ public class AmiyaFunctionCallStatement extends Statement {
     String functionName;
     List<String> args;
     
-    public AmiyaFunctionCallStatement(List<Token> tokens) {
+    public FunctionCallStatement(List<Token> tokens) {
         this.functionName = tokens.get(1).getTextContent();
         int argsStartIndex = 2;
         this.args = new ArrayList<>(tokens.size() - argsStartIndex);

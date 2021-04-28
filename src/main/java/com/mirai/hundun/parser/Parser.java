@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.mirai.hundun.parser.statement.AtStatement;
+import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.parser.statement.SyntaxsErrorStatement;
-import com.mirai.hundun.parser.statement.amiya.AmiyaFunctionCallStatement;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.At;
@@ -57,8 +57,8 @@ public class Parser {
             case AT:
                 statement = new AtStatement(tokens);
                 break;
-            case AMIYA_FUNCTION_CALL:
-                statement = new AmiyaFunctionCallStatement(tokens);
+            case FUNCTION_CALL:
+                statement = new FunctionCallStatement(tokens);
                 break;
             case SYNTAX_ERROR:
             default:
