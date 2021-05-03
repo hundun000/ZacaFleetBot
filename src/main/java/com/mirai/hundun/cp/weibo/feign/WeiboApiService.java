@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import feign.Response;
+
 
 
 
@@ -14,8 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(
         name = "weiboApiService",
         url = "https://m.weibo.cn",
-        configuration = WeiboApiFeignConfiguration.class,
-        fallbackFactory = WeiboApiFallbackFactory.class
+        configuration = WeiboApiFeignConfiguration.class
 )
 @Component
 public interface WeiboApiService {
@@ -47,4 +48,7 @@ public interface WeiboApiService {
             }
     )
     String blogDetail(@RequestParam("id") String id);
+    
+    
+    
 }

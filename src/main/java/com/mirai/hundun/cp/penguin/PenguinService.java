@@ -3,18 +3,24 @@ package com.mirai.hundun.cp.penguin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mirai.hundun.cp.penguin.domain.DropInfo;
+import com.mirai.hundun.cp.penguin.domain.DropType;
 import com.mirai.hundun.cp.penguin.domain.Item;
-import com.mirai.hundun.cp.penguin.domain.MatrixReport;
-import com.mirai.hundun.cp.penguin.domain.MatrixReportNode;
 import com.mirai.hundun.cp.penguin.domain.ResultMatrixNode;
 import com.mirai.hundun.cp.penguin.domain.ResultMatrixResponse;
 import com.mirai.hundun.cp.penguin.domain.Stage;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
+import com.mirai.hundun.cp.penguin.domain.report.StageInfoNode;
+import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
 import com.mirai.hundun.cp.penguin.feign.PenguinApiService;
 import com.mirai.hundun.cp.quiz.QuizService;
 
@@ -40,18 +46,59 @@ public class PenguinService {
     @Autowired
     MatrixReportRepository matrixReportRepository; 
     
-    public void updateStages() {
+    @Autowired
+    StageInfoReportRepository stageInfoReportRepository; 
+    
+    public void resetStages() {
+        
         List<Stage> items = penguinApiService.stages();
+        stageRepository.deleteAll();
         stageRepository.saveAll(items);
         log.info("updateStages items size = {}", items.size());
     }
     
-    public void updateItems() {
+    public void resetItems() {
+        
         List<Item> items = penguinApiService.items();
+        itemRepository.deleteAll();
         itemRepository.saveAll(items);
         log.info("updateItems items size = {}", items.size());
     }
     
+    private StageInfoReport getStageInfoReport(Stage stage) {
+        
+        String reportId = stage.getCode();
+        StageInfoReport report = stageInfoReportRepository.findById(reportId).orElse(null);
+        if (report == null) {
+            report = new StageInfoReport();
+            report.setApCost(stage.getApCost());
+            report.setStageCode(stage.getCode());
+            Map<DropType, List<StageInfoNode>> nodes = new HashMap<>();
+            for (DropInfo dropInfo : stage.getDropInfos()) {
+                if (dropInfo.getItemId() == null) {
+                    continue;
+                }
+                StageInfoNode node = new StageInfoNode();
+                Item item = itemRepository.findById(dropInfo.getItemId()).orElse(null);
+                if (item == null) {
+                    log.warn("ItemId = {} from dropInfo, but not in itemRepository");
+                    return null;
+                }
+                node.setItemName(item.getName());
+                node.setBoundsLower(dropInfo.getBounds().getLower());
+                node.setBoundsUpper(dropInfo.getBounds().getUpper());
+                node.setDropType(dropInfo.getDropType());
+                
+                if(!nodes.containsKey(node.getDropType())) {
+                    nodes.put(node.getDropType(), new ArrayList<>());
+                }
+                nodes.get(node.getDropType()).add(node);
+            }
+            report.setNodes(nodes);
+            stageInfoReportRepository.save(report);
+        }
+        return report;
+    }
     private MatrixReport getResultMatrixReport(Item item) {
         String reportId = item.getItemId();
         MatrixReport report = matrixReportRepository.findById(reportId).orElse(null);
@@ -89,12 +136,14 @@ public class PenguinService {
         return report;
     }
     
-    
-    public Item queryItem(String fuzzyName) {
-        Item item = itemRepository.findTopByName(fuzzyName);
-        return item;
+    public StageInfoReport getStageInfoReport(String stageCode) {
+        Stage stage = stageRepository.findOneByCode(stageCode);
+        if (stage == null) {
+            return null;
+        }
+        StageInfoReport stageInfoReport = getStageInfoReport(stage);
+        return stageInfoReport;
     }
-    
     
     public MatrixReport getTopResultNode(String fuzzyName, int topSize) {
         Item item = itemRepository.findTopByName(fuzzyName);

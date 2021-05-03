@@ -1,4 +1,4 @@
-package com.mirai.hundun.cp.penguin.domain;
+package com.mirai.hundun.cp.penguin.domain.report;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

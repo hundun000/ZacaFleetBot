@@ -8,8 +8,10 @@ import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.event.events.NudgeEvent;
+import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.utils.BotConfiguration;
+import net.mamoe.mirai.utils.ExternalResource;
 
 import java.util.List;
 import java.util.Map;
@@ -73,15 +75,7 @@ public class BotService {
         }
 
         
-        miraiBot = BotFactory.INSTANCE.newBot(qqAccount, qqPwd, new BotConfiguration() {
-            {
-                //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
-                fileBasedDeviceInfo(deviceInfoPath);
-                setProtocol(MiraiProtocol.ANDROID_PHONE); // 切换协议
-                // 开启所有列表缓存
-                enableContactCache();
-            }
-        });
+        
         
         
         //repeaterListener = GlobalEventChannel.INSTANCE.subscribeAlways(GroupMessageEvent.class, repeatConsumer);
@@ -95,6 +89,15 @@ public class BotService {
             // the new thread will blocked by Bot.join()
             Thread thread = new Thread(){
                 public void run(){
+                    miraiBot = BotFactory.INSTANCE.newBot(qqAccount, qqPwd, new BotConfiguration() {
+                        {
+                            //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
+                            fileBasedDeviceInfo(deviceInfoPath);
+                            setProtocol(MiraiProtocol.ANDROID_PHONE); // 切换协议
+                            // 开启所有列表缓存
+                            enableContactCache();
+                        }
+                    });
                     miraiBot.login();
                     isBotOnline = true;
                     miraiBot.join();
@@ -104,12 +107,18 @@ public class BotService {
         }
     }
 
-
-    public void sendToGroup(long groupId, String message) {
+    public void sendToGroup(Long groupId, String message) {
         if (isBotOnline) {
             miraiBot.getGroupOrFail(groupId).sendMessage(message);
         } else {
             log.info("[offline mode]sendToGroup groupId = {}, message = {}", groupId, message);
+        }
+    }
+    public void sendToGroup(long groupId, MessageChain messageChain) {
+        if (isBotOnline) {
+            miraiBot.getGroupOrFail(groupId).sendMessage(messageChain);
+        } else {
+            log.info("[offline mode]sendToGroup groupId = {}, messageChain = {}", groupId, messageChain.serializeToMiraiCode());
         }
     }
 
@@ -120,6 +129,10 @@ public class BotService {
 
 
     public void sendToEventSubject(GroupMessageEvent event, String message) {
+        if (message == null || message.isEmpty()) {
+            log.warn("want send empty message “{}” to EventSubject", message);
+            return;
+        }
         if (isBotOnline) {
             event.getSubject().sendMessage(message);
         } else {
@@ -144,6 +157,20 @@ public class BotService {
             log.info("[offline mode]sendToContact messageChain = {}", messageChain);
         }
     }
+
+
+    public Image uploadImage(Long groupId, ExternalResource externalResource) {
+        if (isBotOnline) {
+            return miraiBot.getGroupOrFail(groupId).uploadImage(externalResource);
+        } else {
+            log.info("[offline mode]uploadImage groupId = {}", groupId);
+            return Image.fromId("offLineImageFakeId");
+        }
+        
+    }
+
+
+    
     
     
 }

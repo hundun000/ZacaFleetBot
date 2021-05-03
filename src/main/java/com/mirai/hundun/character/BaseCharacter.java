@@ -30,8 +30,9 @@ public abstract class BaseCharacter {
     Parser parser = new Parser();
     
     @PostConstruct
-    private void init() {
+    private void initBase() {
         initParser();
+       
     }
     
     
@@ -48,4 +49,10 @@ public abstract class BaseCharacter {
     public String getId() {
         return id;
     }
+    
+    protected String getSessionId(@NotNull GroupMessageEvent event) {
+        return this.getId() + "@" + event.getGroup().getId();
+    }
+    
+    
 }

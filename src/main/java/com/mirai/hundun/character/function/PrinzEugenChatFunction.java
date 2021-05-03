@@ -40,7 +40,7 @@ public class PrinzEugenChatFunction implements IFunction {
     }
     
     @Override
-    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.contains("噗噗")) {

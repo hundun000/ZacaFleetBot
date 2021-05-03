@@ -52,11 +52,11 @@ public class PrinzEugen extends BaseCharacter {
             return false;
         }
         
-        
+        String sessionId = getSessionId(event);
         boolean done = false;
 
         if (!done) {
-            done = chatFunction.acceptStatement(event, statement);
+            done = chatFunction.acceptStatement(sessionId, event, statement);
             if (done) {
                 log.info("done by chatFunction");
             }

@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import feign.Response;
+
 
 
 
@@ -14,8 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(
         name = "stillstandingApiService",
         url = "http://localhost:10100/api",
-        configuration = StillstandingApiFeignConfiguration.class,
-        fallbackFactory = StillstandingApiFallbackFactory.class
+        configuration = StillstandingApiFeignConfiguration.class
 )
 @Component
 public interface StillstandingApiService {
@@ -25,6 +26,7 @@ public interface StillstandingApiService {
             method = RequestMethod.POST
             )
     String createEndlessMatch(
+            @RequestParam("questionPackageName") String questionPackageName
             );
     
     
@@ -40,4 +42,11 @@ public interface StillstandingApiService {
             method = RequestMethod.POST
     )
     String answer(@RequestParam("matchId") int id, @RequestParam("answer") String answer);
+    
+    
+    @RequestMapping(
+            value = "/questions/pictures", 
+            method = RequestMethod.GET
+    )
+    Response pictures(@RequestParam("id") String imageResourceId);
 }

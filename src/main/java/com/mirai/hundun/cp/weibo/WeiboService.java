@@ -1,6 +1,10 @@
 package com.mirai.hundun.cp.weibo;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +23,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 import com.mirai.hundun.cp.weibo.domain.WeiboUserInfoCache;
 import com.mirai.hundun.cp.weibo.feign.WeiboApiService;
+import com.mirai.hundun.cp.weibo.feign.WeiboPictureApiService;
+import com.mirai.hundun.service.file.FileService;
+import com.mirai.hundun.service.file.IFileProvider;
 
+import feign.Response;
+import gui.ava.html.image.generator.HtmlImageGenerator;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,25 +37,33 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class WeiboService {
+public class WeiboService implements IFileProvider {
     ObjectMapper mapper = new ObjectMapper();
     
     @Autowired
+    FileService fileService;
+    
+    @Autowired
     WeiboApiService weiboApiService;
+    
+    @Autowired
+    WeiboPictureApiService weiboPictureApiService;
     
     @Autowired
     WeiboUserInfoCacheRepository userInfoCacheRepository;
     
     @Autowired
     WeiboCardCacheRepository cardCacheRepository;
+
     
-    
-    
-    public static final String yjUid = "6279793937";
-    public static final String CHOSSHANLAND_UID = "6441489862";
+    //public static final String yjUid = "6279793937";
+    //public static final String CHOSSHANLAND_UID = "6441489862";
+    HtmlImageGenerator htmlImageGenerator = new HtmlImageGenerator();
     
     
     String API_TYPE_PARAM = "uid"; 
+    
+
     
     private void updateBlogDetail(WeiboCardCache cardCache) {
 
@@ -56,8 +73,11 @@ public class WeiboService {
             try {
                 JsonNode responseJson = mapper.readTree(responseString);
                 String longTextContent = responseJson.at("/data/longTextContent").asText();
+                
                 String detailText = formatBlogDetail(longTextContent);
                 cardCache.setMblog_textDetail(detailText);
+                
+                
                 cardCacheRepository.save(cardCache);
                 log.warn("updateBlogDetail success: {}", detailText);
             } catch (Exception e) {
@@ -184,12 +204,23 @@ public class WeiboService {
                         String mblog_created_at = mblog.get("created_at").asText();
                         ZonedDateTime utcZoned = ZonedDateTime.parse(mblog_created_at, dateTimeFormatter);
                         LocalDateTime localDateTime = utcZoned.toLocalDateTime();
+                        List<String> picsLargeUrls = new ArrayList<>();
+                        JsonNode picsNode = mblog.get("pics");
+                        if (picsNode != null && picsNode.isArray()) {
+                            for (final JsonNode picNode : picsNode) {
+                                String largUrl = picNode.get("large").get("url").asText();
+                                picsLargeUrls.add(largUrl);
+                            }
+                        }
+                        
+                        
                         cardCache.setMblogCreatedDateTime(localDateTime);
                         cardCache.setMblog_text(mblog_text);
                         cardCache.setMblog_id(mblog_id);
                         cardCache.setScreenName(userInfoCacahe.getScreen_name());
+                        cardCache.setPicsLargeUrls(picsLargeUrls);
                         updateBlogDetail(cardCache);
-                        
+                        checkSingleImage(cardCache);
                         cardCacheRepository.save(cardCache);
                         newBlogs.add(cardCache);
                         log.info("update cardCache: {}", itemid);
@@ -203,6 +234,39 @@ public class WeiboService {
         }
         return newBlogs;
         
+    }
+
+
+
+    private void checkSingleImage(WeiboCardCache cardCache) {
+        if (cardCache.getPicsLargeUrls() != null && cardCache.getPicsLargeUrls().size() == 1) {
+            int lastSlash = cardCache.getPicsLargeUrls().get(0).lastIndexOf("/");
+            String id = cardCache.getPicsLargeUrls().get(0).substring(lastSlash + 1);
+            File file = fileService.downloadOrFromCache(id, this);
+            cardCache.setSinglePicture(file);
+        }
+    }
+
+
+
+    @Override
+    public InputStream download(String fileId) {
+        try {
+            final Response response = weiboPictureApiService.pictures(fileId);
+            final Response.Body body = response.body();
+            final InputStream inputStream = body.asInputStream();
+            return inputStream;
+        } catch (Exception e) {
+            log.info("download image faild {} {}", fileId, e);
+            return null;
+        }
+    }
+
+
+
+    @Override
+    public String getCacheSubFolerName() {
+        return "weibo";
     }
     
 }

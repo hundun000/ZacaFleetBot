@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mirai.hundun.cp.penguin.PenguinService;
-import com.mirai.hundun.cp.penguin.domain.MatrixReport;
-import com.mirai.hundun.cp.penguin.domain.MatrixReportNode;
 import com.mirai.hundun.cp.penguin.domain.ResultMatrixNode;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
+import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
 
 /**
  * @author hundun
@@ -25,13 +26,13 @@ public class DataController {
     
     @RequestMapping(value="/penguin/updateItems", method=RequestMethod.GET)
     public String updateItems() {
-        penguinService.updateItems();
+        penguinService.resetItems();
         return "OK";
     }
     
     @RequestMapping(value="/penguin/updateStages", method=RequestMethod.GET)
     public String updateStages() {
-        penguinService.updateStages();
+        penguinService.resetStages();
         return "OK";
     }
     
@@ -41,5 +42,12 @@ public class DataController {
             @RequestParam("topSize") int topSize
             ) {
         return penguinService.getTopResultNode(fuzzyName, topSize);
+    }
+    
+    @RequestMapping(value="/penguin/getStageInfoReport", method=RequestMethod.GET)
+    public StageInfoReport getStageInfoReport(
+            @RequestParam("stageCode") String stageCode
+            ) {
+        return penguinService.getStageInfoReport(stageCode);
     }
 }

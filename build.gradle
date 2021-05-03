@@ -40,6 +40,7 @@ configurations {
 repositories {
 	mavenCentral()
 	jcenter()
+	maven { url 'https://jitpack.io' }
 }
 
 
@@ -54,6 +55,8 @@ dependencies {
       exclude group: 'net.mamoe', module: 'mirai-core-utils'
     }
     implementation("net.mamoe:mirai-core-utils-jvm:${MIRAI_VERSION}")
+
+    implementation 'com.github.hkirk:java-html2image:0.9'
 
     //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
     //implementation("net.mamoe:mirai-core:${MIRAI_VERSION}") // 运行时使用

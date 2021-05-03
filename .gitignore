@@ -2,6 +2,7 @@ MxLibData/
 cache/
 device.json
 src/main/resources/application-account.yml
+file_cache/
 
 HELP.md
 .gradle

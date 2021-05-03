@@ -39,7 +39,7 @@ public class Tokenizer {
         } else if (message instanceof PlainText) {
             PlainText plainTextMessage = (PlainText)message;
             String text = plainTextMessage != null ? plainTextMessage.contentToString() : null;
-            if (text != null && text.length() > 0) {
+            if (text != null && text.trim().length() > 0) {
                 List<String> subTexts = new ArrayList<>(Arrays.asList(text.split(" ")));
                 if (subTexts.get(0).startsWith(KEYWORD_WAKE_UP) && subTexts.get(0).length() > KEYWORD_WAKE_UP.length()) {
                     String autoSplit = subTexts.get(0).substring(KEYWORD_WAKE_UP.length());

@@ -1,5 +1,6 @@
 package com.mirai.hundun.character.function;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,11 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.message.data.MessageUtils;
 import net.mamoe.mirai.message.data.PlainText;
+import net.mamoe.mirai.utils.ExternalResource;
 
 /**
  * @author hundun
@@ -37,14 +42,12 @@ public class WeiboFunction implements IFunction {
     @Autowired
     WeiboService weiboService;
     
-    //@Autowired
-    //Amiya parent;
     
     @Autowired
     BotService botService;
     
-    
-    Map<Long, SessionData> groupIdToData = new HashMap<>();
+    Map<Long, String> groupIdToCharacterId = new HashMap<>();
+    Map<String, SessionData> characterIdToData = new HashMap<>();
     
     @Getter
     private class SessionData {
@@ -56,24 +59,67 @@ public class WeiboFunction implements IFunction {
     
     public int lastBlogHash = -1;
     
-    public void putGroupData(Long groupId, List<String> blogUids) {
+    public void putGroupIdToCharacter(Long groupId, String characterId) {
+        this.groupIdToCharacterId.put(groupId, characterId);
+        log.info("groupId = {} use characterId = {}", groupId, characterId);
+    }
+    
+    public void putCharacterToData(String characterId, List<String> blogUids) {
         SessionData sessionData = new SessionData();
         sessionData.blogUids = blogUids;
-        this.groupIdToData.put(groupId, sessionData);
+        this.characterIdToData.put(characterId, sessionData);
+        log.info("characterId = {} listening: {}", characterId, blogUids);
+    }
+    
+    private SessionData getDataByGroupId(Long groupId) {
+        String characterId = groupIdToCharacterId.get(groupId);
+        if (characterId != null) {
+            SessionData sessionData = characterIdToData.get(characterId);
+            return sessionData;
+        }
+        return null;
     }
     
     @Scheduled(fixedDelay = 3 * 60 * 1000)
     public void checkNewBlog() {
         log.info("checkNewBlog");
         
-        for (Entry<Long, SessionData> entry : groupIdToData.entrySet()) {
+        for (Entry<Long, String> entry : groupIdToCharacterId.entrySet()) {
             Long groupId = entry.getKey();
-            List<String> blogUids = entry.getValue().getBlogUids();
-            for (String blogUid : blogUids) {
-                List<WeiboCardCache> newBlogs = weiboService.updateBlog(blogUid);
-                for (WeiboCardCache newBlog : newBlogs) {
-                    String firstBlog = "新饼！来自：" + newBlog.getScreenName() + "\n\n" + newBlog.getMblog_textDetail();
-                    botService.sendToGroup(groupId, firstBlog);
+            String characterId = entry.getValue();
+            SessionData sessionData = characterIdToData.get(characterId);
+            if (sessionData != null) {
+                List<String> blogUids = sessionData.getBlogUids();
+                for (String blogUid : blogUids) {
+                    List<WeiboCardCache> newBlogs = weiboService.updateBlog(blogUid);
+                    for (WeiboCardCache newBlog : newBlogs) {
+                        MessageChain chain = MessageUtils.newChain();
+                        
+                        chain = chain.plus(new PlainText("新饼！来自：" + newBlog.getScreenName() + "\n"));
+                        
+                        if (newBlog.getMblog_textDetail() != null) {
+                            chain = chain.plus(new PlainText(newBlog.getMblog_textDetail()));   
+                        }
+                        
+                        if (newBlog.getSinglePicture() != null) {
+                            ExternalResource externalResource = ExternalResource.create(newBlog.getSinglePicture());
+                            Image image = botService.uploadImage(groupId, externalResource);
+                            chain = chain.plus(image);
+                        } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
+                            StringBuilder builder = new StringBuilder();
+                            builder.append("\n图片资源：\n");
+                            for (String url : newBlog.getPicsLargeUrls()) {
+                                builder.append(url).append("\n");
+                            }
+                            chain = chain.plus(new PlainText(builder.toString()));       
+                        }
+                        
+                        
+                            
+                            
+                        botService.sendToGroup(groupId, chain);
+
+                    }
                 }
             }
         }
@@ -84,7 +130,7 @@ public class WeiboFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
             if (!functionCallStatement.getFunctionName().equals(this.functionName)) {
@@ -96,7 +142,7 @@ public class WeiboFunction implements IFunction {
             if (time > 5 * 1000) {
                 lastAsk = now;
                 Long groupId = event.getGroup().getId();
-                SessionData sessionData = groupIdToData.get(groupId);
+                SessionData sessionData = getDataByGroupId(groupId);
                 if (sessionData == null) {
                     return false;
                 }

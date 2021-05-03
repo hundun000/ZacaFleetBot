@@ -28,22 +28,22 @@ public class BotController {
     @Autowired
     QuizService quizService;
     
-    @RequestMapping(value="/getFirstBlog", method=RequestMethod.GET)
-    public String getFirstBlog() {
-        return weiboService.getFirstBlogInfo(weiboService.yjUid);
-    }
-    
-    @RequestMapping(value="/updateContainerid", method=RequestMethod.GET)
-    public String updateContainerid() {
-        weiboService.updateUserInfoCache(weiboService.yjUid);
-        return "OK";
-    }
-    
-    @RequestMapping(value="/updateBlog", method=RequestMethod.GET)
-    public String updateBlog() {
-        weiboService.updateBlog(weiboService.yjUid);
-        return "OK";
-    }
+//    @RequestMapping(value="/getFirstBlog", method=RequestMethod.GET)
+//    public String getFirstBlog() {
+//        return weiboService.getFirstBlogInfo(weiboService.yjUid);
+//    }
+//    
+//    @RequestMapping(value="/updateContainerid", method=RequestMethod.GET)
+//    public String updateContainerid() {
+//        weiboService.updateUserInfoCache(weiboService.yjUid);
+//        return "OK";
+//    }
+//    
+//    @RequestMapping(value="/updateBlog", method=RequestMethod.GET)
+//    public String updateBlog() {
+//        weiboService.updateBlog(weiboService.yjUid);
+//        return "OK";
+//    }
     
     @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login() {
@@ -51,15 +51,15 @@ public class BotController {
         return "OK";
     }
     
-    @RequestMapping(value="/getQuestion", method=RequestMethod.GET)
-    public Question getQuestion() {
-        Question question = quizService.getQuestion();
-        return question;
-    }
-    
-    @RequestMapping(value="/createAndStartEndlessMatch", method=RequestMethod.GET)
-    public String createAndStartEndlessMatch() {
-        quizService.createAndStartEndlessMatch();
-        return "OK";
-    }
+//    @RequestMapping(value="/getQuestion", method=RequestMethod.GET)
+//    public Question getQuestion() {
+//        Question question = quizService.getQuestion();
+//        return question;
+//    }
+//    
+//    @RequestMapping(value="/createAndStartEndlessMatch", method=RequestMethod.GET)
+//    public String createAndStartEndlessMatch() {
+//        return quizService.createAndStartEndlessMatch();
+//        return "OK";
+//    }
 }

@@ -11,5 +11,5 @@ import net.mamoe.mirai.message.data.PlainText;
  * Created on 2021/04/25
  */
 public interface IFunction {
-    boolean acceptStatement(GroupMessageEvent event, Statement statement);
+    boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement);
 }

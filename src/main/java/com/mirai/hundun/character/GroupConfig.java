@@ -14,5 +14,5 @@ public class GroupConfig {
     Long groupId;
     String groupDescription;
     List<String> enableCharacters = new ArrayList<>();
-    List<String> observeBlogUids = new ArrayList<>(); 
+    //List<String> observeBlogUids = new ArrayList<>(); 
 }

@@ -1,5 +1,6 @@
 package com.mirai.hundun.cp.penguin.domain;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.annotation.Id;
@@ -21,4 +22,5 @@ public class Stage {
     String stageId;
     String code;
     int apCost;
+    List<DropInfo> dropInfos;
 }

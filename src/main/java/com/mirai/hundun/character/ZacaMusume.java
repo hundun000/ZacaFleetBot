@@ -45,8 +45,8 @@ public class ZacaMusume extends BaseCharacter {
     @Autowired
     QuizHandler quizHandler;
     
-    @Autowired
-    RepeatConsumer repeatConsumer;
+//    @Autowired
+//    RepeatConsumer repeatConsumer;
     
     
     
@@ -56,7 +56,8 @@ public class ZacaMusume extends BaseCharacter {
 
         parser.tokenizer.KEYWORD_WAKE_UP = "ZACA娘";
         parser.tokenizer.keywords.put("ZACA娘", TokenType.WAKE_UP);
-        parser.tokenizer.functionNames.add(quizHandler.functionName);
+        parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
+        parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         
@@ -81,21 +82,21 @@ public class ZacaMusume extends BaseCharacter {
             return false;
         }
         
-        
+        String sessionId = getSessionId(event);
         boolean done = false;
 
         if (!done) {
-            done = quizHandler.acceptStatement(event, statement);
+            done = quizHandler.acceptStatement(sessionId, event, statement);
             if (done) {
                 log.info("done by quizHandler");
             }
         }
-        if (!done) {
-            done = repeatConsumer.acceptStatement(event, statement);
-            if (done) {
-                log.info("done by repeatConsumer");
-            }
-        }
+//        if (!done) {
+//            done = repeatConsumer.acceptStatement(sessionId, event, statement);
+//            if (done) {
+//                log.info("done by repeatConsumer");
+//            }
+//        }
         
         return done;
     }

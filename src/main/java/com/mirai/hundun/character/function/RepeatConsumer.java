@@ -30,7 +30,7 @@ public class RepeatConsumer implements IFunction {
     
     
     //private final long groupId;
-    Map<Long, SessionData> groupIdToData = new HashMap<>();
+    Map<String, SessionData> sessionDataMap = new HashMap<>();
     
     public class SessionData {
         public String message = "";
@@ -45,48 +45,21 @@ public class RepeatConsumer implements IFunction {
         //this.groupId = groupId;
     }
 
-    public boolean acceptPlainText(GroupMessageEvent event, PlainText plainText) {
-        String newMessage = plainText != null ? plainText.contentToString() : null;
-        
-        if (newMessage == null) {
-            return false;
-        }
-        long groupId = event.getGroup().getId();
-        SessionData sessionData = groupIdToData.get(groupId);
-        if (sessionData == null) {
-            sessionData = new SessionData();
-            groupIdToData.put(groupId, sessionData);
-        } 
-        
-            
-        if (sessionData.message.equals(newMessage)) {
-            sessionData.count++;
-        } else {
-            sessionData.count = 1;
-            sessionData.message = newMessage;
-        }
-
-        
-        if (sessionData.count == 3) {
-            //countNode.count = 0;
-            botService.sendToEventSubject(event, sessionData.message);
-            //log.info("RepeatConsumer update sendMessage, groupId = {}, sendMessage = {}", groupId, countNode.message);
-        }
-            
-            
-            //log.info("RepeatConsumer update Count, groupId = {}, sneder = {}, newCount = {}", groupId, countNode.count);
-        return true;
-    }
+    
 
     @Override
-    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
-            long groupId = event.getGroup().getId();
-            SessionData sessionData = groupIdToData.get(groupId);
+            if (newMessage.isEmpty()) {
+                return false;
+            }
+            
+            
+            SessionData sessionData = sessionDataMap.get(sessionId);
             if (sessionData == null) {
                 sessionData = new SessionData();
-                groupIdToData.put(groupId, sessionData);
+                sessionDataMap.put(sessionId, sessionData);
             } 
             
                 

@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.character.ZacaMusume;
 import com.mirai.hundun.cp.penguin.PenguinService;
-import com.mirai.hundun.cp.penguin.domain.MatrixReport;
-import com.mirai.hundun.cp.penguin.domain.MatrixReportNode;
 import com.mirai.hundun.cp.penguin.domain.ResultMatrixNode;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
 import com.mirai.hundun.parser.statement.Statement;
 
 /**

@@ -71,13 +71,13 @@ public class CharacterRouter extends SimpleListenerHost {
         config.setGroupDescription("arknightsGroup");
         config.setGroupId(arknightsGroupId);
         config.setEnableCharacters(Arrays.asList(amiya.getId(), zacaMusume.getId()));
-        config.setObserveBlogUids(Arrays.asList(WeiboService.yjUid, WeiboService.CHOSSHANLAND_UID));
+        //config.setObserveBlogUids(Arrays.asList(WeiboService.yjUid, WeiboService.CHOSSHANLAND_UID));
         groupConfigs.put(config.getGroupId(), config);
         
         
         for (GroupConfig groupConfig : groupConfigs.values()) {
-            if (groupConfig.getObserveBlogUids() != null && !groupConfig.getObserveBlogUids().isEmpty()) {
-                weiboFunction.putGroupData(groupConfig.getGroupId(), groupConfig.getObserveBlogUids());
+            if (groupConfig.getEnableCharacters().contains(amiya.getId())) {
+                weiboFunction.putGroupIdToCharacter(groupConfig.getGroupId(), amiya.getId());
             }
         }
 

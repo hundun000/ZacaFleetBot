@@ -1,5 +1,6 @@
 package com.mirai.hundun.character.function;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.cp.penguin.PenguinService;
-import com.mirai.hundun.cp.penguin.domain.MatrixReport;
-import com.mirai.hundun.cp.penguin.domain.MatrixReportNode;
+import com.mirai.hundun.cp.penguin.domain.DropType;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
+import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
+import com.mirai.hundun.cp.penguin.domain.report.StageInfoNode;
+import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
 import com.mirai.hundun.cp.quiz.Question;
 import com.mirai.hundun.cp.quiz.QuizService;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
@@ -34,6 +38,8 @@ public class PenguinFunction implements IFunction {
 
     public String functionNameQueryResult = "查掉率";
     
+    public String functionNameQueryStageInfo = "查作战";
+    
     @Autowired
     PenguinService penguinService;
     
@@ -42,12 +48,12 @@ public class PenguinFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
             if (functionCallStatement.getFunctionName().equals(functionNameQueryResult)) {
                 String itemFuzzyName = functionCallStatement.getArgs().get(0);
-                log.info("split itemFuzzyName = {}", itemFuzzyName);
+                log.info("{} by {}", functionCallStatement.getFunctionName(), itemFuzzyName);
                 MatrixReport report = penguinService.getTopResultNode(itemFuzzyName, 3);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -62,6 +68,44 @@ public class PenguinFunction implements IFunction {
                     
                 } else {
                     botService.sendToEventSubject(event, "没找到“" + itemFuzzyName + "”的掉率QAQ");
+                }
+                return true;
+            } else if (functionCallStatement.getFunctionName().equals(functionNameQueryStageInfo)) {
+                String stageCode = functionCallStatement.getArgs().get(0);
+                log.info("{} by {}", functionCallStatement.getFunctionName(), stageCode);
+                StageInfoReport report = penguinService.getStageInfoReport(stageCode);
+                if (report != null) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("作战").append(report.getStageCode()).append("的报告：\n");
+                    builder.append("理智消耗：").append(report.getApCost()).append("\n");
+                    
+                    List<StageInfoNode> nodes;
+                    
+                    nodes = report.getNodes().get(DropType.NORMAL_DROP);
+                    if (nodes != null && nodes.size() > 0) {
+                        builder.append(DropType.NORMAL_DROP.getDes()).append("：");
+                        for (StageInfoNode node : nodes) {
+                            builder.append(node.getItemName()).append("(");
+                            builder.append(node.getBoundsLower()).append("~");
+                            builder.append(node.getBoundsUpper()).append(")").append(", ");
+                        }
+                        builder.setLength(builder.length() - ", ".length());
+                        builder.append("\n");
+                    }
+                    
+                    nodes = report.getNodes().get(DropType.EXTRA_DROP);
+                    if (nodes != null && nodes.size() > 0) {
+                        builder.append(DropType.EXTRA_DROP.getDes()).append("：");
+                        for (StageInfoNode node : nodes) {
+                            builder.append(node.getItemName()).append(", ");
+                        }
+                        builder.setLength(builder.length() - ", ".length());
+                        builder.append("\n");
+                    }
+                    
+                    botService.sendToEventSubject(event, builder.toString());
+                } else {
+                    botService.sendToEventSubject(event, "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
             }

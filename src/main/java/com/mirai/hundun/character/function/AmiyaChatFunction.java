@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.parser.statement.AtStatement;
@@ -32,6 +33,12 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Component
 public class AmiyaChatFunction implements IFunction {
     
+    @Value("${account.specialUser.yuki:0}")
+    public Long yukiAccount;
+    
+    @Value("${account.specialUser.Angelina:0}")
+    public Long angelinaAccount;
+    
     @Autowired
     BotService botService;
     
@@ -43,18 +50,19 @@ public class AmiyaChatFunction implements IFunction {
     Random rand = new Random();
     
     private String cannotRelaxTalk = "博士，您还有许多事情需要处理。现在还不能休息哦。";
-    private File cannotRelaxImage;
+    
     ExternalResource cannotRelaxExternalResource;
     
     List<ExternalResource> faces = new ArrayList<>();
     
-    
-
+    ExternalResource yukiNodgeResource;
+    ExternalResource angelinaNodgeResource;
 
     public AmiyaChatFunction() {
         try {
-            cannotRelaxImage = new File("./data/images/talk/cannotRelax.png");
-            cannotRelaxExternalResource = ExternalResource.create(cannotRelaxImage);
+            yukiNodgeResource = ExternalResource.create(new File("./data/images/talk/yukiNodge.png"));
+            angelinaNodgeResource = ExternalResource.create(new File("./data/images/talk/angelinaNodge.png"));
+            cannotRelaxExternalResource = ExternalResource.create(new File("./data/images/talk/cannotRelax.png"));
             int faceSize = 16;
             for (int i = 1; i <= faceSize; i++) {
                 faces.add(ExternalResource.create(new File("./data/images/face/face" + i + ".png")));
@@ -68,7 +76,7 @@ public class AmiyaChatFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.contains("下班")) {
@@ -79,20 +87,35 @@ public class AmiyaChatFunction implements IFunction {
                 return true;
             }
         } else if (statement instanceof AtStatement) {
-            botService.sendToEventSubject(event, 
-                    talks.get(rand.nextInt(talks.size()))
-                    //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
-                    );
+            if (((AtStatement)statement).getTarget() == botService.getSelfAccount()) {
+                botService.sendToEventSubject(event, 
+                        talks.get(rand.nextInt(talks.size()))
+                        //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
+                        );
+            }
             return true;
         }
         return false;
     }
 
     public boolean acceptNudged(@NotNull NudgeEvent event) {
-        botService.sendToContact(event.getSubject(), 
-                new At(event.getFrom().getId())
-                .plus(event.getSubject().uploadImage(faces.get(rand.nextInt(faces.size()))))
-                );
+        if (event.getTarget().getId() == botService.getSelfAccount()) {
+            botService.sendToContact(event.getSubject(), 
+                    new At(event.getFrom().getId())
+                    .plus(event.getSubject().uploadImage(faces.get(rand.nextInt(faces.size()))))
+                    );
+        } else if (event.getTarget().getId() == yukiAccount && yukiNodgeResource != null) {
+            botService.sendToContact(event.getSubject(), 
+                    new At(event.getFrom().getId())
+                    .plus(event.getSubject().uploadImage(yukiNodgeResource))
+                    );
+        } else if (event.getTarget().getId() == angelinaAccount && angelinaNodgeResource != null) {
+            botService.sendToContact(event.getSubject(), 
+                    new At(event.getFrom().getId())
+                    .plus(event.getSubject().uploadImage(angelinaNodgeResource))
+                    );
+        }
+        
         return true;
     }
 

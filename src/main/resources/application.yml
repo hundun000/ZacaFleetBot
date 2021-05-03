@@ -11,6 +11,13 @@ account:
     group:
         arknights: 11111111
         kancolle: 11111111
+    specialUser:
+        yuki: 11111111
+
+character:
+    amiya:
+        listenWeiboUids: 6279793937,6441489862
+    
     
 spring:
     profiles:
@@ -46,7 +53,7 @@ hystrix:
 logging:
     #config: 'classpath:log4j2.yml'
     level:
-        root: "INFO"
+        #com.mirai.hundun: "INFO"
         com.mirai.hundun.cp.penguin.feign: "DEBUG"
         com.mirai.hundun.cp.weibo.feign: "DEBUG"
         com.mirai.hundun.cp.quiz.feign: "DEBUG"

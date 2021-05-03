@@ -59,20 +59,19 @@ public class Amiya extends BaseCharacter {
 
 
     public boolean enable = true;
-    
-    
+
+    @Value("${character.amiya.listenWeiboUids:}")
+    public String[] listenWeiboUids;
 
     
-    public List<String> blogUids = Arrays.asList(WeiboService.yjUid, WeiboService.CHOSSHANLAND_UID);
-    
     @Autowired
-    WeiboFunction arknightsWeiboHandler;
+    WeiboFunction weiboFunction;
     
     @Autowired
     AmiyaChatFunction amiyaChatFunction;
     
-//    @Autowired
-//    QuizHandler quizHandler;
+    @Autowired
+    QuizHandler quizHandler;
     
     @Autowired
     PenguinFunction penguinFunction;
@@ -87,9 +86,11 @@ public class Amiya extends BaseCharacter {
         
         parser.tokenizer.KEYWORD_WAKE_UP = "阿米娅";
         parser.tokenizer.keywords.put("阿米娅", TokenType.WAKE_UP);
-        parser.tokenizer.functionNames.add(arknightsWeiboHandler.functionName);
-        //parser.tokenizer.functionNames.add(quizHandler.functionName);
+        parser.tokenizer.functionNames.add(weiboFunction.functionName);
+        parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
+        parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
         parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryResult);
+        parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryStageInfo);
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         parser.syntaxsTree.registerSyntaxs(AtStatement.syntaxs, StatementType.AT);
@@ -119,28 +120,29 @@ public class Amiya extends BaseCharacter {
             return false;
         }
         
+        String sessionId = getSessionId(event);
         
-        boolean done = arknightsWeiboHandler.acceptStatement(event, statement);
+        boolean done = weiboFunction.acceptStatement(sessionId, event, statement);
         if (!done) {
-            done = amiyaChatFunction.acceptStatement(event, statement);
+            done = amiyaChatFunction.acceptStatement(sessionId, event, statement);
             if (done) {
                 log.info("done by amiyaTalkHandler");
             }
         }
-//        if (!done) {
-//            done = quizHandler.acceptStatement(event, statement);
-//            if (done) {
-//                log.info("done by quizHandler");
-//            }
-//        }
         if (!done) {
-            done = penguinFunction.acceptStatement(event, statement);
+            done = quizHandler.acceptStatement(sessionId, event, statement);
+            if (done) {
+                log.info("done by quizHandler");
+            }
+        }
+        if (!done) {
+            done = penguinFunction.acceptStatement(sessionId, event, statement);
             if (done) {
                 log.info("done by penguinHandler");
             }
         }
         if (!done) {
-            done = repeatConsumer.acceptStatement(event, statement);
+            done = repeatConsumer.acceptStatement(sessionId, event, statement);
             if (done) {
                 log.info("done by repeatConsumer");
             }
@@ -149,6 +151,15 @@ public class Amiya extends BaseCharacter {
         
         return done;
     }
+
+
+    
+    @PostConstruct
+    public void init() {
+        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
+        
+    }
+
 
 
 
