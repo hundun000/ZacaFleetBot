@@ -5,6 +5,7 @@ import java.io.File;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.parser.statement.AtStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
@@ -12,6 +13,7 @@ import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.PlainText;
 import net.mamoe.mirai.utils.ExternalResource;
 
@@ -40,13 +42,14 @@ public class PrinzEugenChatFunction implements IFunction {
     }
     
     @Override
-    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.contains("噗噗")) {
-                botService.sendToEventSubject(event, 
+                Image image = botService.uploadImage(event.getGroupId(), pupuExternalResource);
+                botService.sendToGroup(event.getGroupId(), 
                         new PlainText("")
-                        .plus(event.getGroup().uploadImage(pupuExternalResource))
+                        .plus(image)
                         );
                 return true;
             }

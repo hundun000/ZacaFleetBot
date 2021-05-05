@@ -1,5 +1,6 @@
 package com.mirai.hundun.character;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.function.QuizHandler;
 import com.mirai.hundun.character.function.RepeatConsumer;
+import com.mirai.hundun.character.function.WeiboFunction;
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.parser.Parser;
 import com.mirai.hundun.parser.StatementType;
 import com.mirai.hundun.parser.TokenType;
@@ -33,11 +36,15 @@ import net.mamoe.mirai.message.data.PlainText;
 @Component
 public class ZacaMusume extends BaseCharacter {
 
+    @Value("${character.zacaMusume.listenWeiboUids:}")
+    public String[] listenWeiboUids;
     
     public ZacaMusume() {
         super("ZacaMusume");
     }
 
+    @Autowired
+    WeiboFunction weiboFunction;
 
     @Autowired
     BotService botService;
@@ -48,7 +55,11 @@ public class ZacaMusume extends BaseCharacter {
 //    @Autowired
 //    RepeatConsumer repeatConsumer;
     
-    
+    @PostConstruct
+    public void init() {
+        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
+        
+    }
     
     @Override
     protected void initParser() {
@@ -65,28 +76,29 @@ public class ZacaMusume extends BaseCharacter {
 
 
     @Override
-    public boolean onNudgeEventMessage(@NotNull NudgeEvent event) throws Exception {
+    public boolean onNudgeEvent(@NotNull EventInfo eventInfo) throws Exception {
         return false;
     }
 
 
     @Override
-    public boolean onGroupMessageEventMessage(@NotNull GroupMessageEvent event) throws Exception {
+    public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception {
 
         
         Statement statement;
         try {
-            statement = parser.simpleParse(event.getMessage());
+            statement = parser.simpleParse(eventInfo.getMessage());
         } catch (Exception e) {
             log.error("Parse error: ", e);
             return false;
         }
         
-        String sessionId = getSessionId(event);
+        String sessionId = getSessionId(eventInfo);
+
         boolean done = false;
 
         if (!done) {
-            done = quizHandler.acceptStatement(sessionId, event, statement);
+            done = quizHandler.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by quizHandler");
             }

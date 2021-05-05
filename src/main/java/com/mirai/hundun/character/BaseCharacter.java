@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Component;
 
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.parser.Parser;
 import com.mirai.hundun.parser.statement.Statement;
 
@@ -38,20 +39,24 @@ public abstract class BaseCharacter {
     
     protected abstract void initParser();
     
-    public abstract boolean onNudgeEventMessage(@NotNull NudgeEvent event) throws Exception;
-    public abstract boolean onGroupMessageEventMessage(@NotNull GroupMessageEvent event) throws Exception;
+    public abstract boolean onNudgeEvent(@NotNull EventInfo event) throws Exception;
+    public abstract boolean onGroupMessageEvent(@NotNull EventInfo event) throws Exception;
 
     public Statement testParse(String message) {
         Statement statement = parser.simpleParse(MessageUtils.newChain(new PlainText(message)));
         return statement;
     }
     
+    public boolean testOnGroupMessageEventMessage(EventInfo eventInfo) throws Exception {
+        return this.onGroupMessageEvent(eventInfo);
+    }
+    
     public String getId() {
         return id;
     }
     
-    protected String getSessionId(@NotNull GroupMessageEvent event) {
-        return this.getId() + "@" + event.getGroup().getId();
+    protected String getSessionId(@NotNull EventInfo event) {
+        return this.getId() + "@" + event.getGroupId();
     }
     
     

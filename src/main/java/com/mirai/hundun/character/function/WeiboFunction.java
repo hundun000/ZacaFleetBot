@@ -1,16 +1,22 @@
 package com.mirai.hundun.character.function;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.GroupConfig;
 import com.mirai.hundun.cp.quiz.Question;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
@@ -18,6 +24,7 @@ import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
+import com.mirai.hundun.service.CharacterRouter;
 
 import lombok.Data;
 import lombok.Getter;
@@ -46,12 +53,18 @@ public class WeiboFunction implements IFunction {
     @Autowired
     BotService botService;
     
-    Map<Long, String> groupIdToCharacterId = new HashMap<>();
-    Map<String, SessionData> characterIdToData = new HashMap<>();
+    @Autowired
+    CharacterRouter characterRouter;
     
-    @Getter
+    Map<String, List<String>> characterIdToBlogUids = new HashMap<>();
+    Map<Long, SessionData> groupIdToSessionData = new HashMap<>();
+    @Data
     private class SessionData {
-        List<String> blogUids = new ArrayList<>();
+        LocalDateTime lastUpdateTime;
+        
+        public SessionData() {
+            this.lastUpdateTime = LocalDateTime.now();
+        }
     }
     
     
@@ -59,69 +72,81 @@ public class WeiboFunction implements IFunction {
     
     public int lastBlogHash = -1;
     
-    public void putGroupIdToCharacter(Long groupId, String characterId) {
-        this.groupIdToCharacterId.put(groupId, characterId);
-        log.info("groupId = {} use characterId = {}", groupId, characterId);
-    }
     
     public void putCharacterToData(String characterId, List<String> blogUids) {
-        SessionData sessionData = new SessionData();
-        sessionData.blogUids = blogUids;
-        this.characterIdToData.put(characterId, sessionData);
+        this.characterIdToBlogUids.put(characterId, blogUids);
         log.info("characterId = {} listening: {}", characterId, blogUids);
     }
     
-    private SessionData getDataByGroupId(Long groupId) {
-        String characterId = groupIdToCharacterId.get(groupId);
-        if (characterId != null) {
-            SessionData sessionData = characterIdToData.get(characterId);
-            return sessionData;
+    private Set<String> getDataByGroupId(List<String> characterIds) {
+        Set<String> allBlogUids = new HashSet<>();
+        
+        for (String characterId : characterIds) {
+            List<String> blogUids = characterIdToBlogUids.get(characterId);
+            if (blogUids != null) {
+                allBlogUids.addAll(blogUids);
+            }
         }
-        return null;
+        
+        return allBlogUids;
     }
     
-    @Scheduled(fixedDelay = 3 * 60 * 1000)
+    @Scheduled(fixedDelay = 5 * 60 * 1000)
     public void checkNewBlog() {
-        log.info("checkNewBlog");
+        log.info("checkNewBlog Scheduled arrival");
         
-        for (Entry<Long, String> entry : groupIdToCharacterId.entrySet()) {
-            Long groupId = entry.getKey();
-            String characterId = entry.getValue();
-            SessionData sessionData = characterIdToData.get(characterId);
-            if (sessionData != null) {
-                List<String> blogUids = sessionData.getBlogUids();
-                for (String blogUid : blogUids) {
-                    List<WeiboCardCache> newBlogs = weiboService.updateBlog(blogUid);
-                    for (WeiboCardCache newBlog : newBlogs) {
-                        MessageChain chain = MessageUtils.newChain();
-                        
-                        chain = chain.plus(new PlainText("新饼！来自：" + newBlog.getScreenName() + "\n"));
-                        
-                        if (newBlog.getMblog_textDetail() != null) {
-                            chain = chain.plus(new PlainText(newBlog.getMblog_textDetail()));   
-                        }
-                        
-                        if (newBlog.getSinglePicture() != null) {
-                            ExternalResource externalResource = ExternalResource.create(newBlog.getSinglePicture());
-                            Image image = botService.uploadImage(groupId, externalResource);
-                            chain = chain.plus(image);
-                        } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
-                            StringBuilder builder = new StringBuilder();
-                            builder.append("\n图片资源：\n");
-                            for (String url : newBlog.getPicsLargeUrls()) {
-                                builder.append(url).append("\n");
-                            }
-                            chain = chain.plus(new PlainText(builder.toString()));       
-                        }
-                        
-                        
-                            
-                            
-                        botService.sendToGroup(groupId, chain);
-
+        for (GroupConfig entry : characterRouter.getGroupConfigs().values()) {
+            Long groupId = entry.getGroupId();
+            Set<String> blogUids = getDataByGroupId(entry.getEnableCharacters());
+            if (!groupIdToSessionData.containsKey(groupId)) {
+                groupIdToSessionData.put(groupId, new SessionData());
+            }
+            SessionData sessionData = groupIdToSessionData.get(groupId);
+            log.info("groupId = {}, LastUpdateTime = {}, checkNewBlog: {}", groupId, sessionData.getLastUpdateTime(), blogUids);
+            
+            for (String blogUid : blogUids) {
+                List<WeiboCardCache> topBlogs = weiboService.updateAndGetTopBlog(blogUid);
+                List<WeiboCardCache> newBlogs = new ArrayList<>(0);
+                for (WeiboCardCache blog : topBlogs) {
+                    if (blog.getMblogCreatedDateTime().isAfter(sessionData.getLastUpdateTime())) {
+                        newBlogs.add(blog);
                     }
                 }
+                
+                for (WeiboCardCache newBlog : newBlogs) {
+
+                    MessageChain chain = MessageUtils.newChain();
+                    
+                    chain = chain.plus(new PlainText("新饼！来自：" + newBlog.getScreenName() + "\n\n"));
+                    
+                    if (newBlog.getMblog_textDetail() != null) {
+                        chain = chain.plus(new PlainText(newBlog.getMblog_textDetail()));   
+                    }
+                    
+                    if (newBlog.getSinglePicture() != null) {
+                        ExternalResource externalResource = ExternalResource.create(newBlog.getSinglePicture());
+                        Image image = botService.uploadImage(groupId, externalResource);
+                        chain = chain.plus(image);
+                    } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
+                        StringBuilder builder = new StringBuilder();
+                        builder.append("\n图片资源：\n");
+                        for (String url : newBlog.getPicsLargeUrls()) {
+                            builder.append(url).append("\n");
+                        }
+                        chain = chain.plus(new PlainText(builder.toString()));       
+                    }
+                    
+                    
+                        
+                        
+                    botService.sendToGroup(groupId, chain);
+
+                }
+
             }
+            
+            sessionData.setLastUpdateTime(LocalDateTime.now());
+            
         }
         
     }
@@ -130,7 +155,7 @@ public class WeiboFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
             if (!functionCallStatement.getFunctionName().equals(this.functionName)) {
@@ -141,25 +166,25 @@ public class WeiboFunction implements IFunction {
             long time = now - lastAsk;
             if (time > 5 * 1000) {
                 lastAsk = now;
-                Long groupId = event.getGroup().getId();
-                SessionData sessionData = getDataByGroupId(groupId);
-                if (sessionData == null) {
+                
+                List<String> blogUids = characterIdToBlogUids.get(event.getCharacterId());
+                if (blogUids == null) {
                     return false;
                 }
                 StringBuilder builder = new StringBuilder();
-                for (String blogUid : sessionData.getBlogUids()) {
+                for (String blogUid : blogUids) {
                     String firstBlog = weiboService.getFirstBlogInfo(blogUid);
                     if (firstBlog != null) {
                         builder.append(firstBlog).append("\n");
                     }
                 }
                 if (builder.length() == 0) {
-                    botService.sendToEventSubject(event, "现在还没有饼哦~");
+                    botService.sendToGroup(event.getGroupId(), "现在还没有饼哦~");
                 } else {
-                    botService.sendToEventSubject(event, builder.toString());
+                    botService.sendToGroup(event.getGroupId(), builder.toString());
                 }
             } else {
-                botService.sendToEventSubject(event, "刚刚已经看过了，晚点再来吧~");
+                botService.sendToGroup(event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
             }
             return true;
         }

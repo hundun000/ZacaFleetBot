@@ -49,20 +49,22 @@ public class PenguinService {
     @Autowired
     StageInfoReportRepository stageInfoReportRepository; 
     
-    public void resetStages() {
-        
-        List<Stage> items = penguinApiService.stages();
-        stageRepository.deleteAll();
-        stageRepository.saveAll(items);
-        log.info("updateStages items size = {}", items.size());
-    }
+
     
-    public void resetItems() {
+    public synchronized void resetCache() {
+        
+        List<Stage> stages = penguinApiService.stages();
+        stageRepository.deleteAll();
+        stageRepository.saveAll(stages);
+        log.info("updateStages items size = {}", stages.size());
         
         List<Item> items = penguinApiService.items();
         itemRepository.deleteAll();
         itemRepository.saveAll(items);
         log.info("updateItems items size = {}", items.size());
+        
+        matrixReportRepository.deleteAll();
+        stageInfoReportRepository.deleteAll();
     }
     
     private StageInfoReport getStageInfoReport(Stage stage) {

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.Amiya;
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
 import com.mirai.hundun.cp.quiz.Question;
@@ -60,7 +61,7 @@ public class QuizHandler implements IFunction {
     
 
     @Override
-    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         
         synchronized (this) {
             
@@ -75,7 +76,7 @@ public class QuizHandler implements IFunction {
                 FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
                 if (functionCallStatement.getFunctionName().equals(functionNameNextQuest)) {
                     if (sessionData.matchId == null) {
-                        botService.sendToEventSubject(event, "没有进行中的比赛");
+                        botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
                         return true;
                     } else if (sessionData.question == null) {
                             sessionData.question = quizService.getQuestion(sessionData.matchId);
@@ -91,13 +92,13 @@ public class QuizHandler implements IFunction {
                             MessageChain messageChain = new PlainText(builder.toString()).plus(new PlainText(""));
                             if (sessionData.question.getResourceImage() != null) {
                                 ExternalResource externalResource = ExternalResource.create(sessionData.question.getResourceImage());
-                                Image image = botService.uploadImage(event.getSubject().getId(), externalResource);
+                                Image image = botService.uploadImage(event.getGroupId(), externalResource);
                                 messageChain = messageChain.plus(image);
                             }
-                            botService.sendToEventSubject(event, messageChain);
+                            botService.sendToGroup(event.getGroupId(), messageChain);
                             return true;
                     } else {
-                            botService.sendToEventSubject(event, "上一个问题还没回答哦~");
+                            botService.sendToGroup(event.getGroupId(), "上一个问题还没回答哦~");
                             return true;
                     }
                 } else if (functionCallStatement.getFunctionName().equals(functionNameStartMatch)) {
@@ -106,14 +107,14 @@ public class QuizHandler implements IFunction {
                         Integer newMatchId = quizService.createAndStartEndlessMatch(questionPackageName);
                         if (newMatchId != null) {
                             sessionData.matchId = newMatchId;
-                            botService.sendToEventSubject(event, "开始比赛成功");
+                            botService.sendToGroup(event.getGroupId(), "开始比赛成功");
                             return true;
                         } else {
-                            botService.sendToEventSubject(event, "开始比赛失败");
+                            botService.sendToGroup(event.getGroupId(), "开始比赛失败");
                             return true;
                         }
                     } else {
-                        botService.sendToEventSubject(event, "目前已在比赛中");
+                        botService.sendToGroup(event.getGroupId(), "目前已在比赛中");
                         return true;
                     }
                     
@@ -124,17 +125,17 @@ public class QuizHandler implements IFunction {
                 if (sessionData.question != null) {
                     String newMessage = ((LiteralValueStatement)statement).getValue();
                     if (sessionData.question.getAnswerChar().equals(newMessage)) {
-                        event.getSubject().sendMessage(
-                                (new At(event.getSender().getId()))
+                        botService.sendToGroup(event.getGroupId(),
+                                (new At(event.getSenderId()))
                                 .plus("回答正确\n正确答案是" + sessionData.question.getAnswerChar())
                                 );
                         sessionData.question = null;
                         return true;
                     } else if (newMessage.equals("A") || newMessage.equals("B") || newMessage.equals("C") || newMessage.equals("D")) {
-                        botService.sendToEventSubject(event, (
-                                (new At(event.getSender().getId()))
+                        botService.sendToGroup(event.getGroupId(),
+                                (new At(event.getSenderId()))
                                 .plus("回答错误QAQ\n正确答案是" + sessionData.question.getAnswerChar())
-                                ));
+                                );
                         sessionData.question = null;
                         return true;
                     }

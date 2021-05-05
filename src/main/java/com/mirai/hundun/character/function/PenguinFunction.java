@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.cp.penguin.PenguinService;
 import com.mirai.hundun.cp.penguin.domain.DropType;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
@@ -37,7 +38,7 @@ import net.mamoe.mirai.message.data.PlainText;
 public class PenguinFunction implements IFunction {
 
     public String functionNameQueryResult = "查掉率";
-    
+    public String functionNameUpdate = "更新企鹅物流";
     public String functionNameQueryStageInfo = "查作战";
     
     @Autowired
@@ -48,7 +49,7 @@ public class PenguinFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
             if (functionCallStatement.getFunctionName().equals(functionNameQueryResult)) {
@@ -64,10 +65,10 @@ public class PenguinFunction implements IFunction {
                         builder.append(node.getGainRateString()).append("\t");
                         builder.append(node.getCostExpectationString()).append("\n");
                     }
-                    botService.sendToEventSubject(event, builder.toString());
+                    botService.sendToGroup(event.getGroupId(), builder.toString());
                     
                 } else {
-                    botService.sendToEventSubject(event, "没找到“" + itemFuzzyName + "”的掉率QAQ");
+                    botService.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
             } else if (functionCallStatement.getFunctionName().equals(functionNameQueryStageInfo)) {
@@ -103,13 +104,15 @@ public class PenguinFunction implements IFunction {
                         builder.append("\n");
                     }
                     
-                    botService.sendToEventSubject(event, builder.toString());
+                    botService.sendToGroup(event.getGroupId(), builder.toString());
                 } else {
-                    botService.sendToEventSubject(event, "没找到“" + stageCode + "”的作战信息QAQ");
+                    botService.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
+            } else if (functionCallStatement.getFunctionName().equals(functionNameUpdate)) {
+                penguinService.resetCache();
+                botService.sendToGroup(event.getGroupId(), "好的");
             }
-            
         }
         return false;
     }

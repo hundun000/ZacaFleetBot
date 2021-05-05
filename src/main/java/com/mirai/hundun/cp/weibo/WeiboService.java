@@ -79,7 +79,7 @@ public class WeiboService implements IFileProvider {
                 
                 
                 cardCacheRepository.save(cardCache);
-                log.warn("updateBlogDetail success: {}", detailText);
+                log.warn("updateBlogDetail success: {} ...", detailText.substring(0, Math.min(20, detailText.length())));
             } catch (Exception e) {
                 log.warn("updateBlogDetail error: {}", responseString);
             }
@@ -100,10 +100,10 @@ public class WeiboService implements IFileProvider {
         return detailText;
     }
     
-    public void updateUserInfoCache(String uid) {
+    public boolean updateUserInfoCache(String uid) {
         
         String responseString = weiboApiService.get(uid, API_TYPE_PARAM, uid, null);
-        log.info("updateContainerid get response.");
+        log.info("updateContainerid get response for uid = {}", uid);
         try {
             JsonNode responseJson = mapper.readTree(responseString);
             JsonNode tabsNode = responseJson.at("/data/tabsInfo/tabs");
@@ -137,13 +137,15 @@ public class WeiboService implements IFileProvider {
                 } else {
                     log.info("userInfoCacahe is up-to-date: {}", uid);
                 }
+                return true;
             } else {
-                log.warn("tabsNode not array: {}", tabsNode);
+                log.warn("tabsNode not array, responseJson = {}", responseJson);
             }
             
         } catch (Exception e) {
             log.warn("updateContainerid mapper.readTree cannot read: {}", responseString);
         }
+        return false;
     }
     
     public String getFirstBlogInfo(String uid) {
@@ -177,11 +179,14 @@ public class WeiboService implements IFileProvider {
         System.out.println(localDateTime.toString());
     }
     
-    public List<WeiboCardCache> updateBlog(String uid) {
+    public List<WeiboCardCache> updateAndGetTopBlog(String uid) {
         List<WeiboCardCache> newBlogs = new ArrayList<>(0);
         WeiboUserInfoCache userInfoCacahe;
         if (!userInfoCacheRepository.existsById(uid)) {
-            updateUserInfoCache(uid);
+            boolean success = updateUserInfoCache(uid);
+            if (!success) {
+                return newBlogs;
+            }
         }
         userInfoCacahe = userInfoCacheRepository.findById(uid).get();
         
@@ -222,9 +227,12 @@ public class WeiboService implements IFileProvider {
                         updateBlogDetail(cardCache);
                         checkSingleImage(cardCache);
                         cardCacheRepository.save(cardCache);
-                        newBlogs.add(cardCache);
+                        
                         log.info("update cardCache: {}", itemid);
+                    } else {
+                        cardCache = cardCacheRepository.findById(itemid).get();
                     }
+                    newBlogs.add(cardCache);
                 } catch (Exception e) {
                     log.warn("itera card error: {}", cardNode);
                 }

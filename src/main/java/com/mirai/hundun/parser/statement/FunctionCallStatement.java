@@ -23,6 +23,11 @@ public class FunctionCallStatement extends Statement {
         syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE));
         syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
         syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
+        syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
+        syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
+        syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
+        syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
+        syntaxs.add(Arrays.asList(TokenType.WAKE_UP, TokenType.FUNCTION_NAME, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE, TokenType.LITERAL_VALUE));
     }
     
     String functionName;

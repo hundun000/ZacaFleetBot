@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.function.AmiyaChatFunction;
 import com.mirai.hundun.character.function.WeiboFunction;
+import com.mirai.hundun.character.function.reminder.ReminderFunction;
+import com.mirai.hundun.configuration.TestSettings;
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.character.function.PenguinFunction;
 import com.mirai.hundun.character.function.QuizHandler;
 import com.mirai.hundun.character.function.RepeatConsumer;
@@ -63,6 +66,8 @@ public class Amiya extends BaseCharacter {
     @Value("${character.amiya.listenWeiboUids:}")
     public String[] listenWeiboUids;
 
+    @Value("${character.amiya.everydayChatTasks:}")
+    public String[] everydayChatTasks;
     
     @Autowired
     WeiboFunction weiboFunction;
@@ -79,6 +84,53 @@ public class Amiya extends BaseCharacter {
     @Autowired
     RepeatConsumer repeatConsumer;
     
+    @Autowired
+    ReminderFunction reminderFunction;
+    
+    @Autowired
+    TestSettings settings;
+    
+    @PostConstruct
+    public void init() {
+        log.info("settings.list = {}",settings.list);
+        
+        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
+
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                19, 0, "十九点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                20, 0, "二十点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                21, 0, "二十一点。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                22, 0, "完全入夜了呢，二十二点到了。博士，您工作辛苦了。"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                23, 0, "二十三点到了。有什么想喝的吗，博士？"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                0, 0, "呜哇！？正好0点！今天是，由阿米娅来担当助力的工作呢。我不会辜负大家的。"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                1, 0, "凌晨一点到啦！凯尔希医生教导过我，工作的时候一定要保持全神贯注......嗯，全神贯注。"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                9, 0, "九点到了。罗德岛全舰正处于通常航行状态。博士，整理下航程信息吧？"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                10, 0, "十点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                11, 0, "十一点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                12, 0, "十二点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                13, 0, "十三点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                14, 0, "十四点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                15, 0, "十五点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                16, 0, "十六点到了。欸嘿嘿......"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                17, 0, "十七点到了。博士，辛苦了！累了的话请休息一会儿吧。"));
+        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
+                18, 0, "十八点到了。欸嘿嘿......"));
+    }
     
     @Override
     protected void initParser() {
@@ -91,6 +143,8 @@ public class Amiya extends BaseCharacter {
         parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
         parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryResult);
         parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryStageInfo);
+        parser.tokenizer.functionNames.add(penguinFunction.functionNameUpdate);
+        parser.tokenizer.functionNames.add(reminderFunction.functionCreateTask);
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         parser.syntaxsTree.registerSyntaxs(AtStatement.syntaxs, StatementType.AT);
@@ -98,14 +152,14 @@ public class Amiya extends BaseCharacter {
 
     
     
-
-    public boolean onNudgeEventMessage(@NotNull NudgeEvent event) throws Exception {
-        boolean done = amiyaChatFunction.acceptNudged(event);
+    @Override
+    public boolean onNudgeEvent(@NotNull EventInfo eventInfo) throws Exception {
+        boolean done = amiyaChatFunction.acceptNudged(eventInfo);
         return done; 
     }
 
-
-    public boolean onGroupMessageEventMessage(@NotNull GroupMessageEvent event) throws Exception { // 可以抛出任何异常, 将在 handleException 处理
+    @Override
+    public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception { // 可以抛出任何异常, 将在 handleException 处理
 
 
         if (!enable) {
@@ -114,51 +168,59 @@ public class Amiya extends BaseCharacter {
         
         Statement statement;
         try {
-            statement = parser.simpleParse(event.getMessage());
+            statement = parser.simpleParse(eventInfo.getMessage());
         } catch (Exception e) {
             log.error("Parse error: ", e);
             return false;
         }
         
-        String sessionId = getSessionId(event);
+        String sessionId = getSessionId(eventInfo);
+ 
         
-        boolean done = weiboFunction.acceptStatement(sessionId, event, statement);
+        boolean done = false;
         if (!done) {
-            done = amiyaChatFunction.acceptStatement(sessionId, event, statement);
+            done = weiboFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
-                log.info("done by amiyaTalkHandler");
+                log.info("done by weiboFunction");
             }
         }
         if (!done) {
-            done = quizHandler.acceptStatement(sessionId, event, statement);
+            done = reminderFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by reminderFunction");
+            }
+        }
+        if (!done) {
+            done = quizHandler.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by quizHandler");
             }
         }
         if (!done) {
-            done = penguinFunction.acceptStatement(sessionId, event, statement);
+            done = penguinFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by penguinHandler");
             }
         }
         if (!done) {
-            done = repeatConsumer.acceptStatement(sessionId, event, statement);
+            done = repeatConsumer.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by repeatConsumer");
             }
         }
-
+        if (!done) {
+            done = amiyaChatFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by amiyaTalkHandler");
+            }
+        }
         
         return done;
     }
 
 
     
-    @PostConstruct
-    public void init() {
-        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
-        
-    }
+    
 
 
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.Amiya;
+import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.parser.statement.AtStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
@@ -48,7 +49,7 @@ public class RepeatConsumer implements IFunction {
     
 
     @Override
-    public boolean acceptStatement(String sessionId, GroupMessageEvent event, Statement statement) {
+    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.isEmpty()) {
@@ -72,7 +73,7 @@ public class RepeatConsumer implements IFunction {
 
             
             if (sessionData.count == 3) {
-                botService.sendToEventSubject(event, sessionData.message);
+                botService.sendToGroup(event.getGroupId(), sessionData.message);
                 return true;
             }
         }

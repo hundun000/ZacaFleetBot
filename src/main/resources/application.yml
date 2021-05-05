@@ -5,6 +5,8 @@ server:
 
 # overwrite this in application-account.yml
 account:
+    admin: 
+        account: 11111111
     bot:
         account: 11111111
         pwd: password123
@@ -14,10 +16,16 @@ account:
     specialUser:
         yuki: 11111111
 
+
+
 character:
     amiya:
         listenWeiboUids: 6279793937,6441489862
-    
+    prinzEugen:
+        listenWeiboUids: 3837704366
+    zacaMusume:
+        listenWeiboUids: 1833959560    
+
     
 spring:
     profiles:
@@ -54,9 +62,10 @@ logging:
     #config: 'classpath:log4j2.yml'
     level:
         #com.mirai.hundun: "INFO"
-        com.mirai.hundun.cp.penguin.feign: "DEBUG"
-        com.mirai.hundun.cp.weibo.feign: "DEBUG"
-        com.mirai.hundun.cp.quiz.feign: "DEBUG"
+        #com.mirai.hundun.cp.penguin.feign: "DEBUG"
+        #com.mirai.hundun.cp.weibo.feign: "DEBUG"
+        #com.mirai.hundun.cp.quiz.feign: "DEBUG"
+        org.springframework.web.client.HttpMessageConverterExtractor: "INFO"
         org.springframework.web: "INFO"
         org.springframework.data: "INFO"
         org.springframework.web.client: "DEBUG"

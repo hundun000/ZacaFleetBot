@@ -1,4 +1,4 @@
-package com.mirai.hundun.character;
+package com.mirai.hundun.core;
 
 import java.util.ArrayList;
 import java.util.List;

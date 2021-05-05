@@ -24,17 +24,12 @@ public class DataController {
     @Autowired
     PenguinService penguinService;
     
-    @RequestMapping(value="/penguin/updateItems", method=RequestMethod.GET)
+    @RequestMapping(value="/penguin/resetCache", method=RequestMethod.GET)
     public String updateItems() {
-        penguinService.resetItems();
+        penguinService.resetCache();
         return "OK";
     }
-    
-    @RequestMapping(value="/penguin/updateStages", method=RequestMethod.GET)
-    public String updateStages() {
-        penguinService.resetStages();
-        return "OK";
-    }
+
     
     @RequestMapping(value="/penguin/getTopResultNode", method=RequestMethod.GET)
     public MatrixReport getTopResultNode(

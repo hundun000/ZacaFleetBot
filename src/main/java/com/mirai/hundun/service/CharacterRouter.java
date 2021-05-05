@@ -1,8 +1,9 @@
-package com.mirai.hundun.character;
+package com.mirai.hundun.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,11 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-
+import com.mirai.hundun.character.Amiya;
+import com.mirai.hundun.character.BaseCharacter;
+import com.mirai.hundun.character.PrinzEugen;
+import com.mirai.hundun.character.ZacaMusume;
 import com.mirai.hundun.character.function.WeiboFunction;
+import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.EventInfoFactory;
+import com.mirai.hundun.core.GroupConfig;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.parser.statement.Statement;
-import com.mirai.hundun.service.BotService;
 
 import kotlin.coroutines.CoroutineContext;
 import lombok.extern.slf4j.Slf4j;
@@ -58,9 +64,16 @@ public class CharacterRouter extends SimpleListenerHost {
     @Value("${account.group.kancolle}")
     public long kancolleGroupId;
     
-    @PostConstruct
-    public void init() {
-        
+    List<BaseCharacter> characters = new ArrayList<>();
+    
+    
+    //Map<Long, List<String>> groupIdToCharacterIds = new HashMap<>();
+    
+    
+    /**
+     * TODO read from config file
+     */
+    private void fakeReadConfigFile() {
         GroupConfig config;
         config = new GroupConfig();
         config.setGroupDescription("kancolleGroup");
@@ -71,18 +84,23 @@ public class CharacterRouter extends SimpleListenerHost {
         config.setGroupDescription("arknightsGroup");
         config.setGroupId(arknightsGroupId);
         config.setEnableCharacters(Arrays.asList(amiya.getId(), zacaMusume.getId()));
-        //config.setObserveBlogUids(Arrays.asList(WeiboService.yjUid, WeiboService.CHOSSHANLAND_UID));
         groupConfigs.put(config.getGroupId(), config);
-        
-        
-        for (GroupConfig groupConfig : groupConfigs.values()) {
-            if (groupConfig.getEnableCharacters().contains(amiya.getId())) {
-                weiboFunction.putGroupIdToCharacter(groupConfig.getGroupId(), amiya.getId());
-            }
-        }
-
     }
     
+    
+    @PostConstruct
+    public void init() {
+        characters.add(amiya);
+        characters.add(prinzEugen);
+        characters.add(zacaMusume);
+        
+        
+        fakeReadConfigFile();
+
+        log.info("groupConfigs = {}", groupConfigs);
+    }
+    
+
     
     @Override
     public void handleException(@NotNull CoroutineContext context, @NotNull Throwable exception){
@@ -100,9 +118,16 @@ public class CharacterRouter extends SimpleListenerHost {
                 return ListeningStatus.LISTENING;
             }
             
+            
             boolean done = false;
-            if (!done && config.getEnableCharacters().contains(amiya.getId())) {
-                done = amiya.onNudgeEventMessage(event);
+            for (BaseCharacter character : characters) {
+                EventInfo eventInfo = EventInfoFactory.get(event, character.getId());
+                if (config.getEnableCharacters().contains(character.getId())) {
+                    done = character.onNudgeEvent(eventInfo);
+                }   
+                if (done) {
+                    break;
+                }
             }
         }
         
@@ -123,18 +148,32 @@ public class CharacterRouter extends SimpleListenerHost {
                 return ListeningStatus.LISTENING;
             }
             
+            
             boolean done = false;
-            if (!done && config.getEnableCharacters().contains(amiya.getId())) {
-                done = amiya.onGroupMessageEventMessage(event);
-            }   
-            if (!done && config.getEnableCharacters().contains(prinzEugen.getId())) {
-                done = prinzEugen.onGroupMessageEventMessage(event);
-            }
-            if (!done && config.getEnableCharacters().contains(zacaMusume.getId())) {
-                done = zacaMusume.onGroupMessageEventMessage(event);
+            for (BaseCharacter character : characters) {
+                EventInfo eventInfo = EventInfoFactory.get(event, character.getId());
+                if (config.getEnableCharacters().contains(character.getId())) {
+                    done = character.onGroupMessageEvent(eventInfo);
+                }   
+                if (done) {
+                    break;
+                }
             }
         }
         
         return ListeningStatus.LISTENING;
+    }
+
+
+    public Map<Long, GroupConfig> getGroupConfigs() {
+        return groupConfigs;
+    }
+
+
+    public List<String> getGroupCharacterIds(Long groupId) {
+        if (!groupConfigs.containsKey(groupId)) {
+            return new ArrayList<>();
+        }
+        return groupConfigs.get(groupId).getEnableCharacters();
     }
 }

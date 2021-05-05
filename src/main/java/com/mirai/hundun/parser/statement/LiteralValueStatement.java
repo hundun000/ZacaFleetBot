@@ -27,12 +27,11 @@ public class LiteralValueStatement extends Statement {
     
     public LiteralValueStatement(List<Token> tokens) {
         
-        if (tokens.size() > 1) {
+        if (tokens.size() > 0) {
             StringBuilder builder = new StringBuilder();
-            tokens.forEach(token -> builder.append(token.getTextContent()));
+            tokens.forEach(token -> builder.append(token.getTextContent()).append(" "));
+            builder.setLength(builder.length() - 1);
             this.value = builder.toString();
-        } else if (tokens.size() == 1) {
-            this.value = tokens.get(0).getTextContent();
         } else {
             this.value = "";
         }
