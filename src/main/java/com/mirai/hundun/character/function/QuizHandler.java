@@ -3,6 +3,7 @@ package com.mirai.hundun.character.function;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,21 @@ import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
-import com.mirai.hundun.cp.quiz.Question;
 import com.mirai.hundun.cp.quiz.QuizService;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
+import com.mirai.hundun.service.file.FileService;
+import com.zaca.stillstanding.domain.dto.AnswerType;
+import com.zaca.stillstanding.domain.dto.EventType;
+import com.zaca.stillstanding.domain.dto.MatchEvent;
+import com.zaca.stillstanding.domain.dto.MatchSituationDTO;
+import com.zaca.stillstanding.domain.dto.MatchState;
+import com.zaca.stillstanding.domain.dto.QuestionDTO;
+import com.zaca.stillstanding.domain.dto.ResourceType;
+import com.zaca.stillstanding.domain.dto.TeamRuntimeInfoDTO;
+import com.zaca.stillstanding.domain.dto.event.AnswerResultEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +36,7 @@ import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.message.data.PlainText;
 import net.mamoe.mirai.utils.ExternalResource;
 
@@ -43,6 +54,8 @@ public class QuizHandler implements IFunction {
     @Autowired
     QuizService quizService;
     
+    @Autowired
+    FileService fileService;
     
     @Autowired
     BotService botService;
@@ -53,8 +66,9 @@ public class QuizHandler implements IFunction {
     
     @Getter
     private class SessionData {
-        Integer matchId;
-        Question question;
+        
+        MatchSituationDTO matchSituationDTO;
+        File resource;
         long createTime;
     }
     
@@ -75,38 +89,46 @@ public class QuizHandler implements IFunction {
             if (statement instanceof FunctionCallStatement) {
                 FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
                 if (functionCallStatement.getFunctionName().equals(functionNameNextQuest)) {
-                    if (sessionData.matchId == null) {
+                    if (sessionData.matchSituationDTO == null) {
                         botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
                         return true;
-                    } else if (sessionData.question == null) {
-                            sessionData.question = quizService.getQuestion(sessionData.matchId);
+                    } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_GENERATE_QUESTION) {
+                            sessionData.matchSituationDTO = quizService.nextQustion(sessionData.matchSituationDTO.getId());
+                            QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
+                            if (questionDTO.getResource().getType() == ResourceType.IMAGE) {
+                                String imageResourceId = questionDTO.getResource().getData();
+                                sessionData.resource = fileService.downloadOrFromCache(imageResourceId, quizService);
+                            } else {
+                                sessionData.resource = null;
+                            }
                             sessionData.createTime = now;
                             StringBuilder builder = new StringBuilder();
-                            builder.append(sessionData.question.getStem()).append("\n")
-                            .append("A. ").append(sessionData.question.getOptions().get(0)).append("\n")
-                            .append("B. ").append(sessionData.question.getOptions().get(1)).append("\n")
-                            .append("C. ").append(sessionData.question.getOptions().get(2)).append("\n")
-                            .append("D. ").append(sessionData.question.getOptions().get(3)).append("\n")
+                            builder.append(questionDTO.getStem()).append("\n")
+                            .append("A. ").append(questionDTO.getOptions().get(0)).append("\n")
+                            .append("B. ").append(questionDTO.getOptions().get(1)).append("\n")
+                            .append("C. ").append(questionDTO.getOptions().get(2)).append("\n")
+                            .append("D. ").append(questionDTO.getOptions().get(3)).append("\n")
                             .append("\n")
                             .append("发送选项字母来回答");
                             MessageChain messageChain = new PlainText(builder.toString()).plus(new PlainText(""));
-                            if (sessionData.question.getResourceImage() != null) {
-                                ExternalResource externalResource = ExternalResource.create(sessionData.question.getResourceImage());
+                            if (sessionData.resource != null) {
+                                ExternalResource externalResource = ExternalResource.create(sessionData.resource);
                                 Image image = botService.uploadImage(event.getGroupId(), externalResource);
                                 messageChain = messageChain.plus(image);
                             }
                             botService.sendToGroup(event.getGroupId(), messageChain);
                             return true;
-                    } else {
+                    } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
                             botService.sendToGroup(event.getGroupId(), "上一个问题还没回答哦~");
                             return true;
                     }
                 } else if (functionCallStatement.getFunctionName().equals(functionNameStartMatch)) {
-                    if (sessionData.matchId == null) {
+                    if (sessionData.matchSituationDTO == null) {
                         String questionPackageName = functionCallStatement.getArgs().get(0);
-                        Integer newMatchId = quizService.createAndStartEndlessMatch(questionPackageName);
-                        if (newMatchId != null) {
-                            sessionData.matchId = newMatchId;
+                        String teamName = functionCallStatement.getArgs().get(1);
+                        sessionData.matchSituationDTO = quizService.createAndStartEndlessMatch(questionPackageName, teamName);
+                        
+                        if (sessionData.matchSituationDTO != null) {
                             botService.sendToGroup(event.getGroupId(), "开始比赛成功");
                             return true;
                         } else {
@@ -121,24 +143,43 @@ public class QuizHandler implements IFunction {
                 }
             } else if (statement instanceof LiteralValueStatement) {
                 
-
-                if (sessionData.question != null) {
+                if (sessionData.matchSituationDTO != null && sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
                     String newMessage = ((LiteralValueStatement)statement).getValue();
-                    if (sessionData.question.getAnswerChar().equals(newMessage)) {
-                        botService.sendToGroup(event.getGroupId(),
-                                (new At(event.getSenderId()))
-                                .plus("回答正确\n正确答案是" + sessionData.question.getAnswerChar())
-                                );
-                        sessionData.question = null;
-                        return true;
-                    } else if (newMessage.equals("A") || newMessage.equals("B") || newMessage.equals("C") || newMessage.equals("D")) {
-                        botService.sendToGroup(event.getGroupId(),
-                                (new At(event.getSenderId()))
-                                .plus("回答错误QAQ\n正确答案是" + sessionData.question.getAnswerChar())
-                                );
-                        sessionData.question = null;
-                        return true;
+                    if (newMessage.equals("A") || newMessage.equals("B") || newMessage.equals("C") || newMessage.equals("D")) {
+                        String correctAnser = QuestionDTO.intToAnswerText(sessionData.matchSituationDTO.getQuestion().getAnswer());
+                        sessionData.matchSituationDTO = quizService.answer(sessionData.matchSituationDTO.getId(), newMessage);
+                        AnswerResultEvent answerResultEvent = sessionData.matchSituationDTO.getAnswerResultEvent();
+                        if (answerResultEvent != null) {
+                            
+                            MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
+                            messageChainBuilder.add(new At(event.getSenderId()));
+                            if (answerResultEvent.getResult() == AnswerType.CORRECT) {
+                                messageChainBuilder.add(new PlainText("回答正确\n正确答案是" + correctAnser));
+                            } else if (answerResultEvent.getResult() == AnswerType.WRONG) {
+                                messageChainBuilder.add(new PlainText("回答错误QAQ\n正确答案是" + correctAnser));
+                            } else {
+                                messageChainBuilder.add(new PlainText("本题已跳过\n正确答案是" + correctAnser));
+                            }
+                            
+                            StringBuilder teamInfoBuilder = new StringBuilder();
+                            teamInfoBuilder.append("\n\n队伍状态:\n");
+                            for (TeamRuntimeInfoDTO dto : sessionData.matchSituationDTO.getTeamRuntimeInfos()) {
+                                teamInfoBuilder.append(dto.getName()).append(" ");
+                                teamInfoBuilder.append(dto.getMatchScore()).append("分 ");
+                                teamInfoBuilder.append("英雄:").append(dto.getRoleName()).append("\n");
+                                for (Entry<String, Integer> entry : dto.getSkillRemainTimes().entrySet()) {
+                                    teamInfoBuilder.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+                                }
+                            }
+                            messageChainBuilder.add(new PlainText(teamInfoBuilder.toString()));
+                            
+                            botService.sendToGroup(event.getGroupId(), messageChainBuilder.build());
+                            return true;
+                        }
+                        
                     }
+                    
+                    
                 }
             }
         }

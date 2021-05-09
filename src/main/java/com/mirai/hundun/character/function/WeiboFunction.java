@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.GroupConfig;
-import com.mirai.hundun.cp.quiz.Question;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;

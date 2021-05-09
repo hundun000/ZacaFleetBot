@@ -1,11 +1,10 @@
-package com.mirai.hundun.cp.quiz.feign;
+package com.zaca.stillstanding.api;
 
 
 
 import org.springframework.context.annotation.Bean;
 
 import feign.Logger;
-import feign.Request;
 
 public class StillstandingApiFeignConfiguration {
 

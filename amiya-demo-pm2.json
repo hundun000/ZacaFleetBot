@@ -1,0 +1,20 @@
+{
+    "apps":[
+    {
+        "name":"demo",
+        "cwd":".",
+        "script":"/usr/bin/java",
+        "args":[
+            "-jar",
+            "-Xmx512m",
+            "amiya-demo-0.0.1-SNAPSHOT.jar"
+            
+        ],
+        "node_args":[],
+        "exec_interpreter":"",
+        "exec_mode":"fork",
+        "error_file" : "demo-err.log",
+        "out_file"   : "demo-out.log"
+     }
+   ]
+}

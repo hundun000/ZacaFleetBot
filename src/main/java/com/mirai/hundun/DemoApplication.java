@@ -8,8 +8,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@EnableFeignClients(basePackages = {"com.mirai.hundun.**"})
-@SpringBootApplication
+@EnableFeignClients(basePackages = {"com.mirai.hundun", "com.zaca.stillstanding"})
+@SpringBootApplication(scanBasePackages = {"com.mirai.hundun", "com.zaca.stillstanding"})
 @EnableConfigurationProperties
 public class DemoApplication {
 

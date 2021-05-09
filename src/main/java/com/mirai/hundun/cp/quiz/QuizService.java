@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -17,10 +18,15 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mirai.hundun.cp.quiz.feign.StillstandingApiService;
+
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.service.file.FileService;
 import com.mirai.hundun.service.file.IFileProvider;
+import com.zaca.stillstanding.api.StillstandingApiFeignClient;
+import com.zaca.stillstanding.domain.dto.ApiResult;
+import com.zaca.stillstanding.domain.dto.MatchConfigDTO;
+import com.zaca.stillstanding.domain.dto.MatchSituationDTO;
+import com.zaca.stillstanding.domain.dto.QuestionDTO;
 
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +45,7 @@ public class QuizService implements IFileProvider {
     FileService fileService;
     
     @Autowired
-    StillstandingApiService stillstandingApiService;
+    StillstandingApiFeignClient stillstandingApiService;
     
     
     public QuizService() {
@@ -48,45 +54,50 @@ public class QuizService implements IFileProvider {
         
     }
     
-    public Integer createAndStartEndlessMatch(String questionPackageName) {
-        String responseString = stillstandingApiService.createEndlessMatch(questionPackageName);
-        Integer matchId;
+    public MatchSituationDTO createAndStartEndlessMatch(String questionPackageName, String teamName) {
+        MatchConfigDTO matchConfigDTO = new MatchConfigDTO();
+        matchConfigDTO.setTeamNames(Arrays.asList(teamName));
+        matchConfigDTO.setQuestionPackageName(questionPackageName);
+        ApiResult apiResult = stillstandingApiService.createEndlessMatch(matchConfigDTO);
+        String sessionId;
         try {
-            JsonNode responseJson = mapper.readTree(responseString);
-            matchId = responseJson.at("/payload").asInt();
+            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            sessionId = matchSituationDTO.getId();
         } catch (Exception e) {
-            log.warn("createEndlessMatch error: {}", responseString);
+            log.warn("createEndlessMatch error, apiResult = {}", apiResult);
+            log.warn("createEndlessMatch error, e = ", e);
             return null;
         }
         
-        responseString = stillstandingApiService.start(matchId);
-        return matchId;
+        apiResult = stillstandingApiService.start(sessionId);
+        try {
+            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            return matchSituationDTO;
+        } catch (Exception e) {
+            log.warn("createEndlessMatch error, apiResult = {}", apiResult);
+            log.warn("createEndlessMatch error, e = ", e);
+            return null;
+        }
     }
     
-    
-    public Question getQuestion(int matchId) {
-        String responseString = stillstandingApiService.answer(matchId, "A");
+    public MatchSituationDTO answer(String sessionId, String answerChar) {
+        ApiResult apiResult = stillstandingApiService.teamAnswer(sessionId, answerChar);
         try {
-            JsonNode responseJson = mapper.readTree(responseString);
-            String payloadString = responseJson.at("/payload").asText();
-            JsonNode payload = mapper.readTree(payloadString);
-            String stem = payload.at("/question/stem").asText();
-            JsonNode optionsNode = payload.at("/question/options");
-            List<String> options = new ArrayList<>();
-            for (final JsonNode option : optionsNode) {
-                options.add(option.asText());
-            }
-            String answerChar = payload.at("/question/answerChar").asText();
-            String resourceType = payload.at("/question/resource/type").asText();
-            File file = null;
-            if (resourceType.equals("IMAGE")) {
-                String imageResourceId = payload.at("/question/resource/data").asText();
-                file = fileService.downloadOrFromCache(imageResourceId, this);
-            }
-            Question question = new Question(stem, options, answerChar, file);
-            return question;
+            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            return matchSituationDTO;
         } catch (Exception e) {
-            log.warn("createEndlessMatch error: {}", responseString);
+            log.warn("createEndlessMatch error: {}", apiResult);
+            return null;
+        }
+    }
+    
+    public MatchSituationDTO nextQustion(String sessionId) {
+        ApiResult apiResult = stillstandingApiService.nextQustion(sessionId);
+        try {
+            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            return matchSituationDTO;
+        } catch (Exception e) {
+            log.warn("createEndlessMatch error: {}", apiResult);
             return null;
         }
     }

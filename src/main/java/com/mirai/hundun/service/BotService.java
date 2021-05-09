@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class BotService {
     
-    private static final String offLineImageFakeId = "01E9451B-70ED-EAE3-B37C-101F1EEBF5B5";
+    private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
     boolean isBotOnline = false;
     
