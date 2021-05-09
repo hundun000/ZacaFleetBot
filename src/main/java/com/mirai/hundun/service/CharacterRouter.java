@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.character.BaseCharacter;
+import com.mirai.hundun.character.Neko;
 import com.mirai.hundun.character.PrinzEugen;
 import com.mirai.hundun.character.ZacaMusume;
 import com.mirai.hundun.character.function.WeiboFunction;
@@ -54,6 +55,9 @@ public class CharacterRouter extends SimpleListenerHost {
     PrinzEugen prinzEugen;
     
     @Autowired
+    Neko neko;
+    
+    @Autowired
     WeiboFunction weiboFunction;
 
     Map<Long, GroupConfig> groupConfigs = new HashMap<>();
@@ -63,6 +67,9 @@ public class CharacterRouter extends SimpleListenerHost {
     
     @Value("${account.group.kancolle}")
     public long kancolleGroupId;
+    
+    @Value("${account.group.neko}")
+    public long nekoGroupId;
     
     List<BaseCharacter> characters = new ArrayList<>();
     
@@ -78,12 +85,17 @@ public class CharacterRouter extends SimpleListenerHost {
         config = new GroupConfig();
         config.setGroupDescription("kancolleGroup");
         config.setGroupId(kancolleGroupId);
-        config.setEnableCharacters(Arrays.asList(prinzEugen.getId(), zacaMusume.getId()));
+        config.setEnableCharacters(Arrays.asList(prinzEugen.getId(), zacaMusume.getId(), neko.getId()));
         groupConfigs.put(config.getGroupId(), config);
         config = new GroupConfig();
         config.setGroupDescription("arknightsGroup");
         config.setGroupId(arknightsGroupId);
         config.setEnableCharacters(Arrays.asList(amiya.getId(), zacaMusume.getId()));
+        groupConfigs.put(config.getGroupId(), config);
+        config = new GroupConfig();
+        config.setGroupDescription("nekoGroup");
+        config.setGroupId(nekoGroupId);
+        config.setEnableCharacters(Arrays.asList(neko.getId()));
         groupConfigs.put(config.getGroupId(), config);
     }
     
@@ -93,7 +105,7 @@ public class CharacterRouter extends SimpleListenerHost {
         characters.add(amiya);
         characters.add(prinzEugen);
         characters.add(zacaMusume);
-        
+        characters.add(neko);
         
         fakeReadConfigFile();
 

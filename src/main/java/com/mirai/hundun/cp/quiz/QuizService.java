@@ -91,6 +91,17 @@ public class QuizService implements IFileProvider {
         }
     }
     
+    public MatchSituationDTO useSkill(String sessionId, String skillName) {
+        ApiResult apiResult = stillstandingApiService.teamUseSkill(sessionId, skillName);
+        try {
+            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            return matchSituationDTO;
+        } catch (Exception e) {
+            log.warn("createEndlessMatch error: {}", apiResult);
+            return null;
+        }
+    }
+    
     public MatchSituationDTO nextQustion(String sessionId) {
         ApiResult apiResult = stillstandingApiService.nextQustion(sessionId);
         try {

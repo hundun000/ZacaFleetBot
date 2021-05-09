@@ -141,6 +141,7 @@ public class Amiya extends BaseCharacter {
         parser.tokenizer.functionNames.add(weiboFunction.functionName);
         parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
         parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
+        parser.tokenizer.functionNames.add(quizHandler.functionNameUseSkill);
         parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryResult);
         parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryStageInfo);
         parser.tokenizer.functionNames.add(penguinFunction.functionNameUpdate);

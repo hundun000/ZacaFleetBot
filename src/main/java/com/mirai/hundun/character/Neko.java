@@ -34,42 +34,35 @@ import net.mamoe.mirai.message.data.PlainText;
  */
 @Slf4j
 @Component
-public class ZacaMusume extends BaseCharacter {
+public class Neko extends BaseCharacter {
 
-    @Value("${character.zacaMusume.listenWeiboUids:}")
-    public String[] listenWeiboUids;
+
     
-    public ZacaMusume() {
-        super("ZacaMusume");
+    public Neko() {
+        super("neko");
     }
 
-    @Autowired
-    WeiboFunction weiboFunction;
 
     @Autowired
     BotService botService;
     
     @Autowired
     QuizHandler quizHandler;
-    
-//    @Autowired
-//    RepeatConsumer repeatConsumer;
+
     
     @PostConstruct
     public void init() {
-        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
-        
+
     }
     
     @Override
     protected void initParser() {
 
 
-        parser.tokenizer.KEYWORD_WAKE_UP = "ZACA娘";
-        parser.tokenizer.keywords.put("ZACA娘", TokenType.WAKE_UP);
+        parser.tokenizer.KEYWORD_WAKE_UP = "猫猫";
+        parser.tokenizer.keywords.put("猫猫", TokenType.WAKE_UP);
         parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
         parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameUseSkill);
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         
@@ -104,12 +97,7 @@ public class ZacaMusume extends BaseCharacter {
                 log.info("done by quizHandler");
             }
         }
-//        if (!done) {
-//            done = repeatConsumer.acceptStatement(sessionId, event, statement);
-//            if (done) {
-//                log.info("done by repeatConsumer");
-//            }
-//        }
+
         
         return done;
     }

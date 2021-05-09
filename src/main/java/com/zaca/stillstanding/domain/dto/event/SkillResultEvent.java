@@ -1,5 +1,7 @@
 package com.zaca.stillstanding.domain.dto.event;
 
+import java.util.List;
+
 import com.zaca.stillstanding.domain.dto.AnswerType;
 import com.zaca.stillstanding.domain.dto.MatchEvent;
 
@@ -14,6 +16,7 @@ public class SkillResultEvent extends MatchEvent {
     String teamName;
     String roleName;
     String skillName;
+    String skillDesc;
     int skillRemainTime;
-    String staticData;
+    List<String> args;
 }

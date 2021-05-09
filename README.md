@@ -1,18 +1,89 @@
+# 功能介绍
+
+bot框架：mirai
+
+外部服务：微博api、企鹅物流api、一站到底答题项目
+
+### bot
+
+本项目只登录唯一的QQ账号，即创建唯一的bot。该bot在可在不同Q群扮演不同角色，只提供该角色的功能，使用该角色的台词（TODO）。
+
+### 现有角色
+
+#### Amiya
+
+《明日方舟》游戏角色
+
+- 推送微博： 明日方舟、朝陇山
+- 一站到底答题
+- 企鹅物流数据查询
+- 事项提醒： 预设的整点报时、用户新增定时提醒
+
+#### PrinzEugen
+
+《舰队收藏》游戏角色
+
+- 推送微博： 海色镇守府
+- 事项提醒： 预设的整点报时、用户新增定时提醒
+
+#### ZacaMusume
+
+原创角色
+
+- 推送微博： 华工ZACA动漫协会
+- 一站到底答题
+
+#### Neko
+
+原创角色
+
+- 一站到底答题
+
+
+# 使用说明
+
+## 环境准备
+
+- java 11
+- mongoDB (以默认配置在本地启动)
+
+## 启动外部项目（可选）
+
+一站到底答题项目需要在本地启动，暂不开源。即一站到底答题功能无法使用。
+
+## 配置账号和群
+
+1. 在\src\main\resources新建application-account.yml，填上application.yml里注明需要覆写的内容。
+2. 修改CharacterRouter类的fakeReadConfigFile方法，即设置每个群使用的角色。
+
+## 启动和登录
+
+1. 启动项目。启动后可以以离线模式测试功能。
+2. 使用登录接口/api/login，登录qq账号。
+
+### 离线模式
+
+用于调试。项目已启动但未登录qq账号，即为离线模式状态。此时可以调用测试接口，模拟qq消息发送给了角色，然后角色的回复会打印在日志里。
+
+# 开发说明
+
 ## 程序架构
 
 mirai-core + springboot + mongoDB + gradle
 
 ### bot
 
-本项目只登录唯一的QQ账号，创建唯一的bot，由BotService负责。
+本项目只登录唯一的QQ账号，即创建唯一的bot，由BotService负责。
 
 ### Character 角色
 
-为了支持该bot可以在不同Q群表现不同行为，使用【Character】区分。拟人化地理解，该bot在可在不同Q群扮演不同角色，只提供该角色的功能，使用在该角色的台词。
+为了支持该bot可以在不同Q群表现不同行为，使用【Character】区分。
 
 例如，在明日方舟群，配置的角色为Amiya；在舰C群，配置的角色为PrinzEugen。
 
-进一步的，可以为一个Q群配置多个角色。如果一个群里既有明日方舟玩家和舰C玩家，可以为该群配置Amiya+PrinzEugen。此时两个角色对输入的响应存在优先级甚至更复杂的调度策略（待优化）。
+进一步的，可以为一个Q群配置多个角色。如果一个群里既有明日方舟玩家和舰C玩家，可以为该群配置Amiya+PrinzEugen。此时两个角色对输入的响应存在优先级甚至更复杂的调度策略（TODO）。
+
+单例。Character无上下文。
 
 ### cp包
 
@@ -24,11 +95,13 @@ mirai-core + springboot + mongoDB + gradle
 
 鉴于Function需要能被任意Character使用，所以只应有Character依赖Function，而Function不应依赖某个具体Character。
 
+单例。若有需要，在内部自行实现区分不同session的上下文。
+
 ### Statement 指令
 
 原始输入MessageChain将被Character处理为一个Statement，Statement作为Function的输入。
 
-目的是实现如下功能：假设Amiya和PrinzEugen都使用查微博功能WeiboFuction，但是希望调用功能的语法不同，例如分别是“阿米娅 看看饼”和“欧根 查看镇守府情报”。
+目的是实现如下功能：假设Amiya和PrinzEugen都使用查微博功能WeiboFuction，但是希望调用功能的语法不同（TODO），例如分别是“阿米娅 看看饼”和“欧根 查看镇守府情报”。
 
 所以Amiya和PrinzEugen需要把原始输入处理成同样的Statement(type=WEIBO_QUERY)，再将其输入WeiboFuction。
 

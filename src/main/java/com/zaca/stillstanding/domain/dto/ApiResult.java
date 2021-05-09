@@ -3,17 +3,11 @@ package com.zaca.stillstanding.domain.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import lombok.Getter;
-import lombok.ToString;
-
-
 
 /**
  * @author hundun
  * Created on 2019/11/04
  */
-@Getter
-@ToString
 public class ApiResult implements IApiResult {
     
     private static final String SUCCESS_MESSAGE = "SUCCESS";

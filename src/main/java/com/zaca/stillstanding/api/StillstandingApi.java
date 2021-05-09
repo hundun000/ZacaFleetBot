@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.zaca.stillstanding.domain.dto.ApiResult;
+import com.zaca.stillstanding.domain.dto.IApiResult;
 import com.zaca.stillstanding.domain.dto.MatchConfigDTO;
 
 import feign.Response;
@@ -49,5 +50,9 @@ public interface StillstandingApi {
             @RequestParam(value = "answer") String answer
             );
     
-
+    @RequestMapping(value="/use-skill", method=RequestMethod.POST)
+    ApiResult teamUseSkill(
+            @RequestParam(value = "sessionId") String sessionId,
+            @RequestParam(value = "skillName") String skillName
+            );
 }
