@@ -1,6 +1,4 @@
-package com.zaca.stillstanding.domain.dto.event;
-
-import com.zaca.stillstanding.domain.dto.MatchEvent;
+package com.zaca.stillstanding.dto.event;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.question;
 
 public enum ResourceType {
 	IMAGE,

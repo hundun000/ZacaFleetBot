@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.function.QuizHandler;
 import com.mirai.hundun.character.function.RepeatConsumer;
+import com.mirai.hundun.character.function.SubFunction;
 import com.mirai.hundun.character.function.WeiboFunction;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.parser.Parser;
@@ -65,11 +66,9 @@ public class ZacaMusume extends BaseCharacter {
     protected void initParser() {
 
 
-        parser.tokenizer.KEYWORD_WAKE_UP = "ZACA娘";
-        parser.tokenizer.keywords.put("ZACA娘", TokenType.WAKE_UP);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameUseSkill);
+        parser.tokenizer.registerWakeUpKeyword("ZACA娘");
+        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
+
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         

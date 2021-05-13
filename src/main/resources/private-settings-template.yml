@@ -1,0 +1,28 @@
+adminAccount: 11111111
+botAccount: 11111111
+botPwd: password123
+
+
+userTagConfigs:
+    ceoboBot:
+        id: 11111111
+        tags:
+            - CEOBE
+    angelinaBot:
+        id: 11111111
+        tags:
+            - ANGELINA    
+        
+groupConfigs:
+    arknights:
+        groupId: 11111111
+        enableCharacters:
+            - Amiya
+    kancolle:
+        groupId: 11111111
+        enableCharacters:
+            - PrinzEugen        
+    neko:
+        groupId: 11111111
+        enableCharacters:
+            - Neko

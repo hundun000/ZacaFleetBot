@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.character.function.RepeatConsumer;
+import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 
@@ -45,24 +46,18 @@ public class BotService {
 
     boolean isBotOnline = false;
     
-    @Value("${account.admin.account}")
-    public Long adminAccount;
-    
-    @Value("${account.bot.account}")
-    public Long botAccount;
-    @Value("${account.bot.pwd}")
-    public String botPwd;
 
     @Autowired
     CharacterRouter characterRouter;
     
     private Bot miraiBot;
-    //Listener<?> repeaterListener;
-    //public RepeatConsumer repeatConsumer = new RepeatConsumer();
+    
+    @Autowired
+    PrivateSettings privateSettings;
     
     @PostConstruct
     public void postConstruct() {
-        this.init();
+        this.initBot();
     }
     
     //设备认证信息文件
@@ -71,8 +66,8 @@ public class BotService {
     /**
      * 启动BOT
      */
-    public void init() {
-        if (null == botAccount || null == botPwd) {
+    public void initBot() {
+        if (null == privateSettings.getBotAccount() || null == privateSettings.getBotPwd()) {
             System.err.println("*****未配置账号或密码*****");
             log.warn("*****未配置账号或密码*****");
             return;
@@ -93,7 +88,7 @@ public class BotService {
             // the new thread will blocked by Bot.join()
             Thread thread = new Thread(){
                 public void run(){
-                    miraiBot = BotFactory.INSTANCE.newBot(botAccount, botPwd, new BotConfiguration() {
+                    miraiBot = BotFactory.INSTANCE.newBot(privateSettings.getBotAccount(), privateSettings.getBotPwd(), new BotConfiguration() {
                         {
                             //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
                             fileBasedDeviceInfo(deviceInfoPath);
@@ -128,11 +123,11 @@ public class BotService {
 
 
     public long getSelfAccount() {
-        return botAccount;
+        return privateSettings.getBotAccount();
     }
     
     public Long getAdminAccount() {
-        return adminAccount;
+        return privateSettings.getAdminAccount();
     }
 
 

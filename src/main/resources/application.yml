@@ -3,21 +3,6 @@
 server:
     port: 10099
 
-# overwrite this in application-account.yml
-account:
-    admin: 
-        account: 11111111
-    bot:
-        account: 11111111
-        pwd: password123
-    group:
-        arknights: 11111111
-        kancolle: 11111111
-        neko: 11111111
-    specialUser:
-        yuki: 11111111
-
-
 
 character:
     amiya:
@@ -29,8 +14,6 @@ character:
 
     
 spring:
-    profiles:
-        include: "account"
     data:
         mongodb:
             uri: mongodb://localhost:27017/mirai

@@ -17,11 +17,12 @@ import org.springframework.stereotype.Component;
 import com.mirai.hundun.character.function.AmiyaChatFunction;
 import com.mirai.hundun.character.function.WeiboFunction;
 import com.mirai.hundun.character.function.reminder.ReminderFunction;
-import com.mirai.hundun.configuration.TestSettings;
+import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.character.function.PenguinFunction;
 import com.mirai.hundun.character.function.QuizHandler;
 import com.mirai.hundun.character.function.RepeatConsumer;
+import com.mirai.hundun.character.function.SubFunction;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
 import com.mirai.hundun.parser.Parser;
@@ -87,12 +88,10 @@ public class Amiya extends BaseCharacter {
     @Autowired
     ReminderFunction reminderFunction;
     
-    @Autowired
-    TestSettings settings;
+
     
     @PostConstruct
     public void init() {
-        log.info("settings.list = {}",settings.list);
         
         weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
 
@@ -136,16 +135,12 @@ public class Amiya extends BaseCharacter {
     protected void initParser() {
         
         
-        parser.tokenizer.KEYWORD_WAKE_UP = "阿米娅";
-        parser.tokenizer.keywords.put("阿米娅", TokenType.WAKE_UP);
-        parser.tokenizer.functionNames.add(weiboFunction.functionName);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameUseSkill);
-        parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryResult);
-        parser.tokenizer.functionNames.add(penguinFunction.functionNameQueryStageInfo);
-        parser.tokenizer.functionNames.add(penguinFunction.functionNameUpdate);
-        parser.tokenizer.functionNames.add(reminderFunction.functionCreateTask);
+        parser.tokenizer.registerWakeUpKeyword("阿米娅");
+        parser.tokenizer.registerSubFunction(SubFunction.WEIBO_SHOW_LATEST, "看看饼");
+        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
+        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(penguinFunction.getSubFunctions());
+        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(reminderFunction.getSubFunctions());
+        
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         parser.syntaxsTree.registerSyntaxs(AtStatement.syntaxs, StatementType.AT);

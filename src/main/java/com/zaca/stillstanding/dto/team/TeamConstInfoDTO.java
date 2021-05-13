@@ -1,7 +1,6 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.team;
 
 import java.util.List;
-
 
 import lombok.Data;
 
@@ -10,7 +9,7 @@ import lombok.Data;
  * Created on 2021/05/08
  */
 @Data
-public class TeamDTO {
+public class TeamConstInfoDTO {
     private String name;
     private List<String> pickTags;
     private List<String> banTags;

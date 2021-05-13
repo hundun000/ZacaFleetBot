@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.match;
 
 import java.util.List;
 

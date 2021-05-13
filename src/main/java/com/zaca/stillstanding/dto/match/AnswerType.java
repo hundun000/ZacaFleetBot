@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.match;
 /**
  * @author hundun
  * Created on 2019/10/08

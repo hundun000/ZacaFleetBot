@@ -6,8 +6,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
-import com.zaca.stillstanding.domain.dto.ApiResult;
-
 import feign.Response;
 
 

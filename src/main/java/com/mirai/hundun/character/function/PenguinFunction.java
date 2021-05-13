@@ -1,6 +1,7 @@
 package com.mirai.hundun.character.function;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,17 @@ import net.mamoe.mirai.message.data.PlainText;
 @Component
 public class PenguinFunction implements IFunction {
 
-    public String functionNameQueryResult = "查掉率";
-    public String functionNameUpdate = "更新企鹅物流";
-    public String functionNameQueryStageInfo = "查作战";
+    
+    @Override
+    public List<SubFunction> getSubFunctions() {
+        return Arrays.asList(
+                SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE,
+                SubFunction.PENGUIN_QUERY_STAGE_INFO,
+                SubFunction.PENGUIN_UPDATE
+                
+                );
+    }
+    
     
     @Autowired
     PenguinService penguinService;
@@ -51,7 +60,7 @@ public class PenguinFunction implements IFunction {
     public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getFunctionName().equals(functionNameQueryResult)) {
+            if (functionCallStatement.getFunctionName() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
                 String itemFuzzyName = functionCallStatement.getArgs().get(0);
                 log.info("{} by {}", functionCallStatement.getFunctionName(), itemFuzzyName);
                 MatrixReport report = penguinService.getTopResultNode(itemFuzzyName, 3);
@@ -70,7 +79,7 @@ public class PenguinFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
-            } else if (functionCallStatement.getFunctionName().equals(functionNameQueryStageInfo)) {
+            } else if (functionCallStatement.getFunctionName() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
                 String stageCode = functionCallStatement.getArgs().get(0);
                 log.info("{} by {}", functionCallStatement.getFunctionName(), stageCode);
                 StageInfoReport report = penguinService.getStageInfoReport(stageCode);
@@ -108,7 +117,7 @@ public class PenguinFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
-            } else if (functionCallStatement.getFunctionName().equals(functionNameUpdate)) {
+            } else if (functionCallStatement.getFunctionName() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
                 botService.sendToGroup(event.getGroupId(), "好的");
             }

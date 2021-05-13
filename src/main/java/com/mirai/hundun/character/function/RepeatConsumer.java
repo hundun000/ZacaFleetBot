@@ -1,6 +1,8 @@
 package com.mirai.hundun.character.function;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -29,7 +31,10 @@ public class RepeatConsumer implements IFunction {
     @Autowired
     BotService botService;
     
-    
+    @Override
+    public List<SubFunction> getSubFunctions() {
+        return Arrays.asList();
+    }
     //private final long groupId;
     Map<String, SessionData> sessionDataMap = new HashMap<>();
     

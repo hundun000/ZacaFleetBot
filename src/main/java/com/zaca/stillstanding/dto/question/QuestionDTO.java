@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.question;
 
 import java.util.List;
 import java.util.Set;
@@ -19,6 +19,7 @@ public class QuestionDTO {
     int answer;
     Resource resource;
     Set<String> tags;
+    
     
     public static int answerTextToInt(String text) {
         switch (text) {

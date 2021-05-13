@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.function.PrinzEugenChatFunction;
 import com.mirai.hundun.character.function.RepeatConsumer;
+import com.mirai.hundun.character.function.SubFunction;
 import com.mirai.hundun.character.function.WeiboFunction;
 import com.mirai.hundun.character.function.reminder.ReminderFunction;
 import com.mirai.hundun.core.EventInfo;
@@ -72,9 +73,8 @@ public class PrinzEugen extends BaseCharacter {
     
     @Override
     protected void initParser() {
-        parser.tokenizer.KEYWORD_WAKE_UP = ".";
-        parser.tokenizer.keywords.put(".", TokenType.WAKE_UP);
-        parser.tokenizer.functionNames.add(weiboFunction.functionName);
+        parser.tokenizer.registerWakeUpKeyword(".");
+        parser.tokenizer.registerSubFunction(SubFunction.WEIBO_SHOW_LATEST, "镇守府情报");
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
     }

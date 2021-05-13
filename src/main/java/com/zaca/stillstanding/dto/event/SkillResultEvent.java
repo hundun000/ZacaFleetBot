@@ -1,9 +1,6 @@
-package com.zaca.stillstanding.domain.dto.event;
+package com.zaca.stillstanding.dto.event;
 
 import java.util.List;
-
-import com.zaca.stillstanding.domain.dto.AnswerType;
-import com.zaca.stillstanding.domain.dto.MatchEvent;
 
 import lombok.Data;
 

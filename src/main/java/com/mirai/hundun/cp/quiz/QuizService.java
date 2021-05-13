@@ -23,10 +23,10 @@ import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.service.file.FileService;
 import com.mirai.hundun.service.file.IFileProvider;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;
-import com.zaca.stillstanding.domain.dto.ApiResult;
-import com.zaca.stillstanding.domain.dto.MatchConfigDTO;
-import com.zaca.stillstanding.domain.dto.MatchSituationDTO;
-import com.zaca.stillstanding.domain.dto.QuestionDTO;
+import com.zaca.stillstanding.dto.ApiResult;
+import com.zaca.stillstanding.dto.match.MatchConfigDTO;
+import com.zaca.stillstanding.dto.match.MatchSituationDTO;
+import com.zaca.stillstanding.dto.team.TeamConstInfoDTO;
 
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -54,14 +54,31 @@ public class QuizService implements IFileProvider {
         
     }
     
-    public MatchSituationDTO createAndStartEndlessMatch(String questionPackageName, String teamName) {
+    public enum MatchType {
+        ENDLESS,
+        PRE, MAIN,
+        ;
+    }
+    
+    public MatchSituationDTO createAndStartMatch(String questionPackageName, List<String> teamNames, MatchType type) {
         MatchConfigDTO matchConfigDTO = new MatchConfigDTO();
-        matchConfigDTO.setTeamNames(Arrays.asList(teamName));
+        matchConfigDTO.setTeamNames(teamNames);
         matchConfigDTO.setQuestionPackageName(questionPackageName);
-        ApiResult apiResult = stillstandingApiService.createEndlessMatch(matchConfigDTO);
+        ApiResult<MatchSituationDTO> apiResult;
+        if (type == MatchType.ENDLESS) {
+            apiResult = stillstandingApiService.createEndlessMatch(matchConfigDTO);
+        } else if (type == MatchType.PRE) {
+            apiResult = stillstandingApiService.createPreMatch(matchConfigDTO);
+        } else if (type == MatchType.MAIN) {
+            apiResult = stillstandingApiService.createMainMatch(matchConfigDTO);
+        } else {
+            log.warn("cannot handle type = {}", type);
+            return null;
+        }
+        
         String sessionId;
         try {
-            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            MatchSituationDTO matchSituationDTO = apiResult.getPayload();
             sessionId = matchSituationDTO.getId();
         } catch (Exception e) {
             log.warn("createEndlessMatch error, apiResult = {}", apiResult);
@@ -71,7 +88,7 @@ public class QuizService implements IFileProvider {
         
         apiResult = stillstandingApiService.start(sessionId);
         try {
-            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            MatchSituationDTO matchSituationDTO = apiResult.getPayload();
             return matchSituationDTO;
         } catch (Exception e) {
             log.warn("createEndlessMatch error, apiResult = {}", apiResult);
@@ -81,9 +98,9 @@ public class QuizService implements IFileProvider {
     }
     
     public MatchSituationDTO answer(String sessionId, String answerChar) {
-        ApiResult apiResult = stillstandingApiService.teamAnswer(sessionId, answerChar);
+        ApiResult<MatchSituationDTO> apiResult = stillstandingApiService.teamAnswer(sessionId, answerChar);
         try {
-            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            MatchSituationDTO matchSituationDTO = apiResult.getPayload();
             return matchSituationDTO;
         } catch (Exception e) {
             log.warn("createEndlessMatch error: {}", apiResult);
@@ -92,9 +109,9 @@ public class QuizService implements IFileProvider {
     }
     
     public MatchSituationDTO useSkill(String sessionId, String skillName) {
-        ApiResult apiResult = stillstandingApiService.teamUseSkill(sessionId, skillName);
+        ApiResult<MatchSituationDTO> apiResult = stillstandingApiService.teamUseSkill(sessionId, skillName);
         try {
-            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            MatchSituationDTO matchSituationDTO = apiResult.getPayload();
             return matchSituationDTO;
         } catch (Exception e) {
             log.warn("createEndlessMatch error: {}", apiResult);
@@ -103,9 +120,9 @@ public class QuizService implements IFileProvider {
     }
     
     public MatchSituationDTO nextQustion(String sessionId) {
-        ApiResult apiResult = stillstandingApiService.nextQustion(sessionId);
+        ApiResult<MatchSituationDTO> apiResult = stillstandingApiService.nextQustion(sessionId);
         try {
-            MatchSituationDTO matchSituationDTO = mapper.readValue(apiResult.getPayload(), MatchSituationDTO.class);
+            MatchSituationDTO matchSituationDTO = apiResult.getPayload();
             return matchSituationDTO;
         } catch (Exception e) {
             log.warn("createEndlessMatch error: {}", apiResult);
@@ -134,6 +151,17 @@ public class QuizService implements IFileProvider {
     @Override
     public String getCacheSubFolerName() {
         return "quiz";
+    }
+
+    public List<TeamConstInfoDTO> updateTeam(String sessionId, TeamConstInfoDTO teamConstInfoDTO) {
+        ApiResult<List<TeamConstInfoDTO>> apiResult = stillstandingApiService.updateTeam(teamConstInfoDTO);
+        try {
+            List<TeamConstInfoDTO> payload = apiResult.getPayload();
+            return payload;
+        } catch (Exception e) {
+            log.warn("updateTeam error: {}", apiResult);
+            return null;
+        }
     }
     
 }

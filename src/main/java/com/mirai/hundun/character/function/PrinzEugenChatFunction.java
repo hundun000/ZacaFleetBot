@@ -1,6 +1,8 @@
 package com.mirai.hundun.character.function;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +32,11 @@ public class PrinzEugenChatFunction implements IFunction {
     
     private File pupuImage;
     ExternalResource pupuExternalResource;
+    
+    @Override
+    public List<SubFunction> getSubFunctions() {
+        return Arrays.asList();
+    }
     
     public PrinzEugenChatFunction() {
         try {

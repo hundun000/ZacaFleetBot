@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.question;
 
 import lombok.Data;
 
@@ -13,7 +13,7 @@ public class Resource {
     
     public Resource(String localFilePathName) {
         this.type = ResourceType.getByLocalFileExtension(localFilePathName);
-        this.data = localFilePathName;
+        this.data = type == ResourceType.NONE ? null : localFilePathName;
     }
     
     public Resource() {

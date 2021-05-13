@@ -59,10 +59,9 @@ public class Neko extends BaseCharacter {
     protected void initParser() {
 
 
-        parser.tokenizer.KEYWORD_WAKE_UP = "猫猫";
-        parser.tokenizer.keywords.put("猫猫", TokenType.WAKE_UP);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameNextQuest);
-        parser.tokenizer.functionNames.add(quizHandler.functionNameStartMatch);
+        parser.tokenizer.registerWakeUpKeyword("猫猫");
+        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
+
         
         parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
         

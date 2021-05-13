@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.event;
 
 public enum EventType {
     SWITCH_QUESTION,
@@ -10,6 +10,6 @@ public enum EventType {
 	GENERAL_SUCCESS, 
 	GENERAL_FAIL, 
 	ANSWER_RESULT,
-	START_TEAM,
+	START_MATCH,
 	;
 }

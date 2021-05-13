@@ -20,9 +20,12 @@ import com.mirai.hundun.character.Neko;
 import com.mirai.hundun.character.PrinzEugen;
 import com.mirai.hundun.character.ZacaMusume;
 import com.mirai.hundun.character.function.WeiboFunction;
+import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.EventInfoFactory;
 import com.mirai.hundun.core.GroupConfig;
+import com.mirai.hundun.core.UserTag;
+import com.mirai.hundun.core.UserTagConfig;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.parser.statement.Statement;
 
@@ -62,41 +65,35 @@ public class CharacterRouter extends SimpleListenerHost {
 
     Map<Long, GroupConfig> groupConfigs = new HashMap<>();
 
-    @Value("${account.group.arknights}")
-    public long arknightsGroupId;
+    Map<Long, UserTagConfig> userTagConfigs = new HashMap<>();
     
-    @Value("${account.group.kancolle}")
-    public long kancolleGroupId;
-    
-    @Value("${account.group.neko}")
-    public long nekoGroupId;
+//    @Value("${account.group.arknights}")
+//    public long arknightsGroupId;
+//    
+//    @Value("${account.group.kancolle}")
+//    public long kancolleGroupId;
+//    
+//    @Value("${account.group.neko}")
+//    public long nekoGroupId;
     
     List<BaseCharacter> characters = new ArrayList<>();
     
     
-    //Map<Long, List<String>> groupIdToCharacterIds = new HashMap<>();
+    @Autowired
+    PrivateSettings privateSettings;
     
-    
-    /**
-     * TODO read from config file
-     */
-    private void fakeReadConfigFile() {
-        GroupConfig config;
-        config = new GroupConfig();
-        config.setGroupDescription("kancolleGroup");
-        config.setGroupId(kancolleGroupId);
-        config.setEnableCharacters(Arrays.asList(prinzEugen.getId(), zacaMusume.getId(), neko.getId()));
-        groupConfigs.put(config.getGroupId(), config);
-        config = new GroupConfig();
-        config.setGroupDescription("arknightsGroup");
-        config.setGroupId(arknightsGroupId);
-        config.setEnableCharacters(Arrays.asList(amiya.getId(), zacaMusume.getId()));
-        groupConfigs.put(config.getGroupId(), config);
-        config = new GroupConfig();
-        config.setGroupDescription("nekoGroup");
-        config.setGroupId(nekoGroupId);
-        config.setEnableCharacters(Arrays.asList(neko.getId()));
-        groupConfigs.put(config.getGroupId(), config);
+
+    private void readConfigFile() {
+        for (Entry<String, GroupConfig> entry : privateSettings.getGroupConfigs().entrySet()) {
+            GroupConfig config = entry.getValue();
+            config.setGroupDescription(entry.getKey());
+            groupConfigs.put(config.getGroupId(), config);
+        }
+        
+        for (Entry<String, UserTagConfig> entry : privateSettings.getUserTagConfigs().entrySet()) {
+            UserTagConfig config = entry.getValue();
+            userTagConfigs.put(config.getId(), config);
+        }
     }
     
     
@@ -107,9 +104,8 @@ public class CharacterRouter extends SimpleListenerHost {
         characters.add(zacaMusume);
         characters.add(neko);
         
-        fakeReadConfigFile();
+        readConfigFile();
 
-        log.info("groupConfigs = {}", groupConfigs);
     }
     
 
@@ -181,6 +177,12 @@ public class CharacterRouter extends SimpleListenerHost {
         return groupConfigs;
     }
 
+    public List<UserTag> getUserTags(Long userId) {
+        if (!userTagConfigs.containsKey(userId)) {
+            return new ArrayList<>();
+        }
+        return userTagConfigs.get(userId).getTags();
+    }
 
     public List<String> getGroupCharacterIds(Long groupId) {
         if (!groupConfigs.containsKey(groupId)) {

@@ -1,7 +1,6 @@
-package com.zaca.stillstanding.domain.dto.event;
+package com.zaca.stillstanding.dto.event;
 
-import com.zaca.stillstanding.domain.dto.AnswerType;
-import com.zaca.stillstanding.domain.dto.MatchEvent;
+import com.zaca.stillstanding.dto.match.AnswerType;
 
 import lombok.Data;
 
@@ -13,4 +12,5 @@ import lombok.Data;
 public class AnswerResultEvent extends MatchEvent {
     AnswerType result;
     int addScore;
+    String addScoreTeamName;
 }

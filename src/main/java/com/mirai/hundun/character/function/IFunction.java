@@ -1,5 +1,9 @@
 package com.mirai.hundun.character.function;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
@@ -13,4 +17,6 @@ import net.mamoe.mirai.message.data.PlainText;
  */
 public interface IFunction {
     boolean acceptStatement(String sessionId, EventInfo eventinfo, Statement statement);
+    
+    List<SubFunction> getSubFunctions();
 }

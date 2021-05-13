@@ -2,6 +2,7 @@ package com.mirai.hundun.character.function.reminder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.BaseCharacter;
 import com.mirai.hundun.character.function.IFunction;
+import com.mirai.hundun.character.function.SubFunction;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.GroupConfig;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
@@ -36,9 +38,13 @@ public class ReminderFunction implements IFunction {
 
     @Autowired
     RemiderTaskRepository taskRepository;
-    
-    public String functionCreateTask = "创建提醒";
 
+
+    @Override
+    public List<SubFunction> getSubFunctions() {
+        return Arrays.asList(SubFunction.REMINDER_CREATE_TASK);
+    }
+    
     @Autowired
     BotService botService;
     
@@ -89,7 +95,7 @@ public class ReminderFunction implements IFunction {
     public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getFunctionName().equals(this.functionCreateTask)) {
+            if (functionCallStatement.getFunctionName() == SubFunction.REMINDER_CREATE_TASK) {
                 if (event.getSenderId() != botService.getAdminAccount()) {
                     botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;

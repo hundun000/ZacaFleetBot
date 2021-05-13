@@ -13,12 +13,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.UserTag;
+import com.mirai.hundun.core.UserTagConfig;
 import com.mirai.hundun.parser.statement.AtStatement;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
+import com.mirai.hundun.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
@@ -36,11 +40,8 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Component
 public class AmiyaChatFunction implements IFunction {
     
-    @Value("${account.specialUser.yuki:0}")
-    public Long yukiAccount;
-    
-    @Value("${account.specialUser.Angelina:0}")
-    public Long angelinaAccount;
+    @Autowired
+    CharacterRouter characterRouter;
     
     @Autowired
     BotService botService;
@@ -61,13 +62,13 @@ public class AmiyaChatFunction implements IFunction {
     
     List<ExternalResource> faces = new ArrayList<>();
     
-    ExternalResource yukiNodgeResource;
+    ExternalResource ceoboNodgeResource;
     ExternalResource angelinaNodgeResource;
     
     
     public AmiyaChatFunction() {
         try {
-            yukiNodgeResource = ExternalResource.create(new File("./data/images/talk/yukiNodge.png"));
+            ceoboNodgeResource = ExternalResource.create(new File("./data/images/talk/yukiNodge.png"));
             angelinaNodgeResource = ExternalResource.create(new File("./data/images/talk/angelinaNodge.png"));
             cannotRelaxExternalResource = ExternalResource.create(new File("./data/images/talk/cannotRelax.png"));
             canRelaxExternalResource = ExternalResource.create(new File("./data/images/talk/canRelax.png"));
@@ -81,6 +82,10 @@ public class AmiyaChatFunction implements IFunction {
         }
         
     }
+    @Override
+    public List<SubFunction> getSubFunctions() {
+        return Arrays.asList();
+    }
 
 
     private boolean canRelax() {
@@ -93,7 +98,7 @@ public class AmiyaChatFunction implements IFunction {
         }
         
         if (now.getDayOfYear() == todayIsWorkday || weekDay < 6) {
-            if (hour <= 9 || hour >= 17) {
+            if (hour < 9 || hour >= 17) {
                 return true;
             } else {
                 return false;
@@ -152,12 +157,19 @@ public class AmiyaChatFunction implements IFunction {
         Image image = null;
         if (eventInfo.getTargetId() == botService.getSelfAccount()) {
             image = botService.uploadImage(eventInfo.getGroupId(), faces.get(rand.nextInt(faces.size())));
-        } else if (eventInfo.getTargetId() == yukiAccount && yukiNodgeResource != null) {
-            image = botService.uploadImage(eventInfo.getGroupId(), yukiNodgeResource);
+        } else {
+            List<UserTag> tags = characterRouter.getUserTags(eventInfo.getTargetId());
+            if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
+                image = botService.uploadImage(eventInfo.getGroupId(), ceoboNodgeResource);
+            } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {
+                image = botService.uploadImage(eventInfo.getGroupId(), angelinaNodgeResource);
+            } 
 
-        } else if (eventInfo.getTargetId() == angelinaAccount && angelinaNodgeResource != null) {
-            image = botService.uploadImage(eventInfo.getGroupId(), angelinaNodgeResource);
         }
+            
+            
+            
+        
         if (image != null) {
             botService.sendToGroup(eventInfo.getGroupId(), 
                     new At(eventInfo.getSenderId())

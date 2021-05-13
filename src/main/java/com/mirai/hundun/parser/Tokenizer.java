@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.mirai.hundun.character.function.SubFunction;
+
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Message;
 import net.mamoe.mirai.message.data.PlainText;
@@ -19,10 +21,11 @@ import net.mamoe.mirai.message.data.PlainText;
  */
 public class Tokenizer {
 
-    public String KEYWORD_WAKE_UP = "UNSETTED";
+    private String KEYWORD_WAKE_UP = "UNSETTED";
     
-    public Map<String, TokenType> keywords = new HashMap<>();
-    public Set<String> functionNames = new HashSet<>();
+    private Map<String, TokenType> keywords = new HashMap<>();
+    private Map<String, SubFunction> functionIdentifiers = new HashMap<>();
+    
     
     public Tokenizer() {
     }
@@ -52,10 +55,12 @@ public class Tokenizer {
                         token.setType(keywords.get(subText));
                         token.setTextContent(subText);
                         result.add(token);
-                    } else if (functionNames.contains(subText)) {
+                    } else if (functionIdentifiers.containsKey(subText)) {
+                        SubFunction subFunction = functionIdentifiers.get(subText);
+                        
                         Token token = new Token();
                         token.setType(TokenType.FUNCTION_NAME);
-                        token.setTextContent(subText);
+                        token.setTextContent(subFunction.name());
                         result.add(token);
                     } else {
                         Token token = new Token();
@@ -67,5 +72,20 @@ public class Tokenizer {
             }
         }
         return result;
+    }
+    
+    public void registerWakeUpKeyword(String wakeUpKeyword) {
+        this.KEYWORD_WAKE_UP = wakeUpKeyword;
+        this.keywords.put(wakeUpKeyword, TokenType.WAKE_UP);
+    }
+
+    public void registerSubFunction(SubFunction subFunction, String customIdentifier) {
+        functionIdentifiers.put(customIdentifier, subFunction);
+    }
+    
+    public void registerSubFunctionsByDefaultIdentifier(List<SubFunction> subFunctions) {
+        for (SubFunction subFunction : subFunctions) {
+            functionIdentifiers.put(subFunction.getDefaultIdentifier(), subFunction);
+        }
     }
 }

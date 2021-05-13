@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.skill;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import lombok.Data;
  * Created on 2021/05/08
  */
 @Data
-public class RunTimeBuffDTO {
+public class BuffRunTimeDTO {
     String name;
     int duration;
 }

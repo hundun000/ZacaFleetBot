@@ -1,4 +1,4 @@
-package com.zaca.stillstanding.domain.dto;
+package com.zaca.stillstanding.dto.team;
 
 import java.util.Map;
 
@@ -16,4 +16,5 @@ public class TeamRuntimeInfoDTO {
     Map<String, Integer> skillRemainTimes;
     Map<String, Integer> buffs;
     boolean alive;
+    int health;
 }

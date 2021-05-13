@@ -53,8 +53,9 @@ bot框架：mirai
 
 ## 配置账号和群
 
-1. 在\src\main\resources新建application-account.yml，填上application.yml里注明需要覆写的内容。
-2. 修改CharacterRouter类的fakeReadConfigFile方法，即设置每个群使用的角色。
+1. 在\src\main\resources里把private-settings-template.yml重命名为private-settings.yml（其会被gitignore）。
+2. 修改private-settings.yml。包括：bot账号密码，每个群的群号和使用的角色，其他私密数据。
+3. private-settings会在启动后打印。注意日志的保密。
 
 ## 启动和登录
 

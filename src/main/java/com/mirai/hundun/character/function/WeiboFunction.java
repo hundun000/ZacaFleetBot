@@ -3,6 +3,7 @@ package com.mirai.hundun.character.function;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,7 +44,7 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Component
 public class WeiboFunction implements IFunction {
     
-    public String functionName = "看看饼";
+    
     
     @Autowired
     WeiboService weiboService;
@@ -157,7 +158,7 @@ public class WeiboFunction implements IFunction {
     public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (!functionCallStatement.getFunctionName().equals(this.functionName)) {
+            if (functionCallStatement.getFunctionName() != SubFunction.WEIBO_SHOW_LATEST) {
                 return false;
             }
 
@@ -188,6 +189,11 @@ public class WeiboFunction implements IFunction {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<SubFunction> getSubFunctions() {
+        return Arrays.asList(SubFunction.WEIBO_SHOW_LATEST);
     }
     
 }
