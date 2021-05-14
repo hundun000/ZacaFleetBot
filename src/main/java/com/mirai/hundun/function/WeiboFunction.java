@@ -1,4 +1,4 @@
-package com.mirai.hundun.character.function;
+package com.mirai.hundun.function;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -158,7 +158,7 @@ public class WeiboFunction implements IFunction {
     public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getFunctionName() != SubFunction.WEIBO_SHOW_LATEST) {
+            if (functionCallStatement.getSubFunction() != SubFunction.WEIBO_SHOW_LATEST) {
                 return false;
             }
 

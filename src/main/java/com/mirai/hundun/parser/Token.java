@@ -10,7 +10,7 @@ import lombok.Data;
  */
 @Data
 public class Token {
-    TokenType type;
-    String textContent;
-    Long longContent;
+    private TokenType type;
+    private String textContent;
+    private String extraContent;
 }

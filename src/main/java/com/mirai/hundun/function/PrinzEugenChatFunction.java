@@ -1,4 +1,4 @@
-package com.mirai.hundun.character.function;
+package com.mirai.hundun.function;
 
 import java.io.File;
 import java.util.Arrays;

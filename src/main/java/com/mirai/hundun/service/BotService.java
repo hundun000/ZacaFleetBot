@@ -27,10 +27,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.Amiya;
-import com.mirai.hundun.character.function.RepeatConsumer;
 import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
+import com.mirai.hundun.function.RepeatConsumer;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package com.mirai.hundun.character.function.reminder;
+package com.mirai.hundun.function.reminder;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,10 +15,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.BaseCharacter;
-import com.mirai.hundun.character.function.IFunction;
-import com.mirai.hundun.character.function.SubFunction;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.GroupConfig;
+import com.mirai.hundun.function.IFunction;
+import com.mirai.hundun.function.SubFunction;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
@@ -42,7 +42,11 @@ public class ReminderFunction implements IFunction {
 
     @Override
     public List<SubFunction> getSubFunctions() {
-        return Arrays.asList(SubFunction.REMINDER_CREATE_TASK);
+        return Arrays.asList(
+                SubFunction.REMINDER_CREATE_TASK,
+                SubFunction.REMINDER_REMOVE_TASK
+                
+                );
     }
     
     @Autowired
@@ -52,6 +56,34 @@ public class ReminderFunction implements IFunction {
     CharacterRouter characterRouter;
     
     Map<String, List<ReminderTask>> characterTasks = new HashMap<>();
+    
+    private String reminderTaskDescroption(ReminderTask task) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("id:").append(task.getId()).append(" ");
+        if (task.getMonthCondition() != -1) {
+            stringBuilder.append(task.getMonthCondition()).append("月");
+        }
+        if (task.getDayOfMonthCondition() != -1) {
+            stringBuilder.append(task.getDayOfMonthCondition()).append("日");
+        }
+        if (task.getDayOfWeekCondition() != -1) {
+            stringBuilder.append("周").append(task.getDayOfWeekCondition());
+        }
+        if (task.getHourCondition() != -1) {
+            stringBuilder.append(task.getHourCondition()).append("时");
+        }
+        if (task.getMinuteCondition() != -1) {
+            stringBuilder.append(task.getMinuteCondition()).append("分");
+        }
+        if (task.getCount() != -1) {
+            stringBuilder.append(task.getCount()).append("次");
+        } else {
+            stringBuilder.append("无限次");
+        }
+        stringBuilder.append(" ").append(task.getText());
+        return stringBuilder.toString();
+    }
+    
     
     public ReminderTask createCharacterEverydayChatTask(
             int hourCondition,
@@ -95,7 +127,7 @@ public class ReminderFunction implements IFunction {
     public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getFunctionName() == SubFunction.REMINDER_CREATE_TASK) {
+            if (functionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
                 if (event.getSenderId() != botService.getAdminAccount()) {
                     botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
@@ -117,6 +149,28 @@ public class ReminderFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("创建失败"));
                 }
                 
+                return true;
+            } else if (functionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
+                if (event.getSenderId() != botService.getAdminAccount()) {
+                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                    return true;
+                }
+                String targetId = functionCallStatement.getArgs().get(0);
+                if (taskRepository.existsById(targetId)) {
+                    taskRepository.deleteById(targetId);
+                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除成功！"));
+                    return true;
+                } else {
+                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除失败，不存在该数据！"));
+                    return true;
+                }
+                
+            } else if (functionCallStatement.getSubFunction() == SubFunction.REMINDER_LIST_TASK) {
+                List<ReminderTask> tasks = taskRepository.findAllByTargetGroup(event.getGroupId());
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("提醒任务列表：\n");
+                tasks.forEach(task -> stringBuilder.append(reminderTaskDescroption(task)).append("\n------\n"));
+                botService.sendToGroup(event.getGroupId(), stringBuilder.toString());
                 return true;
             }
         }

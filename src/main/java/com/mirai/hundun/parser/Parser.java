@@ -48,7 +48,7 @@ public class Parser {
             tokens.addAll(newTokens);
         }
         
-        StatementType type = syntaxsTree.root.accept(new ArrayList<>(tokens));
+        StatementType type = syntaxsTree.root.accept(tokens, 0);
         if (type == null) {
             type = StatementType.SYNTAX_ERROR;
         }
@@ -127,17 +127,26 @@ public class Parser {
             children.put(input, node);
         }
         
-        public StatementType accept(List<Token> tokens) {
+        /**
+         * 特别地，当token的原type非accept时，会尝试把token类型改变为LITERAL_VALU再次检查
+         */
+        public StatementType accept(List<Token> tokens, int currentIndex) {
             if (tokens == null) {
                 return null;
             }
-            if (tokens.size() > 0) {
-                Token top = tokens.remove(0);
-                DFANode nextNode = getChildNode(top.type);
+            if (tokens.size() > currentIndex) {
+                Token top = tokens.get(currentIndex);
+                DFANode nextNode = getChildNode(top.getType());
                 if (nextNode == null) {
-                    return StatementType.SYNTAX_ERROR;
+                    nextNode = getChildNode(TokenType.LITERAL_VALUE);
+                    if (nextNode == null) {
+                        return StatementType.SYNTAX_ERROR;
+                    } else {
+                        top.setType(TokenType.LITERAL_VALUE);
+                        top.setExtraContent(null);
+                    }
                 }
-                return nextNode.accept(tokens);
+                return nextNode.accept(tokens, currentIndex + 1);
             } else {
                 return endType;
             }

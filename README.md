@@ -4,9 +4,7 @@ bot框架：mirai
 
 外部服务：微博api、企鹅物流api、一站到底答题项目
 
-### bot
-
-本项目只登录唯一的QQ账号，即创建唯一的bot。该bot在可在不同Q群扮演不同角色，只提供该角色的功能，使用该角色的台词（TODO）。
+bot：本项目只登录唯一的QQ账号，即创建唯一的bot。该bot在可在不同Q群扮演不同角色，只提供该角色的功能，使用该角色的台词（TODO）。目标是使用同一个账号，为多个群提供差异化服务，易配置，易裁剪或拓展。
 
 ### 现有角色
 
@@ -55,7 +53,7 @@ bot框架：mirai
 
 1. 在\src\main\resources里把private-settings-template.yml重命名为private-settings.yml（其会被gitignore）。
 2. 修改private-settings.yml。包括：bot账号密码，每个群的群号和使用的角色，其他私密数据。
-3. private-settings会在启动后打印。注意日志的保密。
+3. private-settings会在启动后打印。注意日志的保密或修改代码。
 
 ## 启动和登录
 
@@ -98,13 +96,17 @@ mirai-core + springboot + mongoDB + gradle
 
 单例。若有需要，在内部自行实现区分不同session的上下文。
 
+### SubFunction 功能
+
+枚举。用于区分一个Function下个最小粒度的功能。例如“创建事项提醒”和“查询事项提醒”、“删除事项提醒”分别是RemiderFunction下的3个SubFunction。
+
 ### Statement 指令
 
 原始输入MessageChain将被Character处理为一个Statement，Statement作为Function的输入。
 
 目的是实现如下功能：假设Amiya和PrinzEugen都使用查微博功能WeiboFuction，但是希望调用功能的语法不同（TODO），例如分别是“阿米娅 看看饼”和“欧根 查看镇守府情报”。
 
-所以Amiya和PrinzEugen需要把原始输入处理成同样的Statement(type=WEIBO_QUERY)，再将其输入WeiboFuction。
+所以Amiya和PrinzEugen需要把上述两种原始输入处理成同样的Statement(subFunction=SubFunction.WEIBO_SHOW_LATEST)，再将其输入WeiboFuction。
 
 ### Parser 语法分析器
 

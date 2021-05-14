@@ -1,4 +1,4 @@
-package com.mirai.hundun.character.function;
+package com.mirai.hundun.function;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,9 +60,9 @@ public class PenguinFunction implements IFunction {
     public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
         if (statement instanceof FunctionCallStatement) {
             FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getFunctionName() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
+            if (functionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
                 String itemFuzzyName = functionCallStatement.getArgs().get(0);
-                log.info("{} by {}", functionCallStatement.getFunctionName(), itemFuzzyName);
+                log.info("{} by {}", functionCallStatement.getSubFunction(), itemFuzzyName);
                 MatrixReport report = penguinService.getTopResultNode(itemFuzzyName, 3);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -79,9 +79,9 @@ public class PenguinFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
-            } else if (functionCallStatement.getFunctionName() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
+            } else if (functionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
                 String stageCode = functionCallStatement.getArgs().get(0);
-                log.info("{} by {}", functionCallStatement.getFunctionName(), stageCode);
+                log.info("{} by {}", functionCallStatement.getSubFunction(), stageCode);
                 StageInfoReport report = penguinService.getStageInfoReport(stageCode);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -117,7 +117,7 @@ public class PenguinFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
-            } else if (functionCallStatement.getFunctionName() == SubFunction.PENGUIN_UPDATE) {
+            } else if (functionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
                 botService.sendToGroup(event.getGroupId(), "好的");
             }

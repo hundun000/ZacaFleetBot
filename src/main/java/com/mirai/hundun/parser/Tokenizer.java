@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.mirai.hundun.character.function.SubFunction;
+import com.mirai.hundun.function.SubFunction;
 
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Message;
@@ -37,7 +37,7 @@ public class Tokenizer {
             At atMessage = (At)message;
             Token token = new Token();
             token.setType(TokenType.AT);
-            token.setLongContent(atMessage.getTarget());
+            token.setExtraContent(String.valueOf(atMessage.getTarget()));
             result.add(token);
         } else if (message instanceof PlainText) {
             PlainText plainTextMessage = (PlainText)message;
@@ -60,7 +60,8 @@ public class Tokenizer {
                         
                         Token token = new Token();
                         token.setType(TokenType.FUNCTION_NAME);
-                        token.setTextContent(subFunction.name());
+                        token.setTextContent(subText);
+                        token.setExtraContent(subFunction.name());
                         result.add(token);
                     } else {
                         Token token = new Token();

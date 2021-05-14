@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.character.function.PrinzEugenChatFunction;
-import com.mirai.hundun.character.function.RepeatConsumer;
-import com.mirai.hundun.character.function.SubFunction;
-import com.mirai.hundun.character.function.WeiboFunction;
-import com.mirai.hundun.character.function.reminder.ReminderFunction;
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.function.PrinzEugenChatFunction;
+import com.mirai.hundun.function.RepeatConsumer;
+import com.mirai.hundun.function.SubFunction;
+import com.mirai.hundun.function.WeiboFunction;
+import com.mirai.hundun.function.reminder.ReminderFunction;
 import com.mirai.hundun.parser.StatementType;
 import com.mirai.hundun.parser.TokenType;
 import com.mirai.hundun.parser.statement.FunctionCallStatement;
@@ -103,6 +103,12 @@ public class PrinzEugen extends BaseCharacter {
             done = reminderFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by reminderFunction");
+            }
+        }
+        if (!done) {
+            done = weiboFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by weiboFunction");
             }
         }
         if (!done) {

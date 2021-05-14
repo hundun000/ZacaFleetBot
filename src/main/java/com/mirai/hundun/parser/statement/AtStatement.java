@@ -27,6 +27,6 @@ public class AtStatement extends Statement {
     long target;
     
     public AtStatement(List<Token> tokens) {
-        this.target = tokens.get(0).getLongContent();
+        this.target = Long.valueOf(tokens.get(0).getTextContent());
     }
 }

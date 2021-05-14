@@ -1,4 +1,4 @@
-package com.mirai.hundun.character.function;
+package com.mirai.hundun.function;
 /**
  * @author hundun
  * Created on 2021/05/14
@@ -19,6 +19,8 @@ public enum SubFunction {
     PENGUIN_QUERY_STAGE_INFO("查作战"),
     
     REMINDER_CREATE_TASK("创建提醒"),
+    REMINDER_LIST_TASK("查看提醒"),
+    REMINDER_REMOVE_TASK("移除提醒"),
     ;
     
     

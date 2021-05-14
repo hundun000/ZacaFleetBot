@@ -1,5 +1,6 @@
-package com.mirai.hundun.character.function.reminder;
+package com.mirai.hundun.function.reminder;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
@@ -11,6 +12,8 @@ import lombok.Data;
 @Data
 @Document
 public class ReminderTask {
+    @Id
+    String id;
     int count;
     long targetGroup;
     String text;

@@ -19,7 +19,6 @@ import com.mirai.hundun.character.BaseCharacter;
 import com.mirai.hundun.character.Neko;
 import com.mirai.hundun.character.PrinzEugen;
 import com.mirai.hundun.character.ZacaMusume;
-import com.mirai.hundun.character.function.WeiboFunction;
 import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.EventInfoFactory;
@@ -27,6 +26,7 @@ import com.mirai.hundun.core.GroupConfig;
 import com.mirai.hundun.core.UserTag;
 import com.mirai.hundun.core.UserTagConfig;
 import com.mirai.hundun.cp.weibo.WeiboService;
+import com.mirai.hundun.function.WeiboFunction;
 import com.mirai.hundun.parser.statement.Statement;
 
 import kotlin.coroutines.CoroutineContext;

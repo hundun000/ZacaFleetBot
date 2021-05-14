@@ -1,4 +1,4 @@
-package com.mirai.hundun.character.function;
+package com.mirai.hundun.function;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,6 +24,7 @@ import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 import com.mirai.hundun.service.file.FileService;
+import com.zaca.stillstanding.dto.buff.BuffDTO;
 import com.zaca.stillstanding.dto.event.AnswerResultEvent;
 import com.zaca.stillstanding.dto.event.EventType;
 import com.zaca.stillstanding.dto.event.FinishEvent;
@@ -116,72 +117,77 @@ public class QuizHandler implements IFunction {
             
             if (statement instanceof FunctionCallStatement) {
                 FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-                if (functionCallStatement.getFunctionName() == SubFunction.QUIZ_NEXT_QUEST) {
-                    if (sessionData.matchSituationDTO == null) {
-                        botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
-                        result = true;
-                    } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_GENERATE_QUESTION) {
-                        result = handleNextQustion(sessionData, event);
-                    } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
-                        botService.sendToGroup(event.getGroupId(), "上一个问题还没回答哦~");
-                        result = true;
-                    }
-                } else if (functionCallStatement.getFunctionName() == SubFunction.QUIZ_USE_SKILL) {
-                    if (sessionData.matchSituationDTO == null) {
-                        botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
-                        result = true;
-                    } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
-                        String skillName = functionCallStatement.getArgs().get(0);
-                        result = handleUseSkill(sessionData, event, skillName);
-                    }
-                } else if (functionCallStatement.getFunctionName() == SubFunction.QUIZ_EXIT) {
-                    if (event.getSenderId() == botService.getAdminAccount()) {
-                        sessionData.matchSituationDTO = null;
-                        botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
-                        return true;
-                    } else {
-                        botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                        return true;
-                    }
-                } else if (functionCallStatement.getFunctionName() == SubFunction.QUIZ_START_ENDLESS_MATCH 
-                        || functionCallStatement.getFunctionName() == SubFunction.QUIZ_START_PRE_MATCH
-                        || functionCallStatement.getFunctionName() == SubFunction.QUIZ_START_MAIN_MATCH
-                        ) {
-                    if (sessionData.matchSituationDTO == null) {
-                        String questionPackageName = functionCallStatement.getArgs().get(0);
-                        String teamName = functionCallStatement.getArgs().get(1);
-                        boolean showCompletedSituation = false;
-                        if (functionCallStatement.getArgs().size() >= 3) {
-                            String show = functionCallStatement.getArgs().get(2);
-                            if (show.contains("完整")) {
-                                showCompletedSituation = true;
-                            }
+                switch (functionCallStatement.getSubFunction()) {
+                    case QUIZ_NEXT_QUEST:
+                        if (sessionData.matchSituationDTO == null) {
+                            botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
+                            result = true;
+                        } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_GENERATE_QUESTION) {
+                            result = handleNextQustion(sessionData, event);
+                        } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
+                            botService.sendToGroup(event.getGroupId(), "上一个问题还没回答哦~");
+                            result = true;
                         }
-                        
-                        result = handleCreateAndStartMatch(sessionData, event, functionCallStatement.getFunctionName(), questionPackageName, teamName, showCompletedSituation);
-                    } else {
-                        botService.sendToGroup(event.getGroupId(), "目前已在比赛中");
-                        result = true;
-                    }
-                    
-                } else if (functionCallStatement.getFunctionName() == SubFunction.QUIZ_UPDATE_TEAM) {
-                    if (event.getSenderId() == botService.getAdminAccount()) {
-                        String teamName = functionCallStatement.getArgs().get(0);
-                        List<String> pickTags = Arrays.asList(functionCallStatement.getArgs().get(1).split("&"));
-                        List<String> banTags = Arrays.asList(functionCallStatement.getArgs().get(2).split("&"));
-                        String roleName = functionCallStatement.getArgs().get(3);
-                        TeamConstInfoDTO teamConstInfoDTO = new TeamConstInfoDTO();
-                        teamConstInfoDTO.setName(teamName);
-                        teamConstInfoDTO.setPickTags(pickTags);
-                        teamConstInfoDTO.setBanTags(banTags);
-                        teamConstInfoDTO.setRoleName(roleName);
-                        result = handleUpdateTeam(sessionData, event, teamConstInfoDTO);
-                    } else {
-                        botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                        return true;
-                    }
-                    
-                    
+                        break;
+                    case QUIZ_USE_SKILL:
+                        if (sessionData.matchSituationDTO == null) {
+                            botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
+                            result = true;
+                        } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
+                            String skillName = functionCallStatement.getArgs().get(0);
+                            result = handleUseSkill(sessionData, event, skillName);
+                        } else {
+                            botService.sendToGroup(event.getGroupId(), "当前不能使用技能");
+                            result = true;
+                        }
+                        break;
+                    case QUIZ_EXIT:
+                        if (event.getSenderId() == botService.getAdminAccount()) {
+                            sessionData.matchSituationDTO = null;
+                            botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
+                            return true;
+                        } else {
+                            botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                            return true;
+                        }
+                    case QUIZ_START_ENDLESS_MATCH:
+                    case QUIZ_START_PRE_MATCH:
+                    case QUIZ_START_MAIN_MATCH:    
+                        if (sessionData.matchSituationDTO == null) {
+                            String questionPackageName = functionCallStatement.getArgs().get(0);
+                            String teamName = functionCallStatement.getArgs().get(1);
+                            boolean showCompletedSituation = false;
+                            if (functionCallStatement.getArgs().size() >= 3) {
+                                String show = functionCallStatement.getArgs().get(2);
+                                if (show.contains("完整")) {
+                                    showCompletedSituation = true;
+                                }
+                            }
+                            result = handleCreateAndStartMatch(sessionData, event, functionCallStatement.getSubFunction(), questionPackageName, teamName, showCompletedSituation);
+                        } else {
+                            botService.sendToGroup(event.getGroupId(), "目前已在比赛中");
+                            result = true;
+                        }
+                        break;
+                    case QUIZ_UPDATE_TEAM:
+                        if (event.getSenderId() == botService.getAdminAccount()) {
+                            String teamName = functionCallStatement.getArgs().get(0);
+                            List<String> pickTags = Arrays.asList(functionCallStatement.getArgs().get(1).split("&"));
+                            List<String> banTags = Arrays.asList(functionCallStatement.getArgs().get(2).split("&"));
+                            String roleName = functionCallStatement.getArgs().get(3);
+                            TeamConstInfoDTO teamConstInfoDTO = new TeamConstInfoDTO();
+                            teamConstInfoDTO.setName(teamName);
+                            teamConstInfoDTO.setPickTags(pickTags);
+                            teamConstInfoDTO.setBanTags(banTags);
+                            teamConstInfoDTO.setRoleName(roleName);
+                            result = handleUpdateTeam(sessionData, event, teamConstInfoDTO);
+                        } else {
+                            botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                            return true;
+                        }
+                        break;
+                    default:
+                        break;
                 }
             } else if (statement instanceof LiteralValueStatement) {
                 
@@ -231,9 +237,6 @@ public class QuizHandler implements IFunction {
                         case "跳过":
                             String fakeAnswerChar = skillResultEvent.getArgs().get(0);
                             return handleAnswer(sessionData, event, fakeAnswerChar);
-                        case "求助":
-                            // do nothing more
-                            break;
                         case "5050":
                             Random random = new Random();
                             QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
@@ -271,6 +274,10 @@ public class QuizHandler implements IFunction {
                                     stringBuilder.append("揭示的错误选项：B、C");
                                 } 
                             }
+                            break;
+                        default:
+                            log.info("do nothing for {} as default", skillResultEvent.getSkillName());
+                            break;
                     }
                 } catch (Exception e) {
                     stringBuilder.append("エラー発生。处理这个技能的结果时出错：" + e.getMessage());
@@ -312,36 +319,10 @@ public class QuizHandler implements IFunction {
             stringBuilder.append("开始比赛成功");
             if (sessionData.showCompletedSituation) {
                 
-                StartMatchEvent matchEvent = newSituationDTO.getStartMatchEvent();
+                StartMatchEvent startMatchEvent = newSituationDTO.getStartMatchEvent();
                 
-                stringBuilder.append("\n\n队伍详情:\n");
-                for (int i = 0; i < matchEvent.getTeamConstInfos().size(); i++) {
-                    TeamRuntimeInfoDTO teamRuntimeInfoDTO = newSituationDTO.getTeamRuntimeInfos().get(i);
-                    TeamConstInfoDTO team = matchEvent.getTeamConstInfos().get(i);
-                    RoleConstInfoDTO role = matchEvent.getRoleConstInfos().get(i);
-                    
-                    stringBuilder.append(team.getName()).append(" 生命:").append(teamRuntimeInfoDTO.getHealth()).append("\n");
-                    if (team.getPickTags().size() > 0) {
-                        stringBuilder.append("Pick:");
-                        team.getPickTags().forEach(tag -> stringBuilder.append(tag).append("、"));
-                        stringBuilder.setLength(stringBuilder.length() - 1);
-                        stringBuilder.append("\n");
-                    }
-                    if (team.getBanTags().size() > 0) {
-                        stringBuilder.append("Ban:");
-                        team.getBanTags().forEach(tag -> stringBuilder.append(tag).append("、"));
-                        stringBuilder.setLength(stringBuilder.length() - 1);
-                        stringBuilder.append("\n");
-                    }
-                    stringBuilder.append("英雄:").append(role.getName()).append(" 介绍:").append(role.getDescription()).append("\n");
-                    for (int j = 0; j < role.getSkillNames().size(); j++) {
-                        stringBuilder.append("技能").append(j + 1).append(":").append(role.getSkillNames().get(j)).append(" ");
-                        stringBuilder.append("次数:").append(role.getSkillFullCounts().get(j)).append(" ");
-                        stringBuilder.append("效果:").append(role.getSkillDescriptions().get(j)).append("\n");
-                    }
-                    
-                }
-                
+                String teamDetailText = teamsDetailText(newSituationDTO.getTeamRuntimeInfos(), startMatchEvent.getTeamConstInfos(), startMatchEvent.getRoleConstInfos());
+                stringBuilder.append("\n\n").append(teamDetailText);
             }
             
             
@@ -401,6 +382,8 @@ public class QuizHandler implements IFunction {
         return true;
     }
     
+    
+    
     private boolean handleAnswer(SessionData sessionData, EventInfo event, String answerChar) {
         String correctAnser = QuestionDTO.intToAnswerText(sessionData.matchSituationDTO.getQuestion().getAnswer());
         MatchSituationDTO newSituationDTO = quizService.answer(sessionData.matchSituationDTO.getId(), answerChar);
@@ -416,30 +399,24 @@ public class QuizHandler implements IFunction {
             
             MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
             messageChainBuilder.add(new At(event.getSenderId()));
-            if (answerResultEvent.getResult() == AnswerType.CORRECT) {
-                messageChainBuilder.add(new PlainText("回答正确\n正确答案是" + correctAnser));
-            } else if (answerResultEvent.getResult() == AnswerType.WRONG) {
-                messageChainBuilder.add(new PlainText("回答错误QAQ\n正确答案是" + correctAnser));
-            } else if (answerResultEvent.getResult() == AnswerType.SKIPPED) {
-                messageChainBuilder.add(new PlainText("本题已跳过\n正确答案是" + correctAnser));
+            
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                if (answerResultEvent.getResult() == AnswerType.CORRECT) {
+                    stringBuilder.append("回答正确\n正确答案是" + correctAnser);
+                } else if (answerResultEvent.getResult() == AnswerType.WRONG) {
+                    stringBuilder.append("回答错误QAQ\n正确答案是" + correctAnser);
+                } else if (answerResultEvent.getResult() == AnswerType.SKIPPED) {
+                    stringBuilder.append("本题已跳过\n正确答案是" + correctAnser);
+                }
+                stringBuilder.append("\n").append(answerResultEvent.getAddScoreTeamName()).append(" +").append(answerResultEvent.getAddScore()).append("分\n");
+                messageChainBuilder.add(new PlainText(stringBuilder.toString()));
             }
             
             
             if (sessionData.showCompletedSituation) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("\n").append(answerResultEvent.getAddScoreTeamName()).append(" +").append(answerResultEvent.getAddScore()).append("分\n");
-                stringBuilder.append("队伍状态:\n");
-                for (TeamRuntimeInfoDTO dto : sessionData.matchSituationDTO.getTeamRuntimeInfos()) {
-                    stringBuilder.append(dto.getName()).append(" ");
-                    stringBuilder.append("得分:").append(dto.getMatchScore()).append(" ");
-                    stringBuilder.append("生命:").append(dto.getHealth()).append(" ");
-                    stringBuilder.append("英雄:").append(dto.getRoleName()).append("\n");
-                    for (Entry<String, Integer> entry : dto.getSkillRemainTimes().entrySet()) {
-                        stringBuilder.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
-                    }
-                    stringBuilder.append("\n");
-                }
-                messageChainBuilder.add(new PlainText(stringBuilder.toString()));
+                String text = teamsNormalText(sessionData.matchSituationDTO.getTeamRuntimeInfos());
+                messageChainBuilder.add(new PlainText(text));
             }
             
             if (newSituationDTO.getSwitchTeamEvent() != null) {
@@ -464,4 +441,64 @@ public class QuizHandler implements IFunction {
             return false;
         }
     }
+    
+    
+    
+    
+    private String teamsNormalText(List<TeamRuntimeInfoDTO> dtos) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("队伍状态:\n");
+        for (TeamRuntimeInfoDTO dto : dtos) {
+            stringBuilder.append(dto.getName()).append(" ");
+            stringBuilder.append("得分:").append(dto.getMatchScore()).append(" ");
+            stringBuilder.append("生命:").append(dto.getHealth()).append(" ");
+            if (dto.getBuffs().size() > 0) {
+                stringBuilder.append("Buff:\n");
+                for (BuffDTO buffDTO : dto.getBuffs()) {
+                    stringBuilder.append(buffDTO.getName()).append("x").append(buffDTO.getDuration()).append(" ").append(buffDTO.getDescription()).append("\n");
+                }
+            }
+            stringBuilder.append("英雄:").append(dto.getRoleName()).append(" 技能:\n");
+            for (Entry<String, Integer> entry : dto.getSkillRemainTimes().entrySet()) {
+                stringBuilder.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+            }
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
+    
+    
+    private String teamsDetailText(List<TeamRuntimeInfoDTO> teamRuntimeDTOs, List<TeamConstInfoDTO> teamDTOs, List<RoleConstInfoDTO> roleDTOs) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("队伍详情:\n");
+        for (int i = 0; i < teamRuntimeDTOs.size(); i++) {
+            TeamRuntimeInfoDTO teamRuntimeInfoDTO = teamRuntimeDTOs.get(i);
+            TeamConstInfoDTO team = teamDTOs.get(i);
+            RoleConstInfoDTO role = roleDTOs.get(i);
+            
+            stringBuilder.append(team.getName()).append(" 生命:").append(teamRuntimeInfoDTO.getHealth()).append("\n");
+            if (team.getPickTags().size() > 0) {
+                stringBuilder.append("Pick:");
+                team.getPickTags().forEach(tag -> stringBuilder.append(tag).append("、"));
+                stringBuilder.setLength(stringBuilder.length() - 1);
+                stringBuilder.append("\n");
+            }
+            if (team.getBanTags().size() > 0) {
+                stringBuilder.append("Ban:");
+                team.getBanTags().forEach(tag -> stringBuilder.append(tag).append("、"));
+                stringBuilder.setLength(stringBuilder.length() - 1);
+                stringBuilder.append("\n");
+            }
+            stringBuilder.append("英雄:").append(role.getName()).append(" 介绍:").append(role.getDescription()).append("\n");
+            for (int j = 0; j < role.getSkillNames().size(); j++) {
+                stringBuilder.append("技能").append(j + 1).append(":").append(role.getSkillNames().get(j)).append(" ");
+                stringBuilder.append("次数:").append(role.getSkillFullCounts().get(j)).append(" ");
+                stringBuilder.append("效果:").append(role.getSkillDescriptions().get(j)).append("\n");
+            }
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
+    
+    
 }

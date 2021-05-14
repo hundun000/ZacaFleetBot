@@ -10,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.character.function.QuizHandler;
-import com.mirai.hundun.character.function.RepeatConsumer;
-import com.mirai.hundun.character.function.WeiboFunction;
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.function.QuizHandler;
+import com.mirai.hundun.function.RepeatConsumer;
+import com.mirai.hundun.function.WeiboFunction;
 import com.mirai.hundun.parser.Parser;
 import com.mirai.hundun.parser.StatementType;
 import com.mirai.hundun.parser.TokenType;
