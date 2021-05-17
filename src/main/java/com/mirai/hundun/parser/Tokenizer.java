@@ -3,11 +3,8 @@ package com.mirai.hundun.parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import com.mirai.hundun.function.SubFunction;
 
 import net.mamoe.mirai.message.data.At;
@@ -22,6 +19,7 @@ import net.mamoe.mirai.message.data.PlainText;
 public class Tokenizer {
 
     private String KEYWORD_WAKE_UP = "UNSETTED";
+    private String KEYWORD_QUICK_QUERRY = "UNSETTED";
     
     private Map<String, TokenType> keywords = new HashMap<>();
     private Map<String, SubFunction> functionIdentifiers = new HashMap<>();
@@ -44,11 +42,19 @@ public class Tokenizer {
             String text = plainTextMessage != null ? plainTextMessage.contentToString() : null;
             if (text != null && text.trim().length() > 0) {
                 List<String> subTexts = new ArrayList<>(Arrays.asList(text.split(" ")));
+                // special rule: split WAKE_UP from start
                 if (subTexts.get(0).startsWith(KEYWORD_WAKE_UP) && subTexts.get(0).length() > KEYWORD_WAKE_UP.length()) {
                     String autoSplit = subTexts.get(0).substring(KEYWORD_WAKE_UP.length());
                     subTexts.set(0, KEYWORD_WAKE_UP);
                     subTexts.add(1, autoSplit);
                 }
+                // special rule: split WAKE_UP from start
+                if (subTexts.get(0).endsWith(KEYWORD_QUICK_QUERRY) && subTexts.get(0).length() > KEYWORD_QUICK_QUERRY.length()) {
+                    String autoSplit = subTexts.get(0).substring(0, subTexts.get(0).length() - KEYWORD_QUICK_QUERRY.length());
+                    subTexts.set(0, autoSplit);
+                    subTexts.add(1, KEYWORD_QUICK_QUERRY);
+                }
+                
                 for (String subText : subTexts) {
                     if (keywords.containsKey(subText)) {
                         Token token = new Token();
@@ -74,19 +80,22 @@ public class Tokenizer {
         }
         return result;
     }
+
     
-    public void registerWakeUpKeyword(String wakeUpKeyword) {
-        this.KEYWORD_WAKE_UP = wakeUpKeyword;
-        this.keywords.put(wakeUpKeyword, TokenType.WAKE_UP);
+    public void registerKeyword(String keyword, TokenType tokenType) throws Exception {
+        if (keywords.containsKey(keyword)) {
+            throw new Exception("已存在keyword = " + keywords.get(keyword));
+        }
+        this.keywords.put(keyword, tokenType);
+        if (tokenType == TokenType.WAKE_UP) {
+            this.KEYWORD_WAKE_UP = keyword;
+        } else if (tokenType == TokenType.QUICK_SEARCH) {
+            this.KEYWORD_QUICK_QUERRY = keyword;
+        }
     }
 
     public void registerSubFunction(SubFunction subFunction, String customIdentifier) {
         functionIdentifiers.put(customIdentifier, subFunction);
     }
-    
-    public void registerSubFunctionsByDefaultIdentifier(List<SubFunction> subFunctions) {
-        for (SubFunction subFunction : subFunctions) {
-            functionIdentifiers.put(subFunction.getDefaultIdentifier(), subFunction);
-        }
-    }
+
 }

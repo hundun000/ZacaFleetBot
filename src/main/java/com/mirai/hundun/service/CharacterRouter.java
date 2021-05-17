@@ -1,7 +1,6 @@
 package com.mirai.hundun.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.character.Amiya;
@@ -25,10 +23,7 @@ import com.mirai.hundun.core.EventInfoFactory;
 import com.mirai.hundun.core.GroupConfig;
 import com.mirai.hundun.core.UserTag;
 import com.mirai.hundun.core.UserTagConfig;
-import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.function.WeiboFunction;
-import com.mirai.hundun.parser.statement.Statement;
-
 import kotlin.coroutines.CoroutineContext;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.EventHandler;

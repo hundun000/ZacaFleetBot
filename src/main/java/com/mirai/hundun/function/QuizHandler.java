@@ -7,19 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.core.EventInfo;
-import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
-import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.cp.quiz.QuizService;
 import com.mirai.hundun.cp.quiz.QuizService.MatchType;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
@@ -41,11 +36,8 @@ import com.zaca.stillstanding.dto.role.RoleConstInfoDTO;
 import com.zaca.stillstanding.dto.team.TeamConstInfoDTO;
 import com.zaca.stillstanding.dto.team.TeamRuntimeInfoDTO;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
@@ -69,9 +61,7 @@ public class QuizHandler implements IFunction {
                 SubFunction.QUIZ_UPDATE_TEAM, 
                 SubFunction.QUIZ_NEXT_QUEST, 
                 SubFunction.QUIZ_USE_SKILL, 
-                SubFunction.QUIZ_START_ENDLESS_MATCH, 
-                SubFunction.QUIZ_START_PRE_MATCH,
-                SubFunction.QUIZ_START_MAIN_MATCH
+                SubFunction.QUIZ_START_MATCH
                 );
     }
     
@@ -86,8 +76,7 @@ public class QuizHandler implements IFunction {
     BotService botService;
     
     Map<String, SessionData> sessionDataMap = new HashMap<>();
-    
-    private static final long QUESTION_TIME_OUT = 3 * 60 * 1000;
+
     
     @Data
     private class SessionData {
@@ -103,21 +92,21 @@ public class QuizHandler implements IFunction {
     
 
     @Override
-    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
+    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         
         synchronized (this) {
             
-            SessionData sessionData = sessionDataMap.get(sessionId);
+            SessionData sessionData = sessionDataMap.get(sessionId.id());
             if (sessionData == null) {
                 sessionData = new SessionData();
-                sessionDataMap.put(sessionId, sessionData);
+                sessionDataMap.put(sessionId.id(), sessionData);
             }
     
             boolean result = false;
             
-            if (statement instanceof FunctionCallStatement) {
-                FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-                switch (functionCallStatement.getSubFunction()) {
+            if (statement instanceof SubFunctionCallStatement) {
+                SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
+                switch (subFunctionCallStatement.getSubFunction()) {
                     case QUIZ_NEXT_QUEST:
                         if (sessionData.matchSituationDTO == null) {
                             botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
@@ -134,7 +123,7 @@ public class QuizHandler implements IFunction {
                             botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
                             result = true;
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
-                            String skillName = functionCallStatement.getArgs().get(0);
+                            String skillName = subFunctionCallStatement.getArgs().get(0);
                             result = handleUseSkill(sessionData, event, skillName);
                         } else {
                             botService.sendToGroup(event.getGroupId(), "当前不能使用技能");
@@ -150,20 +139,19 @@ public class QuizHandler implements IFunction {
                             botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                             return true;
                         }
-                    case QUIZ_START_ENDLESS_MATCH:
-                    case QUIZ_START_PRE_MATCH:
-                    case QUIZ_START_MAIN_MATCH:    
+                    case QUIZ_START_MATCH:   
                         if (sessionData.matchSituationDTO == null) {
-                            String questionPackageName = functionCallStatement.getArgs().get(0);
-                            String teamName = functionCallStatement.getArgs().get(1);
+                            String matchMode = subFunctionCallStatement.getArgs().get(0);
+                            String questionPackageName = subFunctionCallStatement.getArgs().get(1);
+                            String teamName = subFunctionCallStatement.getArgs().get(2);
                             boolean showCompletedSituation = false;
-                            if (functionCallStatement.getArgs().size() >= 3) {
-                                String show = functionCallStatement.getArgs().get(2);
+                            if (subFunctionCallStatement.getArgs().size() >= 4) {
+                                String show = subFunctionCallStatement.getArgs().get(3);
                                 if (show.contains("完整")) {
                                     showCompletedSituation = true;
                                 }
                             }
-                            result = handleCreateAndStartMatch(sessionData, event, functionCallStatement.getSubFunction(), questionPackageName, teamName, showCompletedSituation);
+                            result = handleCreateAndStartMatch(sessionData, event, matchMode, questionPackageName, teamName, showCompletedSituation);
                         } else {
                             botService.sendToGroup(event.getGroupId(), "目前已在比赛中");
                             result = true;
@@ -171,10 +159,10 @@ public class QuizHandler implements IFunction {
                         break;
                     case QUIZ_UPDATE_TEAM:
                         if (event.getSenderId() == botService.getAdminAccount()) {
-                            String teamName = functionCallStatement.getArgs().get(0);
-                            List<String> pickTags = Arrays.asList(functionCallStatement.getArgs().get(1).split("&"));
-                            List<String> banTags = Arrays.asList(functionCallStatement.getArgs().get(2).split("&"));
-                            String roleName = functionCallStatement.getArgs().get(3);
+                            String teamName = subFunctionCallStatement.getArgs().get(0);
+                            List<String> pickTags = Arrays.asList(subFunctionCallStatement.getArgs().get(1).split("&"));
+                            List<String> banTags = Arrays.asList(subFunctionCallStatement.getArgs().get(2).split("&"));
+                            String roleName = subFunctionCallStatement.getArgs().get(3);
                             TeamConstInfoDTO teamConstInfoDTO = new TeamConstInfoDTO();
                             teamConstInfoDTO.setName(teamName);
                             teamConstInfoDTO.setPickTags(pickTags);
@@ -295,18 +283,18 @@ public class QuizHandler implements IFunction {
         return false;
     }
 
-    private boolean handleCreateAndStartMatch(SessionData sessionData, EventInfo event, SubFunction subFunction, String questionPackageName, String teamName, boolean showTeamSituation) {
+    private boolean handleCreateAndStartMatch(SessionData sessionData, EventInfo event, String matchMode, String questionPackageName, String teamName, boolean showTeamSituation) {
         
         
         MatchSituationDTO newSituationDTO;
-        if (subFunction == SubFunction.QUIZ_START_ENDLESS_MATCH) {
+        if (matchMode.equals("无尽模式")) {
             newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName), MatchType.ENDLESS);
-        } else if (subFunction == SubFunction.QUIZ_START_PRE_MATCH) {
+        } else if (matchMode.equals("预赛模式")) {
             newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName), MatchType.PRE);
-        } else if (subFunction == SubFunction.QUIZ_START_MAIN_MATCH) {
+        } else if (matchMode.equals("复赛模式")) {
             newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName.split("&")), MatchType.MAIN);
         } else {
-            log.warn("unkown functionName: {}", subFunction);
+            log.warn("unkown functionName: {}", matchMode);
             newSituationDTO = null;
         }
         

@@ -4,7 +4,6 @@ package com.mirai.hundun.configuration;
  * Created on 2021/05/07
  */
 
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -12,10 +11,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.io.support.DefaultPropertySourceFactory;
-
 import com.mirai.hundun.core.GroupConfig;
-import com.mirai.hundun.core.UserTag;
 import com.mirai.hundun.core.UserTagConfig;
 
 import lombok.Data;

@@ -5,33 +5,18 @@ import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.event.GlobalEventChannel;
-import net.mamoe.mirai.event.Listener;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.ExternalResource;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.configuration.PrivateSettings;
-import com.mirai.hundun.cp.weibo.WeiboService;
-import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
-import com.mirai.hundun.function.RepeatConsumer;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -87,6 +72,7 @@ public class BotService {
         if (!isBotOnline) {
             // the new thread will blocked by Bot.join()
             Thread thread = new Thread(){
+                @Override
                 public void run(){
                     miraiBot = BotFactory.INSTANCE.newBot(privateSettings.getBotAccount(), privateSettings.getBotPwd(), new BotConfiguration() {
                         {
@@ -130,36 +116,6 @@ public class BotService {
         return privateSettings.getAdminAccount();
     }
 
-
-    public void sendToEventSubject(GroupMessageEvent event, String message) {
-        if (message == null || message.isEmpty()) {
-            log.warn("want send empty message “{}” to EventSubject", message);
-            return;
-        }
-        if (isBotOnline) {
-            event.getSubject().sendMessage(message);
-        } else {
-            log.info("[offline mode]sendToEventSubject message = {}", message);
-        }
-    }
-
-
-    public void sendToEventSubject(GroupMessageEvent event, MessageChain messageChain) {
-        if (isBotOnline) {
-            event.getSubject().sendMessage(messageChain);
-        } else {
-            log.info("[offline mode]messageChain messageChain = {}", messageChain);
-        }
-    }
-
-
-    public void sendToContact(Contact contact, MessageChain messageChain) {
-        if (isBotOnline) {
-            contact.sendMessage(messageChain);
-        } else {
-            log.info("[offline mode]sendToContact messageChain = {}", messageChain);
-        }
-    }
 
 
     public Image uploadImage(Long groupId, ExternalResource externalResource) {

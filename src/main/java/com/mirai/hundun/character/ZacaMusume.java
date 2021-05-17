@@ -1,8 +1,6 @@
 package com.mirai.hundun.character;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
-
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
@@ -11,23 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.function.QuizHandler;
-import com.mirai.hundun.function.RepeatConsumer;
-import com.mirai.hundun.function.SubFunction;
 import com.mirai.hundun.function.WeiboFunction;
-import com.mirai.hundun.parser.Parser;
 import com.mirai.hundun.parser.StatementType;
-import com.mirai.hundun.parser.TokenType;
-import com.mirai.hundun.parser.statement.AtStatement;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
-import net.mamoe.mirai.message.data.MessageUtils;
-import net.mamoe.mirai.message.data.PlainText;
 
 /**
  * @author hundun
@@ -66,12 +56,12 @@ public class ZacaMusume extends BaseCharacter {
     protected void initParser() {
 
 
-        parser.tokenizer.registerWakeUpKeyword("ZACA娘");
-        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(weiboFunction.getSubFunctions());
-        parser.tokenizer.registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
-
+        registerWakeUpKeyword("ZACA娘");
+        registerSubFunctionsByDefaultIdentifier(weiboFunction.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
         
-        parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
+        registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         
     }
 
@@ -88,13 +78,13 @@ public class ZacaMusume extends BaseCharacter {
         
         Statement statement;
         try {
-            statement = parser.simpleParse(eventInfo.getMessage());
+            statement = parserSimpleParse(eventInfo.getMessage());
         } catch (Exception e) {
             log.error("Parse error: ", e);
             return false;
         }
         
-        String sessionId = getSessionId(eventInfo);
+        SessionId sessionId = new SessionId(this.getId(), eventInfo.getGroupId());
 
         boolean done = false;
 
@@ -110,7 +100,12 @@ public class ZacaMusume extends BaseCharacter {
 //                log.info("done by repeatConsumer");
 //            }
 //        }
-        
+        if (!done) {
+            done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by guideFunction");
+            }
+        }
         return done;
     }
     

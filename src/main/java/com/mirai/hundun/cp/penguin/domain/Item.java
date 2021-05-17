@@ -1,14 +1,11 @@
 package com.mirai.hundun.cp.penguin.domain;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
-
 import lombok.Data;
 
 /**

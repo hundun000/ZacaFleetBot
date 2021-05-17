@@ -1,15 +1,12 @@
 package com.mirai.hundun.function;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +15,16 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.GroupConfig;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
-import com.mirai.hundun.parser.statement.LiteralValueStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 import com.mirai.hundun.service.CharacterRouter;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageUtils;
@@ -155,10 +150,10 @@ public class WeiboFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
-        if (statement instanceof FunctionCallStatement) {
-            FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getSubFunction() != SubFunction.WEIBO_SHOW_LATEST) {
+    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+        if (statement instanceof SubFunctionCallStatement) {
+            SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
+            if (subFunctionCallStatement.getSubFunction() != SubFunction.WEIBO_SHOW_LATEST) {
                 return false;
             }
 

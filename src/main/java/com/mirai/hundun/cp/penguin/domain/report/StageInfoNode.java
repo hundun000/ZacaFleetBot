@@ -1,7 +1,5 @@
 package com.mirai.hundun.cp.penguin.domain.report;
 
-import java.util.List;
-
 import com.mirai.hundun.cp.penguin.domain.DropType;
 
 import lombok.Data;

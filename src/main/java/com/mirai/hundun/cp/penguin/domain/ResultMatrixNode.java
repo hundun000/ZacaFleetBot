@@ -1,10 +1,5 @@
 package com.mirai.hundun.cp.penguin.domain;
 
-import java.util.Map;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;

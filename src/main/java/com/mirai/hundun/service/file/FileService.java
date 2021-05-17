@@ -7,7 +7,6 @@ import java.io.InputStream;
 
 import org.springframework.stereotype.Service;
 
-import feign.Response;
 import lombok.extern.slf4j.Slf4j;
 
 /**

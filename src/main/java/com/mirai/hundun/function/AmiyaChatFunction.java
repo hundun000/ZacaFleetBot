@@ -10,23 +10,18 @@ import java.util.Random;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.configuration.PrivateSettings;
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.core.UserTag;
-import com.mirai.hundun.core.UserTagConfig;
 import com.mirai.hundun.parser.statement.AtStatement;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 import com.mirai.hundun.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.PlainText;
@@ -75,6 +70,9 @@ public class AmiyaChatFunction implements IFunction {
             
             int faceSize = 16;
             for (int i = 1; i <= faceSize; i++) {
+                if (i == 3) {
+                    continue;
+                }
                 faces.add(ExternalResource.create(new File("./data/images/face/face" + i + ".png")));
             }
         } catch (Exception e) {
@@ -111,7 +109,7 @@ public class AmiyaChatFunction implements IFunction {
     }
 
     @Override
-    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
+    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == botService.getAdminAccount()) {

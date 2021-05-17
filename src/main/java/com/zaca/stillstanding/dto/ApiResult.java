@@ -1,9 +1,6 @@
 package com.zaca.stillstanding.dto;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.zaca.stillstanding.dto.match.MatchSituationDTO;
-
 import lombok.Data;
 
 

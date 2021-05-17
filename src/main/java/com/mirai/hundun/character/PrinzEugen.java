@@ -10,19 +10,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.function.PrinzEugenChatFunction;
 import com.mirai.hundun.function.RepeatConsumer;
 import com.mirai.hundun.function.SubFunction;
 import com.mirai.hundun.function.WeiboFunction;
 import com.mirai.hundun.function.reminder.ReminderFunction;
 import com.mirai.hundun.parser.StatementType;
-import com.mirai.hundun.parser.TokenType;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
 
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
 
 /**
  * @author hundun
@@ -60,7 +58,7 @@ public class PrinzEugen extends BaseCharacter {
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
                 20, 0, "二十点到了。日本的重巡也，很充实呢。唔姆唔姆，嗯~原来如此……唔姆唔姆…"));
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                21, 0, "二十一点。诶，擅长什么…是吗？是啊，之前有过有过把舰炮压低，狠狠的揍了一顿战车群这回事儿[4]。这个就很擅长！是！"));
+                21, 0, "二十一点。诶，擅长什么…是吗？是啊，之前有过有过把舰炮压低，狠狠的揍了一顿战车群这回事儿。这个就很擅长！是！"));
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
                 22, 0, "完全入夜了呢，二十二点到了。Admiral，今天一天的，作战真是辛苦您了！"));
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
@@ -73,10 +71,11 @@ public class PrinzEugen extends BaseCharacter {
     
     @Override
     protected void initParser() {
-        parser.tokenizer.registerWakeUpKeyword(".");
-        parser.tokenizer.registerSubFunction(SubFunction.WEIBO_SHOW_LATEST, "镇守府情报");
+        registerWakeUpKeyword("欧根");
+        registerSubFunctionByCustomSetting(SubFunction.WEIBO_SHOW_LATEST, "查看镇守府情报");
+        registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
         
-        parser.syntaxsTree.registerSyntaxs(FunctionCallStatement.syntaxs, StatementType.FUNCTION_CALL);
+        registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
     }
 
     @Override
@@ -89,13 +88,13 @@ public class PrinzEugen extends BaseCharacter {
     public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception {
         Statement statement;
         try {
-            statement = parser.simpleParse(eventInfo.getMessage());
+            statement = parserSimpleParse(eventInfo.getMessage());
         } catch (Exception e) {
             log.error("Parse error: ", e);
             return false;
         }
         
-        String sessionId = getSessionId(eventInfo);
+        SessionId sessionId = new SessionId(this.getId(), eventInfo.getGroupId());
 
         boolean done = false;
 
@@ -121,6 +120,12 @@ public class PrinzEugen extends BaseCharacter {
             done = repeatConsumer.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by repeatConsumer");
+            }
+        }
+        if (!done) {
+            done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by guideFunction");
             }
         }
         return done;

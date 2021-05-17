@@ -6,8 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import com.mirai.hundun.cp.weibo.domain.WeiboUserInfoCache;
 
-import java.util.List;
-
 
 /**
  * @author hundun

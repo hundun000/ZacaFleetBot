@@ -4,21 +4,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.character.Amiya;
 import com.mirai.hundun.core.EventInfo;
-import com.mirai.hundun.parser.statement.AtStatement;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.message.data.PlainText;
 
 /**
  * @author hundun
@@ -54,7 +49,7 @@ public class RepeatConsumer implements IFunction {
     
 
     @Override
-    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
+    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.isEmpty()) {
@@ -62,10 +57,10 @@ public class RepeatConsumer implements IFunction {
             }
             
             
-            SessionData sessionData = sessionDataMap.get(sessionId);
+            SessionData sessionData = sessionDataMap.get(sessionId.id());
             if (sessionData == null) {
                 sessionData = new SessionData();
-                sessionDataMap.put(sessionId, sessionData);
+                sessionDataMap.put(sessionId.id(), sessionData);
             } 
             
                 

@@ -1,10 +1,6 @@
 package com.mirai.hundun.core;
 
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.MessageChain;
 
 /**

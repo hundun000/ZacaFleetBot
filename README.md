@@ -102,12 +102,16 @@ mirai-core + springboot + mongoDB + gradle
 
 ### Statement 指令
 
-原始输入MessageChain将被Character处理为一个Statement，Statement作为Function的输入。
+原始输入MessageChain与Function解耦。原始输入MessageChain将被Character处理为一个Statement，正确地填充Statement的成员变量，Statement作为Function的输入。
 
-目的是实现如下功能：假设Amiya和PrinzEugen都使用查微博功能WeiboFuction，但是希望调用功能的语法不同（TODO），例如分别是“阿米娅 看看饼”和“欧根 查看镇守府情报”。
+Function只使用Statement（的成员变量），不关心原始输入。进一步的，甚至Function不关心原始输入是否来自Mira框架。
+
+目的是实现如下功能：假设Amiya和PrinzEugen都使用查微博功能WeiboFuction，但是希望调用功能的语法不同，例如分别是“阿米娅 看看饼”和“欧根 查看镇守府情报”。
 
 所以Amiya和PrinzEugen需要把上述两种原始输入处理成同样的Statement(subFunction=SubFunction.WEIBO_SHOW_LATEST)，再将其输入WeiboFuction。
 
 ### Parser 语法分析器
 
-把MessageChain处理成Statement使用的是Parser。参考编译原理。
+把MessageChain处理成Statement使用的是Parser。参考编译原理。但目前的Parser并没有预期的那么有效。
+
+开发者可以自行实现任意一种把MessageChain处理成Statement的方式，替换parser。

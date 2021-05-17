@@ -16,7 +16,7 @@ import lombok.Getter;
  * Created on 2021/04/27
  */
 @Getter
-public class FunctionCallStatement extends Statement {
+public class SubFunctionCallStatement extends Statement {
     
     public static List<List<TokenType>> syntaxs = new ArrayList<>();
     static {
@@ -34,7 +34,7 @@ public class FunctionCallStatement extends Statement {
     SubFunction subFunction;
     List<String> args;
     
-    public FunctionCallStatement(List<Token> tokens) {
+    public SubFunctionCallStatement(List<Token> tokens) {
         this.subFunction = SubFunction.valueOf(tokens.get(1).getExtraContent());
         int argsStartIndex = 2;
         this.args = new ArrayList<>(tokens.size() - argsStartIndex);

@@ -1,33 +1,23 @@
 package com.mirai.hundun.function;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.cp.penguin.PenguinService;
 import com.mirai.hundun.cp.penguin.domain.DropType;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
 import com.mirai.hundun.cp.penguin.domain.report.StageInfoNode;
 import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
-import com.mirai.hundun.cp.quiz.QuizService;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.message.data.At;
-import net.mamoe.mirai.message.data.PlainText;
 
 /**
  * @author hundun
@@ -57,12 +47,12 @@ public class PenguinFunction implements IFunction {
 
 
     @Override
-    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
-        if (statement instanceof FunctionCallStatement) {
-            FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
-                String itemFuzzyName = functionCallStatement.getArgs().get(0);
-                log.info("{} by {}", functionCallStatement.getSubFunction(), itemFuzzyName);
+    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+        if (statement instanceof SubFunctionCallStatement) {
+            SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
+            if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
+                String itemFuzzyName = subFunctionCallStatement.getArgs().get(0);
+                log.info("{} by {}", subFunctionCallStatement.getSubFunction(), itemFuzzyName);
                 MatrixReport report = penguinService.getTopResultNode(itemFuzzyName, 3);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -79,9 +69,9 @@ public class PenguinFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
-            } else if (functionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
-                String stageCode = functionCallStatement.getArgs().get(0);
-                log.info("{} by {}", functionCallStatement.getSubFunction(), stageCode);
+            } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
+                String stageCode = subFunctionCallStatement.getArgs().get(0);
+                log.info("{} by {}", subFunctionCallStatement.getSubFunction(), stageCode);
                 StageInfoReport report = penguinService.getStageInfoReport(stageCode);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -117,9 +107,10 @@ public class PenguinFunction implements IFunction {
                     botService.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
-            } else if (functionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
+            } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
                 botService.sendToGroup(event.getGroupId(), "好的");
+                return true;
             }
         }
         return false;

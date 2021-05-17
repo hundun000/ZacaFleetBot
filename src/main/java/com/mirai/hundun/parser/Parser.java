@@ -1,24 +1,19 @@
 package com.mirai.hundun.parser;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.mirai.hundun.parser.statement.AtStatement;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.LiteralValueStatement;
+import com.mirai.hundun.parser.statement.QuickSearchStatement;
 import com.mirai.hundun.parser.statement.Statement;
-import com.mirai.hundun.parser.statement.SyntaxsErrorStatement;
-
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Message;
 import net.mamoe.mirai.message.data.MessageChain;
-import net.mamoe.mirai.message.data.MessageUtils;
-import net.mamoe.mirai.message.data.PlainText;
 
 
 
@@ -57,8 +52,11 @@ public class Parser {
             case AT:
                 statement = new AtStatement(tokens);
                 break;
-            case FUNCTION_CALL:
-                statement = new FunctionCallStatement(tokens);
+            case SUB_FUNCTION_CALL:
+                statement = new SubFunctionCallStatement(tokens);
+                break;
+            case QUICK_SEARCH:
+                statement = new QuickSearchStatement(tokens);
                 break;
             case SYNTAX_ERROR:
             default:

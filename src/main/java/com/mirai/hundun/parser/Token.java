@@ -1,7 +1,5 @@
 package com.mirai.hundun.parser;
 
-import java.util.List;
-
 import lombok.Data;
 
 /**

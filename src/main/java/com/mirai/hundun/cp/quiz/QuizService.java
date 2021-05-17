@@ -1,25 +1,14 @@
 package com.mirai.hundun.cp.quiz;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.mirai.hundun.cp.weibo.WeiboService;
 import com.mirai.hundun.service.file.FileService;
 import com.mirai.hundun.service.file.IFileProvider;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;

@@ -5,8 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import com.mirai.hundun.cp.weibo.domain.WeiboCardCache;
-import com.mirai.hundun.cp.weibo.domain.WeiboUserInfoCache;
-
 import java.util.List;
 
 

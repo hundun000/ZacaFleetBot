@@ -4,22 +4,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.mirai.hundun.character.BaseCharacter;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.GroupConfig;
+import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.function.IFunction;
 import com.mirai.hundun.function.SubFunction;
-import com.mirai.hundun.parser.statement.FunctionCallStatement;
+import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 import com.mirai.hundun.service.CharacterRouter;
@@ -44,6 +40,7 @@ public class ReminderFunction implements IFunction {
     public List<SubFunction> getSubFunctions() {
         return Arrays.asList(
                 SubFunction.REMINDER_CREATE_TASK,
+                SubFunction.REMINDER_LIST_TASK,
                 SubFunction.REMINDER_REMOVE_TASK
                 
                 );
@@ -124,22 +121,22 @@ public class ReminderFunction implements IFunction {
     
     
     @Override
-    public boolean acceptStatement(String sessionId, EventInfo event, Statement statement) {
-        if (statement instanceof FunctionCallStatement) {
-            FunctionCallStatement functionCallStatement = (FunctionCallStatement)statement;
-            if (functionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
+    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+        if (statement instanceof SubFunctionCallStatement) {
+            SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
+            if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
                 if (event.getSenderId() != botService.getAdminAccount()) {
                     botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
                 ReminderTask task = createTask(
-                        Integer.valueOf(functionCallStatement.getArgs().get(0)), 
-                        Integer.valueOf(functionCallStatement.getArgs().get(1)), 
-                        Integer.valueOf(functionCallStatement.getArgs().get(2)), 
-                        Integer.valueOf(functionCallStatement.getArgs().get(3)), 
-                        Integer.valueOf(functionCallStatement.getArgs().get(4)),  
-                        Integer.valueOf(functionCallStatement.getArgs().get(5)), 
-                        functionCallStatement.getArgs().get(6), 
+                        Integer.valueOf(subFunctionCallStatement.getArgs().get(0)), 
+                        Integer.valueOf(subFunctionCallStatement.getArgs().get(1)), 
+                        Integer.valueOf(subFunctionCallStatement.getArgs().get(2)), 
+                        Integer.valueOf(subFunctionCallStatement.getArgs().get(3)), 
+                        Integer.valueOf(subFunctionCallStatement.getArgs().get(4)),  
+                        Integer.valueOf(subFunctionCallStatement.getArgs().get(5)), 
+                        subFunctionCallStatement.getArgs().get(6), 
                         event.getGroupId()
                         );
                 if (task != null) {
@@ -150,12 +147,12 @@ public class ReminderFunction implements IFunction {
                 }
                 
                 return true;
-            } else if (functionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
+            } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
                 if (event.getSenderId() != botService.getAdminAccount()) {
                     botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
-                String targetId = functionCallStatement.getArgs().get(0);
+                String targetId = subFunctionCallStatement.getArgs().get(0);
                 if (taskRepository.existsById(targetId)) {
                     taskRepository.deleteById(targetId);
                     botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除成功！"));
@@ -165,7 +162,7 @@ public class ReminderFunction implements IFunction {
                     return true;
                 }
                 
-            } else if (functionCallStatement.getSubFunction() == SubFunction.REMINDER_LIST_TASK) {
+            } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_LIST_TASK) {
                 List<ReminderTask> tasks = taskRepository.findAllByTargetGroup(event.getGroupId());
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("提醒任务列表：\n");

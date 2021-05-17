@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +21,6 @@ import com.mirai.hundun.cp.penguin.domain.report.MatrixReportNode;
 import com.mirai.hundun.cp.penguin.domain.report.StageInfoNode;
 import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
 import com.mirai.hundun.cp.penguin.feign.PenguinApiService;
-import com.mirai.hundun.cp.quiz.QuizService;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -156,6 +153,7 @@ public class PenguinService {
         
         MatrixReport report = getResultMatrixReport(item);
         Collections.sort(report.getNodes(), new Comparator<MatrixReportNode>() {
+            @Override
             public int compare(MatrixReportNode o1, MatrixReportNode o2) {
                 return 1 * (int)(o1.getCostExpectation() - o2.getCostExpectation());
             }
