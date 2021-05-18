@@ -4,6 +4,7 @@ import java.util.Arrays;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.detDSA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.function.AmiyaChatFunction;
+import com.mirai.hundun.function.MiraiCodeFunction;
 import com.mirai.hundun.function.PenguinFunction;
 import com.mirai.hundun.function.QuickSearchFunction;
 import com.mirai.hundun.function.QuizHandler;
@@ -67,6 +69,9 @@ public class Amiya extends BaseCharacter {
     @Autowired
     QuickSearchFunction quickSearchFunction;
     
+    @Autowired
+    MiraiCodeFunction miraiCodeFunction;
+    
     @PostConstruct
     public void init() {
         
@@ -119,6 +124,7 @@ public class Amiya extends BaseCharacter {
         registerSubFunctionsByDefaultIdentifier(penguinFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(reminderFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         registerSyntaxs(QuickSearchStatement.syntaxs, StatementType.QUICK_SEARCH);
@@ -199,6 +205,12 @@ public class Amiya extends BaseCharacter {
             done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by guideFunction");
+            }
+        }
+        if (!done) {
+            done = miraiCodeFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by decodeFunction");
             }
         }
         if (!done) {

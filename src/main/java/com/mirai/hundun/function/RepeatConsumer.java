@@ -14,6 +14,7 @@ import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.message.code.MiraiCode;
 
 /**
  * @author hundun
@@ -34,7 +35,7 @@ public class RepeatConsumer implements IFunction {
     Map<String, SessionData> sessionDataMap = new HashMap<>();
     
     public class SessionData {
-        public String message = "";
+        public String messageMiraiCode = "";
         public int count = 0;
     }
     public class A {
@@ -51,12 +52,9 @@ public class RepeatConsumer implements IFunction {
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
-            String newMessage = ((LiteralValueStatement)statement).getValue();
-            if (newMessage.isEmpty()) {
-                return false;
-            }
-            
-            
+            String newMessageMiraiCode = ((LiteralValueStatement)statement).getOriginMiraiCode();
+
+
             SessionData sessionData = sessionDataMap.get(sessionId.id());
             if (sessionData == null) {
                 sessionData = new SessionData();
@@ -64,16 +62,16 @@ public class RepeatConsumer implements IFunction {
             } 
             
                 
-            if (sessionData.message.equals(newMessage)) {
+            if (sessionData.messageMiraiCode.equals(newMessageMiraiCode)) {
                 sessionData.count++;
             } else {
                 sessionData.count = 1;
-                sessionData.message = newMessage;
+                sessionData.messageMiraiCode = newMessageMiraiCode;
             }
 
             
             if (sessionData.count == 3) {
-                botService.sendToGroup(event.getGroupId(), sessionData.message);
+                botService.sendToGroup(event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
                 return true;
             }
         }

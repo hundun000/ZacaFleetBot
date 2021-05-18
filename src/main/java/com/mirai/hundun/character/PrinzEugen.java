@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.SessionId;
+import com.mirai.hundun.function.MiraiCodeFunction;
+import com.mirai.hundun.function.KancolleWikiQuickSearchFunction;
 import com.mirai.hundun.function.PrinzEugenChatFunction;
 import com.mirai.hundun.function.RepeatConsumer;
 import com.mirai.hundun.function.SubFunction;
@@ -18,6 +20,7 @@ import com.mirai.hundun.function.WeiboFunction;
 import com.mirai.hundun.function.reminder.ReminderFunction;
 import com.mirai.hundun.parser.StatementType;
 import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
+import com.mirai.hundun.parser.statement.QuickSearchStatement;
 import com.mirai.hundun.parser.statement.Statement;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,12 @@ public class PrinzEugen extends BaseCharacter {
     @Autowired
     ReminderFunction reminderFunction;
     
+    @Autowired
+    MiraiCodeFunction miraiCodeFunction;
+    
+    @Autowired
+    KancolleWikiQuickSearchFunction kancolleWikiQuickSearchFunction;
+    
     @PostConstruct
     public void init() {
         weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
@@ -72,10 +81,13 @@ public class PrinzEugen extends BaseCharacter {
     @Override
     protected void initParser() {
         registerWakeUpKeyword("欧根");
+        registerQuickQueryKeyword(".");
         registerSubFunctionByCustomSetting(SubFunction.WEIBO_SHOW_LATEST, "查看镇守府情报");
         registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
+        registerSyntaxs(QuickSearchStatement.syntaxs, StatementType.QUICK_SEARCH);
     }
 
     @Override
@@ -111,11 +123,18 @@ public class PrinzEugen extends BaseCharacter {
             }
         }
         if (!done) {
+            done = miraiCodeFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by decodeFunction");
+            }
+        }
+        if (!done) {
             done = chatFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by chatFunction");
             }
         }
+        
         if (!done) {
             done = repeatConsumer.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
@@ -126,6 +145,12 @@ public class PrinzEugen extends BaseCharacter {
             done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
                 log.info("done by guideFunction");
+            }
+        }
+        if (!done) {
+            done = kancolleWikiQuickSearchFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by kancolleWikiQuickSearchFunction");
             }
         }
         return done;

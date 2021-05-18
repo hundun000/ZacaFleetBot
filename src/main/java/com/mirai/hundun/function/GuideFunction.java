@@ -116,7 +116,7 @@ public class GuideFunction implements IFunction {
         try {
             document = subFunction.getDefaultSubFunctionDocument();
         } catch (Exception e) {
-            log.error(e.getMessage());
+            //log.error(e.getMessage());
             return;
         }
         if (customIdentifier != null) {

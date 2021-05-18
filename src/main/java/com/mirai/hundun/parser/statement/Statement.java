@@ -15,4 +15,5 @@ import lombok.Data;
 public abstract class Statement {
     List<Token> tokens;
     StatementType type;
+    String originMiraiCode;
 }

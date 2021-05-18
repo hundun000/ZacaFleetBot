@@ -68,6 +68,7 @@ public class Parser {
         
         statement.setType(type);
         statement.setTokens(tokens);
+        statement.setOriginMiraiCode(messageChain.serializeToMiraiCode());
         return statement;
     }
     

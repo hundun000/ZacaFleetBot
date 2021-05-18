@@ -73,6 +73,12 @@ public class QuickSearchFunction implements IFunction {
         node.answerTemplate = "https://hguandl.com/yituliu/yituliu.jsp";
         nodes.add(node);
         
+        node = new QuickSearchNode();
+        node.conditions = Arrays.asList("舰娘百科", "一图流绿票");
+        node.answerTemplate = "https://hguandl.com/yituliu/yituliu.jsp";
+        nodes.add(node);
+        
+        
     }
     
     
