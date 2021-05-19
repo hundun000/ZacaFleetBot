@@ -138,7 +138,7 @@ public class QuizService implements IFileProvider {
     }
 
     @Override
-    public String getCacheSubFolerName() {
+    public String getCacheSubFolderName() {
         return "quiz";
     }
 

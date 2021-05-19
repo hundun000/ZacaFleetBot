@@ -22,9 +22,13 @@ import com.mirai.hundun.service.BotService;
 import com.mirai.hundun.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.message.code.MiraiCode;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.message.data.PlainText;
+import net.mamoe.mirai.message.data.Voice;
 import net.mamoe.mirai.utils.ExternalResource;
 
 /**
@@ -52,6 +56,8 @@ public class AmiyaChatFunction implements IFunction {
     private String canRelaxTalk = "博士，辛苦了！累了的话请休息一会儿吧。";
     ExternalResource cannotRelaxExternalResource;
     ExternalResource canRelaxExternalResource;
+    ExternalResource damedaneVoiceExternalResource;
+    
     int todayIsHoliday;
     int todayIsWorkday;
     
@@ -63,11 +69,11 @@ public class AmiyaChatFunction implements IFunction {
     
     public AmiyaChatFunction() {
         try {
-            ceoboNodgeResource = ExternalResource.create(new File("./data/images/talk/yukiNodge.png"));
-            angelinaNodgeResource = ExternalResource.create(new File("./data/images/talk/angelinaNodge.png"));
-            cannotRelaxExternalResource = ExternalResource.create(new File("./data/images/talk/cannotRelax.png"));
-            canRelaxExternalResource = ExternalResource.create(new File("./data/images/talk/canRelax.png"));
-            
+            ceoboNodgeResource = ExternalResource.create(new File("./data/images/amiya_chat/yukiNodge.png"));
+            angelinaNodgeResource = ExternalResource.create(new File("./data/images/amiya_chat/angelinaNodge.png"));
+            cannotRelaxExternalResource = ExternalResource.create(new File("./data/images/amiya_chat/cannotRelax.png"));
+            canRelaxExternalResource = ExternalResource.create(new File("./data/images/amiya_chat/canRelax.png"));
+            damedaneVoiceExternalResource = ExternalResource.create(new File("./data/voices/amiya_chat/damedane.amr"));
             int faceSize = 16;
             for (int i = 1; i <= faceSize; i++) {
                 if (i == 3) {
@@ -137,6 +143,16 @@ public class AmiyaChatFunction implements IFunction {
                             .plus(image)
                             );
                 }
+                return true;
+            } else if (newMessage.contains("damedane")) {
+                Voice voice = botService.uploadVoice(event.getGroupId(), damedaneVoiceExternalResource);
+                MessageChainBuilder builder = new MessageChainBuilder();
+                builder.add(voice);
+                MessageChain messageChain = builder.build();
+
+                botService.sendToGroup(event.getGroupId(), 
+                        messageChain
+                        );
                 return true;
             }
         } else if (statement instanceof AtStatement) {

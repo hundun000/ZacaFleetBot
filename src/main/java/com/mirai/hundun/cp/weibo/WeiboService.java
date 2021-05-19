@@ -266,7 +266,7 @@ public class WeiboService implements IFileProvider {
 
 
     @Override
-    public String getCacheSubFolerName() {
+    public String getCacheSubFolderName() {
         return "weibo";
     }
     

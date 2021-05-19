@@ -8,6 +8,7 @@ import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.message.data.Voice;
 import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.ExternalResource;
 
@@ -130,6 +131,14 @@ public class BotService {
 
 
     
-    
+    public Voice uploadVoice(Long groupId, ExternalResource externalResource) {
+        if (isBotOnline) {
+            return miraiBot.getGroupOrFail(groupId).uploadVoice(externalResource);
+        } else {
+            log.info("[offline mode]uploadVoice groupId = {}", groupId);
+            return new Voice("", new byte[1], 0, 0, "");
+        }
+        
+    }
     
 }

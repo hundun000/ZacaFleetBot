@@ -31,19 +31,36 @@ public class FileService {
             subFoler.mkdir();
         }
     }
-
-    public File downloadOrFromCache(String fileId, IFileProvider provider) {
-        
-        String subFolerName = provider.getCacheSubFolerName();
+    
+    
+    public boolean fileCacheExists(String fileId, IFileProvider provider) {
+        String saveFilePathName = getCacheFilePath(fileId, provider);
+        File file = new File(saveFilePathName);
+        return file.exists();
+    }
+    
+    private String getCacheFilePath(String fileId, IFileProvider provider) {
+        String subFolerName = provider.getCacheSubFolderName();
         checkFolder(subFolerName);
         String saveFilePathName = RESOURCE_DOWNLOAD_FOLDER + subFolerName + "/" + fileId;
         
+        
+        return saveFilePathName;
+    }
+
+    public File downloadOrFromCache(String fileId, IFileProvider provider) {
+        String subFolerName = provider.getCacheSubFolderName();
+        String saveFilePathName = getCacheFilePath(fileId, provider);
         File file = new File(saveFilePathName);
         if (file.exists()) {
             log.info("image from cache :{}", subFolerName + "---" + fileId);
-            
         } else {
             InputStream inputStream = provider.download(fileId);
+            
+            if (inputStream == null) {
+                log.info("provider not support download, image null for: {}", subFolerName + "---" + fileId);
+                return null;
+            }
             
             try {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();

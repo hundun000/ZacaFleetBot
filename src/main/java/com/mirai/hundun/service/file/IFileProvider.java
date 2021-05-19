@@ -11,5 +11,5 @@ public interface IFileProvider {
     InputStream download(String fileId);
 
     
-    String getCacheSubFolerName();
+    String getCacheSubFolderName();
 }

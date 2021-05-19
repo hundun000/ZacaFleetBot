@@ -16,6 +16,7 @@ import com.mirai.hundun.parser.statement.Statement;
 import com.mirai.hundun.parser.statement.SubFunctionCallStatement;
 import com.mirai.hundun.service.BotService;
 
+import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.code.MiraiCode;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.MessageChain;
@@ -24,6 +25,7 @@ import net.mamoe.mirai.message.data.MessageChain;
  * @author hundun
  * Created on 2021/05/19
  */
+@Slf4j
 @Component
 public class MiraiCodeFunction implements IFunction {
 
@@ -44,6 +46,7 @@ public class MiraiCodeFunction implements IFunction {
             if (subFunctionCallStatement.getSubFunction() == SubFunction.DECODE_MIRAI_CODE) {
                 if (event.getSenderId() == botService.getAdminAccount()) {
                     String miraiCode = subFunctionCallStatement.getArgs().get(0);
+                    log.info("build MessageChain by miraiCode = {}", miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
                     botService.sendToGroup(event.getGroupId(), chain);
                     return true;

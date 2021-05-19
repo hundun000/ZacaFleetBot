@@ -15,7 +15,10 @@ import com.mirai.hundun.service.BotService;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.MessageChain;
+import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.message.data.PlainText;
+import net.mamoe.mirai.message.data.Voice;
 import net.mamoe.mirai.utils.ExternalResource;
 
 /**
@@ -29,8 +32,9 @@ public class PrinzEugenChatFunction implements IFunction {
     @Autowired
     BotService botService;
     
-    private File pupuImage;
+
     ExternalResource pupuExternalResource;
+    ExternalResource xiuXiuXiuVoiceExternalResource;
     
     @Override
     public List<SubFunction> getSubFunctions() {
@@ -39,8 +43,9 @@ public class PrinzEugenChatFunction implements IFunction {
     
     public PrinzEugenChatFunction() {
         try {
-            pupuImage = new File("./data/images/chat/噗噗.jpg");
-            pupuExternalResource = ExternalResource.create(pupuImage);
+            
+            pupuExternalResource = ExternalResource.create(new File("./data/images/chat/噗噗.jpg"));
+            xiuXiuXiuVoiceExternalResource = ExternalResource.create(new File("./data/voices/prinz_eugen_chat/咻咻咻.amr"));
         } catch (Exception e) {
             log.error("open cannotRelaxImage error: {}", e.getMessage());
         }
@@ -56,6 +61,16 @@ public class PrinzEugenChatFunction implements IFunction {
                 botService.sendToGroup(event.getGroupId(), 
                         new PlainText("")
                         .plus(image)
+                        );
+                return true;
+            } else if (newMessage.contains("咻咻咻") || newMessage.contains("西姆咻")) {
+                Voice voice = botService.uploadVoice(event.getGroupId(), xiuXiuXiuVoiceExternalResource);
+                MessageChainBuilder builder = new MessageChainBuilder();
+                builder.add(voice);
+                MessageChain messageChain = builder.build();
+
+                botService.sendToGroup(event.getGroupId(), 
+                        messageChain
                         );
                 return true;
             }
