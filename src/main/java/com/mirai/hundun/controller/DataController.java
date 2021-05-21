@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mirai.hundun.cp.kcwiki.KancolleWikiService;
 import com.mirai.hundun.cp.penguin.PenguinService;
 import com.mirai.hundun.cp.penguin.domain.report.MatrixReport;
 import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
@@ -19,11 +20,20 @@ import com.mirai.hundun.cp.penguin.domain.report.StageInfoReport;
 public class DataController {
     @Autowired
     PenguinService penguinService;
+    @Autowired
+    KancolleWikiService kancolleWikiService;
+    
     
     @RequestMapping(value="/penguin/resetCache", method=RequestMethod.GET)
     public String updateItems() {
         penguinService.resetCache();
         return "OK";
+    }
+    
+    @RequestMapping(value="/kcw/getShipDetail", method=RequestMethod.GET)
+    public String getShipDetail(
+            @RequestParam("fuzzyName") String fuzzyName) {
+        return kancolleWikiService.getShipDetail(fuzzyName).toString();
     }
 
     

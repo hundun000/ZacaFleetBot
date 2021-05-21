@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import com.mirai.hundun.cp.PublicFeignConfiguration;
+
 
 
 
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(
         name = "weiboApiService",
         url = "https://m.weibo.cn",
-        configuration = WeiboApiFeignConfiguration.class
+        configuration = PublicFeignConfiguration.class
 )
 @Component
 public interface WeiboApiService {

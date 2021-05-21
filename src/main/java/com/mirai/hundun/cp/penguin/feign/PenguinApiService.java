@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import com.mirai.hundun.cp.PublicFeignConfiguration;
 import com.mirai.hundun.cp.penguin.domain.Item;
 import com.mirai.hundun.cp.penguin.domain.ResultMatrixResponse;
 import com.mirai.hundun.cp.penguin.domain.Stage;
@@ -20,7 +21,7 @@ import com.mirai.hundun.cp.penguin.domain.Stage;
 @FeignClient(
         name = "penguinApiService",
         url = "https://penguin-stats.io/PenguinStats/api",
-        configuration = PenguinApiFeignConfiguration.class
+        configuration = PublicFeignConfiguration.class
 )
 @Component
 public interface PenguinApiService {

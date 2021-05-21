@@ -6,6 +6,8 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import com.mirai.hundun.cp.PublicFeignConfiguration;
+
 import feign.Response;
 
 
@@ -16,7 +18,7 @@ import feign.Response;
 @FeignClient(
         name = "weiboPictureApiService",
         url = "https://wx2.sinaimg.cn",
-        configuration = WeiboApiFeignConfiguration.class
+        configuration = PublicFeignConfiguration.class
 )
 @Component
 public interface WeiboPictureApiService {
