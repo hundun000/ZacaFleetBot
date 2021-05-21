@@ -43,7 +43,6 @@ public class PrinzEugenChatFunction implements IFunction {
     
     public PrinzEugenChatFunction() {
         try {
-            
             pupuExternalResource = ExternalResource.create(new File("./data/images/chat/噗噗.jpg"));
             xiuXiuXiuVoiceExternalResource = ExternalResource.create(new File("./data/voices/prinz_eugen_chat/咻咻咻.amr"));
         } catch (Exception e) {

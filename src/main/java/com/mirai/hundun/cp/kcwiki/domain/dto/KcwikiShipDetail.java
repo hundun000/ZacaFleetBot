@@ -59,7 +59,7 @@ public class KcwikiShipDetail {
     int sort_no;
     int after_lv;
     int after_ship_id;
-    int wiki_id;
+    String wiki_id;
     String chinese_name;
     String stype_name_chinese;
     KcwikiShipStats stats;

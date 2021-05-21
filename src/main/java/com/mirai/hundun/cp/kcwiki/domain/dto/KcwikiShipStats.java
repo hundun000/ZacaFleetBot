@@ -1,8 +1,12 @@
 package com.mirai.hundun.cp.kcwiki.domain.dto;
+
+import lombok.Data;
+
 /**
  * @author hundun
  * Created on 2021/05/21
  */
+@Data
 public class KcwikiShipStats {
     /*
      * {
@@ -55,23 +59,23 @@ public class KcwikiShipStats {
     /**
      * 速度 0=陆上基地, 5=低速, 10=高速
      */
-    int[] soku;
+    int soku;
     /**
      * 射程 0=无, 1=短, 2=中, 3=长, 4=超长
      */
-    int[] leng;
+    int leng;
     /**
-     * ？？？
+     * 回避
      */
-    int[] kaih;
+    int kaih;
     /**
-     * ？？？
+     * 对潜
      */
-    int[] tais;
+    int tais;
     /**
      * Slot 数量
      */
-    int[] slot_num;
+    int slot_num;
     /**
      * 舰载机搭载数
      */
@@ -87,11 +91,11 @@ public class KcwikiShipStats {
     /**
      * 消耗燃料
      */
-    int[] fuel_max;
+    int fuel_max;
     /**
      * 消耗弹药
      */
-    int[] bull_max;
+    int bull_max;
     /**
      * 解体资材（油弹钢铝）
      */
@@ -103,5 +107,5 @@ public class KcwikiShipStats {
     /**
      * 建造时间，单位为分钟
      */
-    int[] build_time;
+    int build_time;
 }

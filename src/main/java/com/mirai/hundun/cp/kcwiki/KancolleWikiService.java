@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiShipDetail;
+import com.mirai.hundun.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.mirai.hundun.cp.kcwiki.feign.KcwikiApiFeignClient;
 import com.mirai.hundun.service.file.IFileProvider;
 
@@ -39,6 +42,28 @@ public class KancolleWikiService implements IFileProvider {
         String standardName = getStandardName(fuzzyName);
         KcwikiShipDetail shipDetail = apiFeignClient.shipDetail(standardName);
         return shipDetail;
+    }
+    
+    public ShipUpgradeLink getShipUpgradeLine(String fuzzyName) {
+        ShipUpgradeLink upgradeLink = new ShipUpgradeLink();
+        String standardName = getStandardName(fuzzyName);
+        KcwikiShipDetail currentdetail = apiFeignClient.shipDetail(standardName); 
+        while (currentdetail != null) {
+            if (!upgradeLink.getUpgradeLinkIds().contains(currentdetail.getId())) {
+                upgradeLink.getUpgradeLinkIds().add(Integer.valueOf(currentdetail.getId()));
+                upgradeLink.getShipDetails().put(currentdetail.getId(), currentdetail);
+                int nextId = currentdetail.getAfter_ship_id();
+                if (nextId > 0) {
+                    currentdetail = apiFeignClient.shipDetail(nextId); 
+                } else {
+                    currentdetail = null;
+                }
+            } else {
+                upgradeLink.getUpgradeLinkIds().add(currentdetail.getId());
+                currentdetail = null;
+            }
+        }
+        return upgradeLink;
     }
     
     @Override
