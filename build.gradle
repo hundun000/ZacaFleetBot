@@ -57,6 +57,7 @@ dependencies {
     implementation("net.mamoe:mirai-core-utils-jvm:${MIRAI_VERSION}")
 
     implementation 'com.github.hkirk:java-html2image:0.9'
+    implementation group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
 
     //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
     //implementation("net.mamoe:mirai-core:${MIRAI_VERSION}") // 运行时使用

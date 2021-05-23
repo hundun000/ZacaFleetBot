@@ -7,6 +7,8 @@ public enum SubFunction {
     DECODE_MIRAI_CODE("解码"),
     ENCODE_LAST_TO_MIRAI_CODE("转码"),
     
+    JAPANESE_TOOL("日文注音"),
+    
     GUIDE_QUERY_FUNCTION_DOCUMENT("help"),
     
     WEIBO_SHOW_LATEST("查看最新微博"),

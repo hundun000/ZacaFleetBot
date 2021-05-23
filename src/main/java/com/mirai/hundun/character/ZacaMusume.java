@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.mirai.hundun.core.EventInfo;
 import com.mirai.hundun.core.SessionId;
+import com.mirai.hundun.function.JapaneseFunction;
 import com.mirai.hundun.function.QuizHandler;
 import com.mirai.hundun.function.WeiboFunction;
 import com.mirai.hundun.parser.StatementType;
@@ -43,6 +44,9 @@ public class ZacaMusume extends BaseCharacter {
     @Autowired
     QuizHandler quizHandler;
     
+    @Autowired
+    JapaneseFunction japaneseFunction;
+    
 //    @Autowired
 //    RepeatConsumer repeatConsumer;
     
@@ -60,6 +64,7 @@ public class ZacaMusume extends BaseCharacter {
         registerSubFunctionsByDefaultIdentifier(weiboFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(japaneseFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         
@@ -100,6 +105,12 @@ public class ZacaMusume extends BaseCharacter {
 //                log.info("done by repeatConsumer");
 //            }
 //        }
+        if (!done) {
+            done = japaneseFunction.acceptStatement(sessionId, eventInfo, statement);
+            if (done) {
+                log.info("done by japaneseFunction");
+            }
+        }
         if (!done) {
             done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
             if (done) {
