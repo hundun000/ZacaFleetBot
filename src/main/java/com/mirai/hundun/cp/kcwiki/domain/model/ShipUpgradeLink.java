@@ -17,5 +17,5 @@ import lombok.Data;
 @Data
 public class ShipUpgradeLink {
     List<Integer> upgradeLinkIds = new LinkedList<>();
-    Map<Integer, KcwikiShipDetail> shipDetails = new LinkedHashMap<>();
+    Map<Integer, ShipInfo> shipDetails = new LinkedHashMap<>();
 }

@@ -13,7 +13,9 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiInitEquip;
 import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiShipDetail;
+import com.mirai.hundun.cp.kcwiki.domain.model.ShipInfo;
 import com.mirai.hundun.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.mirai.hundun.cp.kcwiki.feign.KcwikiApiFeignClient;
 import com.mirai.hundun.service.file.IFileProvider;
@@ -48,10 +50,12 @@ public class KancolleWikiService implements IFileProvider {
         ShipUpgradeLink upgradeLink = new ShipUpgradeLink();
         String standardName = getStandardName(fuzzyName);
         KcwikiShipDetail currentdetail = apiFeignClient.shipDetail(standardName); 
-        while (currentdetail != null) {
+        while (currentdetail != null && currentdetail.getId() > 0) {
             if (!upgradeLink.getUpgradeLinkIds().contains(currentdetail.getId())) {
                 upgradeLink.getUpgradeLinkIds().add(Integer.valueOf(currentdetail.getId()));
-                upgradeLink.getShipDetails().put(currentdetail.getId(), currentdetail);
+                KcwikiInitEquip initEquip = apiFeignClient.initEquip(currentdetail.getId());
+                ShipInfo shipInfo = new ShipInfo(currentdetail, initEquip);
+                upgradeLink.getShipDetails().put(currentdetail.getId(), shipInfo);
                 int nextId = currentdetail.getAfter_ship_id();
                 if (nextId > 0) {
                     currentdetail = apiFeignClient.shipDetail(nextId); 
@@ -63,6 +67,7 @@ public class KancolleWikiService implements IFileProvider {
                 currentdetail = null;
             }
         }
+        log.info("get upgradeLink of ids = {}", upgradeLink.getUpgradeLinkIds());
         return upgradeLink;
     }
     

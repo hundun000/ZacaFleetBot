@@ -13,6 +13,7 @@ import com.mirai.hundun.core.SessionId;
 import com.mirai.hundun.cp.kcwiki.KancolleWikiService;
 import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiShipStats;
+import com.mirai.hundun.cp.kcwiki.domain.model.ShipInfo;
 import com.mirai.hundun.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.mirai.hundun.function.QuickSearchFunction.QuickSearchNode;
 import com.mirai.hundun.parser.statement.QuickSearchStatement;
@@ -56,9 +57,9 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 chainBuilder.add(new PlainText("\n\n"));
                 
                 StringBuilder urls = new StringBuilder();
-                for (KcwikiShipDetail detail : upgradeLink.getShipDetails().values()) {
-                    
-                    String name = detail.getChinese_name();
+                {
+                    ShipInfo detail = upgradeLink.getShipDetails().get(upgradeLink.getUpgradeLinkIds().get(0));
+                    String name = detail.getChineseName();
                     String urlEncodedArg;
                     try {
                         urlEncodedArg = URLEncoder.encode(
@@ -74,21 +75,22 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 }
                 chainBuilder.add(new PlainText(urls.toString()));
                 
+
                 StringBuilder nameLink = new StringBuilder();
                 for (int id : upgradeLink.getUpgradeLinkIds()) {
-                    KcwikiShipDetail detail = upgradeLink.getShipDetails().get(id);
-                    if (detail.getAfter_lv() > 0) {
-                        nameLink.append(detail.getChinese_name()).append("(").append(detail.getAfter_lv()).append(")->");
+                    ShipInfo detail = upgradeLink.getShipDetails().get(id);
+                    if (detail.getAfterLv() > 0) {
+                        nameLink.append(detail.toSimpleText()).append("\n");
+                        nameLink.append("-").append(detail.getAfterLv()).append("级->");
                     } else {
-                        nameLink.append(detail.getChinese_name()).append("->");
+                        nameLink.append(detail.toSimpleText());
                     }
                 }
-                nameLink.setLength(nameLink.length() - 2);
                 nameLink.append("\n");
                 chainBuilder.add(new PlainText(nameLink.toString()));
                 
                 int firstId = upgradeLink.getUpgradeLinkIds().get(0);
-                KcwikiShipDetail firstDetail = upgradeLink.getShipDetails().get(firstId);
+                ShipInfo firstDetail = upgradeLink.getShipDetails().get(firstId);
                 String fileId = String.valueOf(firstDetail.getId());
                 File imageFile = fileService.downloadOrFromCache(fileId, kancolleWikiService);
                 if (imageFile != null) {

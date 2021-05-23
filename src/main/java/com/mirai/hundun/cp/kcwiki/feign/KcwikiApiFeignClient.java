@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.mirai.hundun.cp.PublicFeignConfiguration;
+import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiInitEquip;
 import com.mirai.hundun.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.mirai.hundun.cp.penguin.domain.Item;
 
@@ -36,5 +37,9 @@ public interface KcwikiApiFeignClient {
             )
     KcwikiShipDetail shipDetail(@PathVariable("name") String name);
     
-    
+    @RequestMapping(
+            value = "/init/equip/{id}", 
+            method = RequestMethod.GET
+            )
+    KcwikiInitEquip initEquip(@PathVariable("id") int id);
 }
