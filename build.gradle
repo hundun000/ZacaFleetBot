@@ -13,67 +13,101 @@ buildscript {
 }
 
 
-
-plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.4.32' // 确保添加 Kotlin
-	
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-
-group = 'com.mirai.plugin'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
-
-
-
-
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
-repositories {
-	mavenCentral()
-	jcenter()
-	maven { url 'https://jitpack.io' }
-}
-
-
-
-dependencies {
-
-    implementation("net.mamoe:mirai-core-jvm:${MIRAI_VERSION}") {
-      exclude group: 'net.mamoe', module: 'mirai-core-api'
-      exclude group: 'net.mamoe', module: 'mirai-core-utils'
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    
+    group = 'com.mirai.hundun'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '11'
+    
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven { url 'https://jitpack.io' }
     }
-    implementation("net.mamoe:mirai-core-api-jvm:${MIRAI_VERSION}") {
-      exclude group: 'net.mamoe', module: 'mirai-core-utils'
+    //configurations {
+    //    compileOnly {
+    //        extendsFrom annotationProcessor
+    //    }
+    //}
+    
+    test {
+        useJUnitPlatform()
     }
-    implementation("net.mamoe:mirai-core-utils-jvm:${MIRAI_VERSION}")
-
-    implementation 'com.github.hkirk:java-html2image:0.9'
-    implementation group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
-
-    //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
-    //implementation("net.mamoe:mirai-core:${MIRAI_VERSION}") // 运行时使用
-    //implementation("net.mamoe:mirai-login-solver-selenium:1.0-dev-17")
-    implementation ("org.springframework.boot:spring-boot-starter:${springBootVersion}")
-    implementation ("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-    implementation ("org.springframework.cloud:spring-cloud-starter-openfeign:${springCloudVersion}")
-    implementation ("org.springframework.cloud:spring-cloud-starter-netflix-hystrix:${springCloudVersion}")
-
-	implementation ("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
-	
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    
+    
 }
 
-test {
-	useJUnitPlatform()
+project(":mirai-server") {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    
+    dependencies {
+        implementation project(":mirai-plugin")
+
+    
+        //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
+        //implementation("net.mamoe:mirai-core:${MIRAI_VERSION}") // 运行时使用
+        //implementation("net.mamoe:mirai-login-solver-selenium:1.0-dev-17")
+        implementation ("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+        implementation ("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
+        implementation ("org.springframework.cloud:spring-cloud-starter-openfeign:${springCloudVersion}")
+        implementation ("org.springframework.cloud:spring-cloud-starter-netflix-hystrix:${springCloudVersion}")
+    
+        implementation ("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
+        
+        compileOnly 'org.projectlombok:lombok:1.18.4'
+        annotationProcessor 'org.projectlombok:lombok:1.18.4'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+    
 }
+
+project(":mirai-plugin") {
+    dependencies {
+
+        implementation("net.mamoe:mirai-core-jvm:${MIRAI_VERSION}") {
+          exclude group: 'net.mamoe', module: 'mirai-core-api'
+          exclude group: 'net.mamoe', module: 'mirai-core-utils'
+        }
+        implementation("net.mamoe:mirai-core-api-jvm:${MIRAI_VERSION}") {
+          exclude group: 'net.mamoe', module: 'mirai-core-utils'
+        }
+        implementation("net.mamoe:mirai-core-utils-jvm:${MIRAI_VERSION}")
+    
+        implementation 'com.github.hkirk:java-html2image:0.9'
+        implementation group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
+
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
+        implementation group: 'org.mongodb', name: 'mongodb-driver', version: '3.6.3'
+
+        implementation 'io.github.openfeign:feign-core:11.1'
+        implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.1'
+        
+        
+        
+        compileOnly 'org.projectlombok:lombok:1.18.4'
+        annotationProcessor 'org.projectlombok:lombok:1.18.4'
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
