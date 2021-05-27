@@ -9,6 +9,10 @@ import java.util.Map;
 
 import com.hundun.mirai.plugin.CustomBeanFactory;
 import com.hundun.mirai.plugin.IManualWired;
+import com.hundun.mirai.plugin.cp.penguin.db.ItemRepository;
+import com.hundun.mirai.plugin.cp.penguin.db.MatrixReportRepository;
+import com.hundun.mirai.plugin.cp.penguin.db.StageInfoReportRepository;
+import com.hundun.mirai.plugin.cp.penguin.db.StageRepository;
 import com.hundun.mirai.plugin.cp.penguin.domain.DropInfo;
 import com.hundun.mirai.plugin.cp.penguin.domain.DropType;
 import com.hundun.mirai.plugin.cp.penguin.domain.Item;
@@ -19,7 +23,7 @@ import com.hundun.mirai.plugin.cp.penguin.domain.report.MatrixReport;
 import com.hundun.mirai.plugin.cp.penguin.domain.report.MatrixReportNode;
 import com.hundun.mirai.plugin.cp.penguin.domain.report.StageInfoNode;
 import com.hundun.mirai.plugin.cp.penguin.domain.report.StageInfoReport;
-import com.hundun.mirai.plugin.cp.penguin.feign.PenguinApiService;
+import com.hundun.mirai.plugin.cp.penguin.feign.PenguinApiFeignClient;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +38,7 @@ public class PenguinService implements IManualWired {
     
     ItemRepository itemRepository;
     
-    PenguinApiService penguinApiService;
+    PenguinApiFeignClient penguinApiFeignClient;
     
     MatrixReportRepository matrixReportRepository; 
     
@@ -42,21 +46,21 @@ public class PenguinService implements IManualWired {
     
     @Override
     public void manualWired() {
-        this.stageRepository = CustomBeanFactory.getInstance().stageRepository;
-        this.itemRepository = CustomBeanFactory.getInstance().itemRepository;
-        this.penguinApiService = CustomBeanFactory.getInstance().penguinApiService;
+        this.stageRepository = CustomBeanFactory.getInstance().penguinStageRepository;
+        this.itemRepository = CustomBeanFactory.getInstance().penguinItemRepository;
+        this.penguinApiFeignClient = CustomBeanFactory.getInstance().penguinApiFeignClient;
         this.matrixReportRepository = CustomBeanFactory.getInstance().matrixReportRepository;
         this.stageInfoReportRepository = CustomBeanFactory.getInstance().stageInfoReportRepository;
     }
     
     public synchronized void resetCache() {
         
-        List<Stage> stages = penguinApiService.stages();
+        List<Stage> stages = penguinApiFeignClient.stages();
         stageRepository.deleteAll();
         stageRepository.saveAll(stages);
         log.info("updateStages items size = {}", stages.size());
         
-        List<Item> items = penguinApiService.items();
+        List<Item> items = penguinApiFeignClient.items();
         itemRepository.deleteAll();
         itemRepository.saveAll(items);
         log.info("updateItems items size = {}", items.size());
@@ -103,7 +107,7 @@ public class PenguinService implements IManualWired {
         String reportId = item.getItemId();
         MatrixReport report = matrixReportRepository.findById(reportId);
         if (report == null) {
-            ResultMatrixResponse response = penguinApiService.resultMatrix(item.getItemId());
+            ResultMatrixResponse response = penguinApiFeignClient.resultMatrix(item.getItemId());
             if (response != null) {
                 List<MatrixReportNode> reportNodes = new ArrayList<>();
                 for (ResultMatrixNode matrixNode : response.getMatrix()) {

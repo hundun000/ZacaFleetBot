@@ -9,7 +9,6 @@ import java.util.Map;
 import com.hundun.mirai.plugin.CustomBeanFactory;
 import com.hundun.mirai.plugin.core.EventInfo;
 import com.hundun.mirai.plugin.core.SessionId;
-import com.hundun.mirai.plugin.function.RepeatConsumer.SessionData;
 import com.hundun.mirai.plugin.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.plugin.parser.statement.Statement;
 import com.hundun.mirai.plugin.parser.statement.SubFunctionCallStatement;

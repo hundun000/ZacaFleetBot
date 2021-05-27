@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ZacaMusume extends BaseCharacter {
 
     //@Value("${character.zacaMusume.listenWeiboUids:}")
-    // TODO
     public String[] listenWeiboUids = new String[0];
     
     public ZacaMusume() {
@@ -45,6 +44,8 @@ public class ZacaMusume extends BaseCharacter {
     @Override
     public void manualWired() {
         super.manualWired();
+        
+        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.zacaMusumeListenWeiboUids;
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.botService = CustomBeanFactory.getInstance().botService;

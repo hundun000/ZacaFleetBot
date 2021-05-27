@@ -1,6 +1,7 @@
 package com.hundun.mirai.server.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +12,8 @@ import com.hundun.mirai.plugin.cp.kcwiki.KancolleWikiService;
 import com.hundun.mirai.plugin.cp.penguin.PenguinService;
 import com.hundun.mirai.plugin.cp.penguin.domain.report.MatrixReport;
 import com.hundun.mirai.plugin.cp.penguin.domain.report.StageInfoReport;
+import com.hundun.mirai.plugin.cp.weibo.WeiboService;
+import com.hundun.mirai.plugin.cp.weibo.domain.WeiboCardCache;
 
 /**
  * @author hundun
@@ -24,6 +27,13 @@ public class DataController {
     
     KancolleWikiService kancolleWikiService = CustomBeanFactory.getInstance().kancolleWikiService;
     
+    WeiboService weiboService = CustomBeanFactory.getInstance().weiboService;
+    
+    @RequestMapping(value="/weibo/updateAndGetTopBlog", method=RequestMethod.GET)
+    public List<WeiboCardCache> updateAndGetTopBlog(
+            @RequestParam("uid") String uid) {
+        return weiboService.updateAndGetTopBlog(uid);
+    }
     
     @RequestMapping(value="/penguin/resetCache", method=RequestMethod.GET)
     public String updateItems() {

@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 public class WeiboUserInfoCache {
-    String id;
+    String uid;
     String screen_name;
     String weibo_containerid;
 }

@@ -57,6 +57,11 @@ public class ReminderFunction implements IFunction {
         this.taskRepository = CustomBeanFactory.getInstance().taskRepository;
     }
     
+    @Override
+    public void afterManualWired() {
+        registerClockSchedule();
+    }
+    
     Map<String, List<ReminderTask>> characterTasks = new HashMap<>();
     
     private String reminderTaskDescroption(ReminderTask task) {

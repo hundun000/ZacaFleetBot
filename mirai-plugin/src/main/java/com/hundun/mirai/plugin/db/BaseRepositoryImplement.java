@@ -1,0 +1,100 @@
+package com.hundun.mirai.plugin.db;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.bson.conversions.Bson;
+
+import com.mongodb.BasicDBObject;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
+
+
+/**
+ * @author hundun
+ * Created on 2021/05/31
+ * @param <T>
+ */
+public abstract class BaseRepositoryImplement<T> {
+    protected final MongoDatabase database;
+    protected final MongoCollection<T> collection;
+    protected final String idFieldName;
+    
+    private final IdGetter<T> idGetter;
+    private final IdSetter<T> idSetter;
+    
+    @FunctionalInterface
+    public interface IdGetter<T> {
+        String convert(T item);
+    }
+    
+    @FunctionalInterface
+    public interface IdSetter<T> {
+        void set(T item, String id);
+    }
+    
+    public BaseRepositoryImplement(CollectionSettings<T> mongoSettings) {
+        this.database = mongoSettings.getDatabase();
+        this.collection = database.getCollection(mongoSettings.getCollectionName(), mongoSettings.getType());
+        this.idFieldName = mongoSettings.getIdFieldName();
+        this.idGetter = mongoSettings.getIdGetter();
+        this.idSetter = mongoSettings.getIdSetter();
+    }
+    
+    
+    public void deleteAll() {
+        Bson filter = new BasicDBObject();
+        collection.deleteMany(filter);
+    }
+
+    
+
+    public void save(T item) {
+        String id = idGetter.convert(item);
+        
+        if (id == null) {
+            id = UUID.randomUUID().toString();
+            idSetter.set(item, id);
+            collection.insertOne(item);
+        } else {
+            Bson filter = Filters.eq(idFieldName, id);
+            collection.replaceOne(filter, item, new ReplaceOptions().upsert(true));
+        }
+    }
+    
+    public void saveAll(List<T> items) {
+        for (T item: items) {
+            this.save(item);
+        }
+    }
+
+    
+    public T findById(String itemId) {
+        Bson filter = Filters.eq(idFieldName, itemId);
+        return collection.find(filter).first();
+    }
+
+    public List<T> findAllByFilter(Bson filter, Integer topLimit) {
+        List<T> result = new ArrayList<>();
+        MongoCursor<T> cursor = collection.find(filter).iterator();
+        while (cursor.hasNext()) {
+            if (topLimit == null || result.size() < topLimit) {
+                result.add(cursor.next());
+            } else {
+                break;
+            }
+        }
+        return result;
+    }
+    
+    public boolean existsById(String itemId) {
+        Bson filter = Filters.eq(idFieldName, itemId);
+        return collection.countDocuments(filter) > 0;
+    }
+    
+}

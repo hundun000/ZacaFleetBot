@@ -19,7 +19,6 @@ import com.hundun.mirai.plugin.service.BotService;
 import com.hundun.mirai.plugin.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.message.code.MiraiCode;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;

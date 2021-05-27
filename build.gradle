@@ -26,17 +26,20 @@ allprojects {
         jcenter()
         maven { url 'https://jitpack.io' }
     }
-    //configurations {
-    //    compileOnly {
-    //        extendsFrom annotationProcessor
-    //    }
-    //}
-    
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+    }
     test {
         useJUnitPlatform()
     }
     
     
+
 }
 
 project(":mirai-server") {
@@ -79,11 +82,12 @@ project(":mirai-plugin") {
         implementation 'com.github.hkirk:java-html2image:0.9'
         implementation group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
 
-        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.0.1'
-        implementation group: 'org.mongodb', name: 'mongodb-driver', version: '3.6.3'
+        
+        implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '3.8.2'
 
+        implementation 'io.github.openfeign:feign-jackson:11.1'
         implementation 'io.github.openfeign:feign-core:11.1'
-        implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.1'
+        //implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.1'
         
         
         

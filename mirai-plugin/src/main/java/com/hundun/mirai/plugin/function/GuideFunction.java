@@ -1,6 +1,5 @@
 package com.hundun.mirai.plugin.function;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,8 +13,6 @@ import com.hundun.mirai.plugin.core.SessionId;
 import com.hundun.mirai.plugin.parser.statement.Statement;
 import com.hundun.mirai.plugin.parser.statement.SubFunctionCallStatement;
 import com.hundun.mirai.plugin.service.BotService;
-import com.zaca.stillstanding.dto.match.MatchSituationDTO;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

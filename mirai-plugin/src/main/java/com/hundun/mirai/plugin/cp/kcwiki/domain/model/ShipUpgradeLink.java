@@ -4,13 +4,10 @@ package com.hundun.mirai.plugin.cp.kcwiki.domain.model;
  * Created on 2021/05/21
  */
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import com.hundun.mirai.plugin.cp.kcwiki.domain.dto.KcwikiShipDetail;
 
 import lombok.Data;
 

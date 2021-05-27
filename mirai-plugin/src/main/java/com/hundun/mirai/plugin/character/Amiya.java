@@ -3,7 +3,6 @@ package com.hundun.mirai.plugin.character;
 import java.util.Arrays;
 
 
-import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSASigner.detDSA;
 import org.jetbrains.annotations.NotNull;
 
 import com.hundun.mirai.plugin.CustomBeanFactory;
@@ -63,6 +62,8 @@ public class Amiya extends BaseCharacter {
     @Override
     public void manualWired() {
         super.manualWired();
+        
+        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.amiyaListenWeiboUids;
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.amiyaChatFunction = CustomBeanFactory.getInstance().amiyaChatFunction;

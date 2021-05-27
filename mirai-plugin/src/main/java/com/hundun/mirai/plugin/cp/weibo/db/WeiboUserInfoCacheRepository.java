@@ -1,4 +1,4 @@
-package com.hundun.mirai.plugin.cp.weibo;
+package com.hundun.mirai.plugin.cp.weibo.db;
 
 
 import com.hundun.mirai.plugin.cp.weibo.domain.WeiboUserInfoCache;

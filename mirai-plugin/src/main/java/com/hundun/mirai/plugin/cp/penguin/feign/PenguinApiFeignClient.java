@@ -16,7 +16,13 @@ import feign.RequestLine;
 
 
 
-public interface PenguinApiService {
+//@FeignClient(
+//        name = "penguinApiService",
+//        url = "https://penguin-stats.io/PenguinStats/api",
+//        configuration = PublicFeignConfiguration.class
+//)
+//@Component
+public interface PenguinApiFeignClient {
 
     @RequestLine("GET /v2/items")
     List<Item> items();
@@ -24,7 +30,7 @@ public interface PenguinApiService {
     @RequestLine("GET /v2/stages?server=CN")
     List<Stage> stages();
     
-    @RequestLine("GET /v2/result/matrix?is_personal=false&server=CN&show_closed_zones=false")
+    @RequestLine("GET /v2/result/matrix?is_personal=false&server=CN&show_closed_zones=false&itemFilter={itemFilter}")
     ResultMatrixResponse resultMatrix(@Param("itemFilter") String itemFilter);
 
 }

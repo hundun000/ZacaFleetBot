@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 public class PrinzEugen extends BaseCharacter {
 
     //@Value("${character.prinzEugen.listenWeiboUids:}")
-    // TODO
     public String[] listenWeiboUids = new String[0];
     
     public PrinzEugen() {
@@ -51,6 +50,9 @@ public class PrinzEugen extends BaseCharacter {
     @Override
     public void manualWired() {
         super.manualWired();
+        
+        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.prinzEugenListenWeiboUids;
+        
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.chatFunction = CustomBeanFactory.getInstance().prinzEugenChatFunction;
         this.repeatConsumer = CustomBeanFactory.getInstance().repeatConsumer;

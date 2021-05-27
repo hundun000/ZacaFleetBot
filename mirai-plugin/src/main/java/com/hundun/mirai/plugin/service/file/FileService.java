@@ -18,6 +18,7 @@ public class FileService implements IManualWired {
     
     private static final String RESOURCE_DOWNLOAD_FOLDER = "file_cache/";
     
+    @Override
     public void manualWired() {
         // TODO Auto-generated method stub
         

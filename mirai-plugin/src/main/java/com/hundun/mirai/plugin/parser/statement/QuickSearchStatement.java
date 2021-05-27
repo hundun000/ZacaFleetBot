@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.hundun.mirai.plugin.function.SubFunction;
 import com.hundun.mirai.plugin.parser.Token;
 import com.hundun.mirai.plugin.parser.TokenType;
 
-import lombok.Data;
 import lombok.Getter;
 
 /**

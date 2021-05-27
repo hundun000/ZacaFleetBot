@@ -1,5 +1,6 @@
 package com.hundun.mirai.plugin.cp.penguin.domain;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -17,5 +18,5 @@ public class Item {
     String sortId;
     String rarity;
     String name;
-    Map<String, String[]> alias;
+    Map<String, List<String>> alias;
 }

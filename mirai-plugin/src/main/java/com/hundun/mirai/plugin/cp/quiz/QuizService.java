@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.plugin.CustomBeanFactory;
+import com.hundun.mirai.plugin.IManualWired;
 import com.hundun.mirai.plugin.service.file.FileService;
 import com.hundun.mirai.plugin.service.file.IFileProvider;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/25
  */
 @Slf4j
-public class QuizService implements IFileProvider {
+public class QuizService implements IFileProvider, IManualWired {
     ObjectMapper mapper = new ObjectMapper();
     
     
@@ -30,9 +31,10 @@ public class QuizService implements IFileProvider {
     
     StillstandingApiFeignClient stillstandingApiService;
     
+    @Override
     public void manualWired() {
         this.fileService = CustomBeanFactory.getInstance().fileService;
-        this.stillstandingApiService = CustomBeanFactory.getInstance().stillstandingApiService;
+        this.stillstandingApiService = CustomBeanFactory.getInstance().stillstandingApiFeignClient;
     }
     
     public QuizService() {

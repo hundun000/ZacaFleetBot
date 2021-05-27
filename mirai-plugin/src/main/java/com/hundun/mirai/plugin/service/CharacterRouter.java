@@ -93,7 +93,10 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
         }
     }
 
-    public void postConstruct() {
+    
+    @Override
+    public void afterManualWired() {
+
         characters.add(amiya);
         characters.add(prinzEugen);
         characters.add(zacaMusume);

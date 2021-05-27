@@ -1,4 +1,4 @@
-package com.hundun.mirai.plugin.cp.weibo;
+package com.hundun.mirai.plugin.cp.weibo.db;
 
 
 

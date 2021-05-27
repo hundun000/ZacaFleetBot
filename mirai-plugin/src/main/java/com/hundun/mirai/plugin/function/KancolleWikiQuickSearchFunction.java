@@ -13,7 +13,6 @@ import com.hundun.mirai.plugin.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.hundun.mirai.plugin.cp.kcwiki.domain.dto.KcwikiShipStats;
 import com.hundun.mirai.plugin.cp.kcwiki.domain.model.ShipInfo;
 import com.hundun.mirai.plugin.cp.kcwiki.domain.model.ShipUpgradeLink;
-import com.hundun.mirai.plugin.function.QuickSearchFunction.QuickSearchNode;
 import com.hundun.mirai.plugin.parser.statement.QuickSearchStatement;
 import com.hundun.mirai.plugin.parser.statement.Statement;
 import com.hundun.mirai.plugin.service.BotService;

@@ -55,6 +55,11 @@ public class WeiboFunction implements IFunction {
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
+    @Override
+    public void afterManualWired() {
+        registerSchedule();
+    }
+    
     @Data
     private class SessionData {
         LocalDateTime lastUpdateTime;
@@ -88,7 +93,7 @@ public class WeiboFunction implements IFunction {
         return allBlogUids;
     }
     
-    public void checkNewBlog() {
+    public void registerSchedule() {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {

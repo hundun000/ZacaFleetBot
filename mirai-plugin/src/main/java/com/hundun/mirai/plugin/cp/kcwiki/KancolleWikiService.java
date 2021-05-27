@@ -4,11 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-
 import com.hundun.mirai.plugin.CustomBeanFactory;
 import com.hundun.mirai.plugin.IManualWired;
 import com.hundun.mirai.plugin.cp.kcwiki.domain.dto.KcwikiInitEquip;
@@ -33,7 +28,7 @@ public class KancolleWikiService implements IFileProvider, IManualWired {
     
     @Override
     public void manualWired() {
-        this.apiFeignClient = CustomBeanFactory.getInstance().apiFeignClient;
+        this.apiFeignClient = CustomBeanFactory.getInstance().kcwikiApiFeignClient;
     }
     
     public String getStandardName(String fuzzyName) {

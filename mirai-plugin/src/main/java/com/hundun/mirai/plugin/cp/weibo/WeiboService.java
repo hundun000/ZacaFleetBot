@@ -14,10 +14,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.plugin.CustomBeanFactory;
 import com.hundun.mirai.plugin.IManualWired;
+import com.hundun.mirai.plugin.cp.weibo.db.WeiboCardCacheRepository;
+import com.hundun.mirai.plugin.cp.weibo.db.WeiboUserInfoCacheRepository;
 import com.hundun.mirai.plugin.cp.weibo.domain.WeiboCardCache;
 import com.hundun.mirai.plugin.cp.weibo.domain.WeiboUserInfoCache;
-import com.hundun.mirai.plugin.cp.weibo.feign.WeiboApiService;
-import com.hundun.mirai.plugin.cp.weibo.feign.WeiboPictureApiService;
+import com.hundun.mirai.plugin.cp.weibo.feign.WeiboApiFeignClient;
+import com.hundun.mirai.plugin.cp.weibo.feign.WeiboPictureApiFeignClient;
 import com.hundun.mirai.plugin.service.file.FileService;
 import com.hundun.mirai.plugin.service.file.IFileProvider;
 
@@ -36,9 +38,9 @@ public class WeiboService implements IFileProvider, IManualWired {
     
     FileService fileService;
     
-    WeiboApiService weiboApiService;
+    WeiboApiFeignClient weiboApiFeignClient;
     
-    WeiboPictureApiService weiboPictureApiService;
+    WeiboPictureApiFeignClient weiboPictureApiFeignClient;
     
     WeiboUserInfoCacheRepository userInfoCacheRepository;
     
@@ -55,10 +57,10 @@ public class WeiboService implements IFileProvider, IManualWired {
     @Override
     public void manualWired() {
         this.fileService = CustomBeanFactory.getInstance().fileService;
-        this.weiboApiService = CustomBeanFactory.getInstance().weiboApiService;
-        this.weiboPictureApiService = CustomBeanFactory.getInstance().weiboPictureApiService;
-        this.userInfoCacheRepository = CustomBeanFactory.getInstance().userInfoCacheRepository;
-        this.cardCacheRepository = CustomBeanFactory.getInstance().cardCacheRepository;
+        this.weiboApiFeignClient = CustomBeanFactory.getInstance().weiboApiFeignClient;
+        this.weiboPictureApiFeignClient = CustomBeanFactory.getInstance().weiboPictureApiFeignClient;
+        this.userInfoCacheRepository = CustomBeanFactory.getInstance().weiboUserInfoCacheRepository;
+        this.cardCacheRepository = CustomBeanFactory.getInstance().weiboCardCacheRepository;
     }
     
     
@@ -66,10 +68,13 @@ public class WeiboService implements IFileProvider, IManualWired {
     private void updateBlogDetail(WeiboCardCache cardCache) {
 
         if (cardCache.getMblog_textDetail() == null) {
-            String responseString = weiboApiService.blogDetail(cardCache.getMblog_id());
+            
             log.info("updateBlogDetail get response.");
             try {
-                JsonNode responseJson = mapper.readTree(responseString);
+                //String responseString = weiboApiFeignClient.blogDetail(cardCache.getMblog_id());
+                //JsonNode responseJson = mapper.readTree(responseString);
+                JsonNode responseJson = weiboApiFeignClient.blogDetail(cardCache.getMblog_id());
+                
                 String longTextContent = responseJson.get("data").get("longTextContent").asText();
                 
                 String detailText = formatBlogDetail(longTextContent);
@@ -79,7 +84,7 @@ public class WeiboService implements IFileProvider, IManualWired {
                 cardCacheRepository.save(cardCache);
                 log.warn("updateBlogDetail success: {} ...", detailText.substring(0, Math.min(20, detailText.length())));
             } catch (Exception e) {
-                log.warn("updateBlogDetail error: {}", responseString);
+                log.warn("updateBlogDetail error:", e);
             }
         }
 
@@ -100,10 +105,11 @@ public class WeiboService implements IFileProvider, IManualWired {
     
     public boolean updateUserInfoCache(String uid) {
         
-        String responseString = weiboApiService.get(uid, API_TYPE_PARAM, uid, null);
         log.info("updateContainerid get response for uid = {}", uid);
         try {
-            JsonNode responseJson = mapper.readTree(responseString);
+            //String responseString = weiboApiFeignClient.get(uid, API_TYPE_PARAM, uid, null);
+            //JsonNode responseJson = mapper.readTree(responseString);
+            JsonNode responseJson = weiboApiFeignClient.get(uid, API_TYPE_PARAM, uid, null);
             JsonNode tabsNode = responseJson.get("data").get("tabsInfo").get("tabs");
             if (tabsNode.isArray()) {
                 boolean updated = false;
@@ -112,7 +118,7 @@ public class WeiboService implements IFileProvider, IManualWired {
                     userInfoCacahe = userInfoCacheRepository.findById(uid);
                 } else {
                     userInfoCacahe = new WeiboUserInfoCache();
-                    userInfoCacahe.setId(uid);
+                    userInfoCacahe.setUid(uid);
                     String screen_name = responseJson.get("data").get("userInfo").get("screen_name").asText();
                     userInfoCacahe.setScreen_name(screen_name);
                     updated = true;
@@ -141,7 +147,7 @@ public class WeiboService implements IFileProvider, IManualWired {
             }
             
         } catch (Exception e) {
-            log.warn("updateContainerid mapper.readTree cannot read: {}", responseString);
+            log.warn("updateContainerid :", e);
         }
         return false;
     }
@@ -188,9 +194,10 @@ public class WeiboService implements IFileProvider, IManualWired {
         }
         userInfoCacahe = userInfoCacheRepository.findById(uid);
         
-        String responseString = weiboApiService.get(uid, API_TYPE_PARAM, uid, userInfoCacahe.getWeibo_containerid());
         try {
-            JsonNode responseJson = mapper.readTree(responseString);
+            //String responseString = weiboApiFeignClient.get(uid, API_TYPE_PARAM, uid, userInfoCacahe.getWeibo_containerid());
+            //JsonNode responseJson = mapper.readTree(responseString);
+            JsonNode responseJson = weiboApiFeignClient.get(uid, API_TYPE_PARAM, uid, userInfoCacahe.getWeibo_containerid());
             JsonNode cardsNode = responseJson.get("data").get("cards");
             for (final JsonNode cardNode : cardsNode) {
                 try {
@@ -236,7 +243,7 @@ public class WeiboService implements IFileProvider, IManualWired {
                 }
             }
         } catch (Exception e) {
-            log.warn("updateBlog mapper.readTree cannot read: {}", responseString);
+            log.warn("updateBlog: ", e);
         }
         return newBlogs;
         
@@ -258,7 +265,7 @@ public class WeiboService implements IFileProvider, IManualWired {
     @Override
     public InputStream download(String fileId) {
         try {
-            final Response response = weiboPictureApiService.pictures(fileId);
+            final Response response = weiboPictureApiFeignClient.pictures(fileId);
             final Response.Body body = response.body();
             final InputStream inputStream = body.asInputStream();
             return inputStream;

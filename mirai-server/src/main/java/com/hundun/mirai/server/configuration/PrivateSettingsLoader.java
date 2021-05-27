@@ -4,15 +4,10 @@ package com.hundun.mirai.server.configuration;
  * Created on 2021/05/07
  */
 
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import com.hundun.mirai.plugin.CustomBeanFactory;
 import com.hundun.mirai.plugin.configuration.PrivateSettings;
 
 import lombok.Data;
@@ -26,10 +21,4 @@ import lombok.extern.slf4j.Slf4j;
 public class PrivateSettingsLoader {
     public PrivateSettings privateSettings;
 
-    
-    @PostConstruct
-    public void show() {
-        log.info("PrivateSettings = {}", privateSettings);
-        CustomBeanFactory.getInstance().privateSettings =  this.getPrivateSettings();
-    }
 }

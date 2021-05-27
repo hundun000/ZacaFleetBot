@@ -9,7 +9,6 @@ import com.hundun.mirai.plugin.IManualWired;
 import com.hundun.mirai.plugin.core.EventInfo;
 import com.hundun.mirai.plugin.function.GuideFunction;
 import com.hundun.mirai.plugin.function.SubFunction;
-import com.hundun.mirai.plugin.function.SubFunctionDocument;
 import com.hundun.mirai.plugin.parser.Parser;
 import com.hundun.mirai.plugin.parser.StatementType;
 import com.hundun.mirai.plugin.parser.TokenType;

@@ -17,7 +17,7 @@ public enum SubFunction {
     QUIZ_UPDATE_TEAM("配置队伍"),
     QUIZ_NEXT_QUEST("出题"),
     QUIZ_USE_SKILL("使用技能"),
-    QUIZ_START_MATCH("开始无尽模式比赛"),
+    QUIZ_START_MATCH("开始比赛"),
 
     
     PENGUIN_QUERY_ITEM_DROP_RATE("查掉率"),
