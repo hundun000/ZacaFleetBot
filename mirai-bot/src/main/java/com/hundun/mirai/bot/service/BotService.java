@@ -43,6 +43,8 @@ public class BotService implements IManualWired {
     }
     
     
+
+    
     //设备认证信息文件
     private final String deviceInfoPath = "device.json";
 
@@ -55,10 +57,6 @@ public class BotService implements IManualWired {
             log.warn("*****未配置账号或密码*****");
             return;
         }
-
-        
-        
-        
         
         //repeaterListener = GlobalEventChannel.INSTANCE.subscribeAlways(GroupMessageEvent.class, repeatConsumer);
         GlobalEventChannel.INSTANCE.registerListenerHost(characterRouter);

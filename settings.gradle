@@ -1,2 +1,2 @@
 rootProject.name = 'mirai-all'
-include 'mirai-server', 'mirai-bot'
+include 'mirai-server', 'mirai-bot', 'mirai-plugin'

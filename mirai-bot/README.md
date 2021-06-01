@@ -24,6 +24,8 @@ mirai-core + mongoDB + gradle
 
 ### Function 功能
 
+> 自己造了一遍轮子，才发现mirai-console里包含相同思路的实现。下文的Statement对应了net.mamoe.mirai.console.command。
+
 连接CpService和Character。是Character总体功能的组成单元，即每个Character实际是在使用若干Function。
 
 鉴于Function需要能被任意Character使用，所以只应有Character依赖Function，而Function不应依赖某个具体Character。

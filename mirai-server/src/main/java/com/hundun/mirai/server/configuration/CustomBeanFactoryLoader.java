@@ -31,7 +31,7 @@ public class CustomBeanFactoryLoader {
     public String[] zacaMusumeListenWeiboUids;
     
     @PostConstruct
-    public void name() {
+    public void load() {
         log.info("PrivateSettings = {}", privateSettingsLoader.getPrivateSettings());
         
         PublicSettings publicSettings = new PublicSettings();
