@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hundun.mirai.plugin.CustomBeanFactory;
-import com.hundun.mirai.plugin.cp.quiz.QuizService;
-import com.hundun.mirai.plugin.cp.weibo.WeiboService;
-import com.hundun.mirai.plugin.service.BotService;
+import com.hundun.mirai.bot.CustomBeanFactory;
+import com.hundun.mirai.bot.cp.quiz.QuizService;
+import com.hundun.mirai.bot.cp.weibo.WeiboService;
+import com.hundun.mirai.bot.service.BotService;
 
 /**
  * @author hundun

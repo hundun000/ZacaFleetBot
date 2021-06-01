@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hundun.mirai.plugin.character.BaseCharacter;
-import com.hundun.mirai.plugin.core.EventInfo;
-import com.hundun.mirai.plugin.core.EventInfoFactory;
-import com.hundun.mirai.plugin.parser.statement.Statement;
+import com.hundun.mirai.bot.character.BaseCharacter;
+import com.hundun.mirai.bot.core.EventInfo;
+import com.hundun.mirai.bot.core.EventInfoFactory;
+import com.hundun.mirai.bot.parser.statement.Statement;
 
 /**
  * @author hundun

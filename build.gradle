@@ -47,7 +47,7 @@ project(":mirai-server") {
     apply plugin: 'io.spring.dependency-management'
     
     dependencies {
-        implementation project(":mirai-plugin")
+        implementation project(":mirai-bot")
 
     
         //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
@@ -55,10 +55,10 @@ project(":mirai-server") {
         //implementation("net.mamoe:mirai-login-solver-selenium:1.0-dev-17")
         implementation ("org.springframework.boot:spring-boot-starter:${springBootVersion}")
         implementation ("org.springframework.boot:spring-boot-starter-web:${springBootVersion}")
-        implementation ("org.springframework.cloud:spring-cloud-starter-openfeign:${springCloudVersion}")
-        implementation ("org.springframework.cloud:spring-cloud-starter-netflix-hystrix:${springCloudVersion}")
+        //implementation ("org.springframework.cloud:spring-cloud-starter-openfeign:${springCloudVersion}")
+        //implementation ("org.springframework.cloud:spring-cloud-starter-netflix-hystrix:${springCloudVersion}")
     
-        implementation ("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
+        //implementation ("org.springframework.boot:spring-boot-starter-data-mongodb:${springBootVersion}")
         
         compileOnly 'org.projectlombok:lombok:1.18.4'
         annotationProcessor 'org.projectlombok:lombok:1.18.4'
@@ -67,7 +67,7 @@ project(":mirai-server") {
     
 }
 
-project(":mirai-plugin") {
+project(":mirai-bot") {
     dependencies {
 
         implementation("net.mamoe:mirai-core-jvm:${MIRAI_VERSION}") {

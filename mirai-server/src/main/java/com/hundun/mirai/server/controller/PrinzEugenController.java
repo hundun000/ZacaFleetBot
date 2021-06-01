@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hundun.mirai.bot.CustomBeanFactory;
+import com.hundun.mirai.bot.character.PrinzEugen;
 import com.hundun.mirai.server.controller.BaseCharacterController;
-import com.hundun.mirai.plugin.CustomBeanFactory;
-import com.hundun.mirai.plugin.character.PrinzEugen;
 
 /**
  * @author hundun

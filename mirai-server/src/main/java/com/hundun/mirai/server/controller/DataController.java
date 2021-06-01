@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hundun.mirai.plugin.CustomBeanFactory;
-import com.hundun.mirai.plugin.cp.kcwiki.KancolleWikiService;
-import com.hundun.mirai.plugin.cp.penguin.PenguinService;
-import com.hundun.mirai.plugin.cp.penguin.domain.report.MatrixReport;
-import com.hundun.mirai.plugin.cp.penguin.domain.report.StageInfoReport;
-import com.hundun.mirai.plugin.cp.weibo.WeiboService;
-import com.hundun.mirai.plugin.cp.weibo.domain.WeiboCardCache;
+import com.hundun.mirai.bot.CustomBeanFactory;
+import com.hundun.mirai.bot.cp.kcwiki.KancolleWikiService;
+import com.hundun.mirai.bot.cp.penguin.PenguinService;
+import com.hundun.mirai.bot.cp.penguin.domain.report.MatrixReport;
+import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoReport;
+import com.hundun.mirai.bot.cp.weibo.WeiboService;
+import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 
 /**
  * @author hundun
