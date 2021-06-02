@@ -1,0 +1,19 @@
+{
+    "apps":[
+    {
+        "name":"mirai-server",
+        "cwd":".",
+        "script":"/usr/bin/java",
+        "args":[
+            "-jar",
+            "-Xmx512m",
+            "mirai-server-0.0.1-SNAPSHOT.jar"
+        ],
+        "node_args":[],
+        "exec_interpreter":"",
+        "exec_mode":"fork",
+        "error_file" : "mirai-server-err.log",
+        "out_file"   : "mirai-server-out.log"
+     }
+   ]
+}
