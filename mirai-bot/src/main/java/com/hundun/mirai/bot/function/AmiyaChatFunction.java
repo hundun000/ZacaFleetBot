@@ -14,7 +14,7 @@ import com.hundun.mirai.bot.core.UserTag;
 import com.hundun.mirai.bot.parser.statement.AtStatement;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +35,10 @@ public class AmiyaChatFunction implements IFunction {
     
     CharacterRouter characterRouter;
     
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
@@ -115,46 +115,46 @@ public class AmiyaChatFunction implements IFunction {
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
-            if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == botService.getAdminAccount()) {
+            if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == offlineConsole.getAdminAccount()) {
                 todayIsHoliday = LocalDateTime.now().getDayOfYear();
                 todayIsWorkday = -1;
-                botService.sendToGroup(event.getGroupId(), "好耶");
+                offlineConsole.sendToGroup(event.getGroupId(), "好耶");
                 return true;
-            } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == botService.getAdminAccount()) {
+            } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == offlineConsole.getAdminAccount()) {
                 todayIsHoliday = -1;
                 todayIsWorkday = LocalDateTime.now().getDayOfYear();
-                botService.sendToGroup(event.getGroupId(), "哼");
+                offlineConsole.sendToGroup(event.getGroupId(), "哼");
                 return true;
             } else if (newMessage.contains("下班")) {
                 boolean canRelax = canRelax();
                 if (canRelax) {
-                    Image image = botService.uploadImage(event.getGroupId(), canRelaxExternalResource);
-                    botService.sendToGroup(event.getGroupId(), 
+                    Image image = offlineConsole.uploadImage(event.getGroupId(), canRelaxExternalResource);
+                    offlineConsole.sendToGroup(event.getGroupId(), 
                             new PlainText(canRelaxTalk)
                             .plus(image)
                             );
                 } else {
-                    Image image = botService.uploadImage(event.getGroupId(), cannotRelaxExternalResource);
-                    botService.sendToGroup(event.getGroupId(), 
+                    Image image = offlineConsole.uploadImage(event.getGroupId(), cannotRelaxExternalResource);
+                    offlineConsole.sendToGroup(event.getGroupId(), 
                             new PlainText(cannotRelaxTalk)
                             .plus(image)
                             );
                 }
                 return true;
             } else if (newMessage.contains("damedane")) {
-                Voice voice = botService.uploadVoice(event.getGroupId(), damedaneVoiceExternalResource);
+                Voice voice = offlineConsole.uploadVoice(event.getGroupId(), damedaneVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
                 builder.add(voice);
                 MessageChain messageChain = builder.build();
 
-                botService.sendToGroup(event.getGroupId(), 
+                offlineConsole.sendToGroup(event.getGroupId(), 
                         messageChain
                         );
                 return true;
             }
         } else if (statement instanceof AtStatement) {
-            if (((AtStatement)statement).getTarget() == botService.getSelfAccount()) {
-                botService.sendToGroup(event.getGroupId(), 
+            if (((AtStatement)statement).getTarget() == offlineConsole.getSelfAccount()) {
+                offlineConsole.sendToGroup(event.getGroupId(), 
                         talks.get(rand.nextInt(talks.size()))
                         //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
                         );
@@ -166,14 +166,14 @@ public class AmiyaChatFunction implements IFunction {
 
     public boolean acceptNudged(EventInfo eventInfo) {
         Image image = null;
-        if (eventInfo.getTargetId() == botService.getSelfAccount()) {
-            image = botService.uploadImage(eventInfo.getGroupId(), faces.get(rand.nextInt(faces.size())));
+        if (eventInfo.getTargetId() == offlineConsole.getSelfAccount()) {
+            image = offlineConsole.uploadImage(eventInfo.getGroupId(), faces.get(rand.nextInt(faces.size())));
         } else {
             List<UserTag> tags = characterRouter.getUserTags(eventInfo.getTargetId());
             if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
-                image = botService.uploadImage(eventInfo.getGroupId(), ceoboNodgeResource);
+                image = offlineConsole.uploadImage(eventInfo.getGroupId(), ceoboNodgeResource);
             } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {
-                image = botService.uploadImage(eventInfo.getGroupId(), angelinaNodgeResource);
+                image = offlineConsole.uploadImage(eventInfo.getGroupId(), angelinaNodgeResource);
             } 
 
         }
@@ -182,7 +182,7 @@ public class AmiyaChatFunction implements IFunction {
             
         
         if (image != null) {
-            botService.sendToGroup(eventInfo.getGroupId(), 
+            offlineConsole.sendToGroup(eventInfo.getGroupId(), 
                     new At(eventInfo.getSenderId())
                     .plus(image)
                     );

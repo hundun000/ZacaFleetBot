@@ -13,7 +13,7 @@ import com.hundun.mirai.bot.function.WeiboFunction;
 import com.hundun.mirai.bot.parser.StatementType;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +33,7 @@ public class ZacaMusume extends BaseCharacter {
 
     WeiboFunction weiboFunction;
 
-    BotService botService;
+    IConsole offlineConsole;
     
     QuizHandler quizHandler;
     
@@ -48,7 +48,7 @@ public class ZacaMusume extends BaseCharacter {
         this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.zacaMusumeListenWeiboUids;
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
         this.japaneseFunction = CustomBeanFactory.getInstance().japaneseFunction;
     }

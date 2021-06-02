@@ -9,7 +9,7 @@ import com.hundun.mirai.bot.core.EventInfo;
 import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.Image;
@@ -26,10 +26,10 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Slf4j
 public class PrinzEugenChatFunction implements IFunction {
 
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
 
     ExternalResource pupuExternalResource;
@@ -55,19 +55,19 @@ public class PrinzEugenChatFunction implements IFunction {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.contains("噗噗")) {
-                Image image = botService.uploadImage(event.getGroupId(), pupuExternalResource);
-                botService.sendToGroup(event.getGroupId(), 
+                Image image = offlineConsole.uploadImage(event.getGroupId(), pupuExternalResource);
+                offlineConsole.sendToGroup(event.getGroupId(), 
                         new PlainText("")
                         .plus(image)
                         );
                 return true;
             } else if (newMessage.contains("咻咻咻") || newMessage.contains("西姆咻")) {
-                Voice voice = botService.uploadVoice(event.getGroupId(), xiuXiuXiuVoiceExternalResource);
+                Voice voice = offlineConsole.uploadVoice(event.getGroupId(), xiuXiuXiuVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
                 builder.add(voice);
                 MessageChain messageChain = builder.build();
 
-                botService.sendToGroup(event.getGroupId(), 
+                offlineConsole.sendToGroup(event.getGroupId(), 
                         messageChain
                         );
                 return true;

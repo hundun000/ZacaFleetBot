@@ -16,7 +16,7 @@ import com.hundun.mirai.bot.cp.quiz.QuizService.MatchType;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.file.FileService;
 import com.zaca.stillstanding.dto.buff.BuffDTO;
 import com.zaca.stillstanding.dto.event.AnswerResultEvent;
@@ -68,7 +68,7 @@ public class QuizHandler implements IFunction {
     
     FileService fileService;
     
-    BotService botService;
+    IConsole offlineConsole;
     
     Map<String, SessionData> sessionDataMap = new HashMap<>();
 
@@ -76,7 +76,7 @@ public class QuizHandler implements IFunction {
     public void manualWired() {
         this.quizService = CustomBeanFactory.getInstance().quizService;
         this.fileService = CustomBeanFactory.getInstance().fileService;
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
     
     @Data
@@ -110,34 +110,34 @@ public class QuizHandler implements IFunction {
                 switch (subFunctionCallStatement.getSubFunction()) {
                     case QUIZ_NEXT_QUEST:
                         if (sessionData.matchSituationDTO == null) {
-                            botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
+                            offlineConsole.sendToGroup(event.getGroupId(), "没有进行中的比赛");
                             result = true;
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_GENERATE_QUESTION) {
                             result = handleNextQustion(sessionData, event);
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
-                            botService.sendToGroup(event.getGroupId(), "上一个问题还没回答哦~");
+                            offlineConsole.sendToGroup(event.getGroupId(), "上一个问题还没回答哦~");
                             result = true;
                         }
                         break;
                     case QUIZ_USE_SKILL:
                         if (sessionData.matchSituationDTO == null) {
-                            botService.sendToGroup(event.getGroupId(), "没有进行中的比赛");
+                            offlineConsole.sendToGroup(event.getGroupId(), "没有进行中的比赛");
                             result = true;
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
                             String skillName = subFunctionCallStatement.getArgs().get(0);
                             result = handleUseSkill(sessionData, event, skillName);
                         } else {
-                            botService.sendToGroup(event.getGroupId(), "当前不能使用技能");
+                            offlineConsole.sendToGroup(event.getGroupId(), "当前不能使用技能");
                             result = true;
                         }
                         break;
                     case QUIZ_EXIT:
-                        if (event.getSenderId() == botService.getAdminAccount()) {
+                        if (event.getSenderId() == offlineConsole.getAdminAccount()) {
                             sessionData.matchSituationDTO = null;
-                            botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
+                            offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
                             return true;
                         } else {
-                            botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                            offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                             return true;
                         }
                     case QUIZ_START_MATCH:   
@@ -154,12 +154,12 @@ public class QuizHandler implements IFunction {
                             }
                             result = handleCreateAndStartMatch(sessionData, event, matchMode, questionPackageName, teamName, showCompletedSituation);
                         } else {
-                            botService.sendToGroup(event.getGroupId(), "目前已在比赛中");
+                            offlineConsole.sendToGroup(event.getGroupId(), "目前已在比赛中");
                             result = true;
                         }
                         break;
                     case QUIZ_UPDATE_TEAM:
-                        if (event.getSenderId() == botService.getAdminAccount()) {
+                        if (event.getSenderId() == offlineConsole.getAdminAccount()) {
                             String teamName = subFunctionCallStatement.getArgs().get(0);
                             List<String> pickTags = Arrays.asList(subFunctionCallStatement.getArgs().get(1).split("&"));
                             List<String> banTags = Arrays.asList(subFunctionCallStatement.getArgs().get(2).split("&"));
@@ -171,7 +171,7 @@ public class QuizHandler implements IFunction {
                             teamConstInfoDTO.setRoleName(roleName);
                             result = handleUpdateTeam(sessionData, event, teamConstInfoDTO);
                         } else {
-                            botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                            offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                             return true;
                         }
                         break;
@@ -195,10 +195,10 @@ public class QuizHandler implements IFunction {
     private boolean handleUpdateTeam(SessionData sessionData, EventInfo event, TeamConstInfoDTO teamConstInfoDTO) {
         List<TeamConstInfoDTO> payload = quizService.updateTeam(sessionData.getMatchSituationDTO().getId(), teamConstInfoDTO);
         if (payload != null)  {
-            botService.sendToGroup(event.getGroupId(), "配置队伍成功。");
+            offlineConsole.sendToGroup(event.getGroupId(), "配置队伍成功。");
             return true;
         } else {
-            botService.sendToGroup(event.getGroupId(), "配置队伍失败。");
+            offlineConsole.sendToGroup(event.getGroupId(), "配置队伍失败。");
             return true;
         }
     }
@@ -209,7 +209,7 @@ public class QuizHandler implements IFunction {
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
         } else {
-            botService.sendToGroup(event.getGroupId(), "使用技能失败。");
+            offlineConsole.sendToGroup(event.getGroupId(), "使用技能失败。");
             return true;
         }
         
@@ -277,7 +277,7 @@ public class QuizHandler implements IFunction {
             } else {
                 messageChainBuilder.add(new PlainText("使用技能失败，技能点已耗尽。"));
             }
-            botService.sendToGroup(event.getGroupId(), messageChainBuilder.build());
+            offlineConsole.sendToGroup(event.getGroupId(), messageChainBuilder.build());
             return true;
         }
         
@@ -315,10 +315,10 @@ public class QuizHandler implements IFunction {
             }
             
             
-            botService.sendToGroup(event.getGroupId(), stringBuilder.toString());
+            offlineConsole.sendToGroup(event.getGroupId(), stringBuilder.toString());
             return true;
         } else {
-            botService.sendToGroup(event.getGroupId(), "开始比赛失败");
+            offlineConsole.sendToGroup(event.getGroupId(), "开始比赛失败");
             return true;
         }
         
@@ -330,7 +330,7 @@ public class QuizHandler implements IFunction {
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
         } else {
-            botService.sendToGroup(event.getGroupId(), "出题失败");
+            offlineConsole.sendToGroup(event.getGroupId(), "出题失败");
             return true;
         }
         
@@ -364,10 +364,10 @@ public class QuizHandler implements IFunction {
         MessageChain messageChain = new PlainText(builder.toString()).plus(new PlainText(""));
         if (sessionData.resource != null) {
             ExternalResource externalResource = ExternalResource.create(sessionData.resource);
-            Image image = botService.uploadImage(event.getGroupId(), externalResource);
+            Image image = offlineConsole.uploadImage(event.getGroupId(), externalResource);
             messageChain = messageChain.plus(image);
         }
-        botService.sendToGroup(event.getGroupId(), messageChain);
+        offlineConsole.sendToGroup(event.getGroupId(), messageChain);
         return true;
     }
     
@@ -424,7 +424,7 @@ public class QuizHandler implements IFunction {
                 sessionData.matchSituationDTO = null;
             }
             
-            botService.sendToGroup(event.getGroupId(), messageChainBuilder.build());
+            offlineConsole.sendToGroup(event.getGroupId(), messageChainBuilder.build());
             return true;
         } else {
             return false;

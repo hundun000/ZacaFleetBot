@@ -14,7 +14,7 @@ import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoNode;
 import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoReport;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,10 +38,10 @@ public class PenguinFunction implements IFunction {
     
     PenguinService penguinService;
     
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.penguinService = CustomBeanFactory.getInstance().penguinService;
     }
 
@@ -62,10 +62,10 @@ public class PenguinFunction implements IFunction {
                         builder.append(node.getGainRateString()).append("\t");
                         builder.append(node.getCostExpectationString()).append("\n");
                     }
-                    botService.sendToGroup(event.getGroupId(), builder.toString());
+                    offlineConsole.sendToGroup(event.getGroupId(), builder.toString());
                     
                 } else {
-                    botService.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
+                    offlineConsole.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
@@ -101,14 +101,14 @@ public class PenguinFunction implements IFunction {
                         builder.append("\n");
                     }
                     
-                    botService.sendToGroup(event.getGroupId(), builder.toString());
+                    offlineConsole.sendToGroup(event.getGroupId(), builder.toString());
                 } else {
-                    botService.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
+                    offlineConsole.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
-                botService.sendToGroup(event.getGroupId(), "好的");
+                offlineConsole.sendToGroup(event.getGroupId(), "好的");
                 return true;
             }
         }

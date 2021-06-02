@@ -19,7 +19,7 @@ import com.hundun.mirai.bot.function.IFunction;
 import com.hundun.mirai.bot.function.SubFunction;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +49,13 @@ public class ReminderFunction implements IFunction, IManualWired {
                 );
     }
     
-    BotService botService;
+    IConsole offlineConsole;
     
     CharacterRouter characterRouter;
     
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
         this.taskRepository = CustomBeanFactory.getInstance().reminderTaskRepository;
     }
@@ -138,8 +138,8 @@ public class ReminderFunction implements IFunction, IManualWired {
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
-                if (event.getSenderId() != botService.getAdminAccount()) {
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                if (event.getSenderId() != offlineConsole.getAdminAccount()) {
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
                 ReminderTask task = createTask(
@@ -154,24 +154,24 @@ public class ReminderFunction implements IFunction, IManualWired {
                         );
                 if (task != null) {
                     taskRepository.save(task);
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("创建成功"));
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("创建成功"));
                 } else {
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("创建失败"));
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("创建失败"));
                 }
                 
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
-                if (event.getSenderId() != botService.getAdminAccount()) {
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                if (event.getSenderId() != offlineConsole.getAdminAccount()) {
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
                 String targetId = subFunctionCallStatement.getArgs().get(0);
                 if (taskRepository.existsById(targetId)) {
                     taskRepository.deleteById(targetId);
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除成功！"));
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除成功！"));
                     return true;
                 } else {
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除失败，不存在该数据！"));
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("删除失败，不存在该数据！"));
                     return true;
                 }
                 
@@ -180,7 +180,7 @@ public class ReminderFunction implements IFunction, IManualWired {
                 StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.append("提醒任务列表：\n");
                 tasks.forEach(task -> stringBuilder.append(reminderTaskDescroption(task)).append("\n------\n"));
-                botService.sendToGroup(event.getGroupId(), stringBuilder.toString());
+                offlineConsole.sendToGroup(event.getGroupId(), stringBuilder.toString());
                 return true;
             }
         }
@@ -213,7 +213,7 @@ public class ReminderFunction implements IFunction, IManualWired {
                     for (ReminderTask task : tasks) {
                         boolean triggered = checkTask(task, now);
                         if (triggered) {
-                            botService.sendToGroup(groupId, task.text);
+                            offlineConsole.sendToGroup(groupId, task.text);
                         }
                     }
                 }
@@ -253,7 +253,7 @@ public class ReminderFunction implements IFunction, IManualWired {
                 String miraiCode = task.text;
                 log.info("build MessageChain by miraiCode = {}", miraiCode);
                 MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
-                botService.sendToGroup(task.targetGroup, chain);
+                offlineConsole.sendToGroup(task.targetGroup, chain);
                 if (task.count != -1) {
                     task.count--;
                     if (task.count == 0) {

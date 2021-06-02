@@ -4,9 +4,9 @@ bot功能：该bot在可在不同Q群扮演不同角色，只提供该角色的�
 
 子项目mirai-bot: bot核心包，提供上述bot功能。
 
-子项目mirai-plugin: 使用子项目mirai-bot，输出mirai-console-plugin。需通过mirai-console启动。
+【开发中】子项目mirai-plugin: 使用子项目mirai-bot，输出mirai-console-plugin。需通过mirai-console启动。
 
-子项目mirai-server: 使用子项目mirai-bot，使用mirai-core，输出SpringBootApplication。启动后可连接QQ上线bot。
+【已上线】子项目mirai-server: 使用子项目mirai-bot，使用mirai-core，输出SpringBootApplication。启动后可连接QQ上线bot。
 
 外部服务：微博api、企鹅物流api、一站到底答题项目
 

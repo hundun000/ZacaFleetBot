@@ -11,7 +11,7 @@ import com.hundun.mirai.bot.core.EventInfo;
 import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.parser.statement.QuickSearchStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,10 +32,10 @@ public class QuickSearchFunction implements IFunction {
     
     List<QuickSearchNode> nodes = new ArrayList<>();
     
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
     
     public QuickSearchFunction() {
@@ -124,7 +124,7 @@ public class QuickSearchFunction implements IFunction {
                     }
                     
                     
-                    botService.sendToGroup(event.getGroupId(), answer);
+                    offlineConsole.sendToGroup(event.getGroupId(), answer);
                     return true;
                 }
             }   

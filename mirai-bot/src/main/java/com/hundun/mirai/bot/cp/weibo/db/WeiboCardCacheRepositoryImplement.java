@@ -10,6 +10,7 @@ import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 import com.hundun.mirai.bot.db.BaseRepositoryImplement;
 import com.hundun.mirai.bot.db.CollectionSettings;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
 
 /**
  * @author hundun
@@ -24,13 +25,8 @@ public class WeiboCardCacheRepositoryImplement extends BaseRepositoryImplement<W
     @Override
     public List<WeiboCardCache> findTop5ByUidOrderByMblogCreatedDateTimeDesc(String uid) {
         Bson filter = Filters.eq("uid", uid);
-        List<WeiboCardCache> cardCaches = findAllByFilter(filter, 5);
-        Collections.sort(cardCaches, new Comparator<WeiboCardCache>() {
-            @Override
-            public int compare(WeiboCardCache o1, WeiboCardCache o2) {
-                return -1 * o1.getMblogCreatedDateTime().compareTo(o2.getMblogCreatedDateTime());
-            }
-        });
+        Bson sorter = Sorts.descending("mblogCreatedDateTime");
+        List<WeiboCardCache> cardCaches = findAllByFilter(filter, sorter, 5);
         return cardCaches;
     }
 

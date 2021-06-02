@@ -15,7 +15,7 @@ import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.hundun.mirai.bot.parser.statement.QuickSearchStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.file.FileService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +31,14 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Slf4j
 public class KancolleWikiQuickSearchFunction implements IFunction {
 
-    BotService botService;
+    IConsole offlineConsole;
     
     KancolleWikiService kancolleWikiService;
     
     FileService fileService;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.kancolleWikiService = CustomBeanFactory.getInstance().kancolleWikiService;
         this.fileService = CustomBeanFactory.getInstance().fileService;
     }
@@ -94,7 +94,7 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 File imageFile = fileService.downloadOrFromCache(fileId, kancolleWikiService);
                 if (imageFile != null) {
                     ExternalResource externalResource = ExternalResource.create(imageFile);
-                    Image image = botService.uploadImage(event.getGroupId(), externalResource);
+                    Image image = offlineConsole.uploadImage(event.getGroupId(), externalResource);
                     chainBuilder.add(image);
                 } else {
                     log.info("shipDetail no imageFile");
@@ -104,7 +104,7 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 log.info("no shipDetail");
             }
             
-            botService.sendToGroup(event.getGroupId(), chainBuilder.build());
+            offlineConsole.sendToGroup(event.getGroupId(), chainBuilder.build());
             return true;
   
         }

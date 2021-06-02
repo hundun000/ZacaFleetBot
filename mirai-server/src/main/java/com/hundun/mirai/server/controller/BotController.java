@@ -1,5 +1,8 @@
 package com.hundun.mirai.server.controller;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,7 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.cp.quiz.QuizService;
 import com.hundun.mirai.bot.cp.weibo.WeiboService;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.server.SpringConsole;
+import com.hundun.mirai.server.configuration.SpringConsoleLoader;
 
 /**
  * @author hundun
@@ -17,11 +21,18 @@ import com.hundun.mirai.bot.service.BotService;
 @RequestMapping("/api")
 public class BotController {
     
-    BotService botService = CustomBeanFactory.getInstance().botService;
+    @Autowired
+    SpringConsoleLoader springConsoleLoader;
+    
     
     WeiboService weiboService = CustomBeanFactory.getInstance().weiboService;
     
     QuizService quizService = CustomBeanFactory.getInstance().quizService;
+    
+    @PostConstruct
+    public void postConstruct() {
+        
+    }
     
 //    @RequestMapping(value="/getFirstBlog", method=RequestMethod.GET)
 //    public String getFirstBlog() {
@@ -42,7 +53,7 @@ public class BotController {
     
     @RequestMapping(value="/login", method=RequestMethod.GET)
     public String login() {
-        botService.login();
+        springConsoleLoader.springConsole.login();
         return "OK";
     }
     

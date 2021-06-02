@@ -10,7 +10,7 @@ import com.hundun.mirai.bot.function.QuizHandler;
 import com.hundun.mirai.bot.parser.StatementType;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +28,7 @@ public class Neko extends BaseCharacter {
     }
 
 
-    BotService botService;
+    IConsole offlineConsole;
     
     QuizHandler quizHandler;
 
@@ -37,7 +37,7 @@ public class Neko extends BaseCharacter {
         super.manualWired();
         
         this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
     
     @Override

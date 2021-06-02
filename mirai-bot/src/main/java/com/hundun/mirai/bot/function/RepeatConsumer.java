@@ -10,7 +10,7 @@ import com.hundun.mirai.bot.core.EventInfo;
 import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.code.MiraiCode;
@@ -22,10 +22,10 @@ import net.mamoe.mirai.message.code.MiraiCode;
 @Slf4j
 public class RepeatConsumer implements IFunction {
 
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
     
     @Override
@@ -69,7 +69,7 @@ public class RepeatConsumer implements IFunction {
 
             
             if (sessionData.count == 3) {
-                botService.sendToGroup(event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
+                offlineConsole.sendToGroup(event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
                 return true;
             }
         }

@@ -12,7 +12,7 @@ import com.hundun.mirai.bot.core.EventInfo;
 import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 /**
  * @author hundun
@@ -22,10 +22,10 @@ public class JapaneseFunction implements IFunction {
 
     static Tokenizer tokenizer = new Tokenizer();
     
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
     
     @Override
@@ -36,7 +36,7 @@ public class JapaneseFunction implements IFunction {
                 StringBuilder allArg = new StringBuilder();
                 subFunctionCallStatement.getArgs().forEach(item -> allArg.append(item).append(" "));
                 String result = funAllLines(allArg.toString(), "\n");
-                botService.sendToGroup(event.getGroupId(), result);
+                offlineConsole.sendToGroup(event.getGroupId(), result);
                 return true;
             }
             

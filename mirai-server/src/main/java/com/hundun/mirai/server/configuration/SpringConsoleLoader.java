@@ -4,12 +4,16 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.configuration.PublicSettings;
+import com.hundun.mirai.bot.service.IConsole;
+import com.hundun.mirai.server.SpringConsole;
 
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.event.GlobalEventChannel;
 
 /**
  * @author hundun
@@ -17,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Configuration
-public class CustomBeanFactoryLoader {
+public class SpringConsoleLoader {
     @Autowired
     PrivateSettingsLoader privateSettingsLoader;
     
@@ -30,6 +34,9 @@ public class CustomBeanFactoryLoader {
     @Value("${character.zacaMusume.listenWeiboUids:}")
     public String[] zacaMusumeListenWeiboUids;
     
+    
+    public SpringConsole springConsole;
+    
     @PostConstruct
     public void load() {
         log.info("PrivateSettings = {}", privateSettingsLoader.getPrivateSettings());
@@ -38,7 +45,12 @@ public class CustomBeanFactoryLoader {
         publicSettings.amiyaListenWeiboUids = amiyaListenWeiboUids;
         publicSettings.prinzEugenListenWeiboUids = prinzEugenListenWeiboUids;
         publicSettings.zacaMusumeListenWeiboUids = zacaMusumeListenWeiboUids;
-        CustomBeanFactory.init(privateSettingsLoader.getPrivateSettings(), publicSettings);
+        
+        springConsole = new SpringConsole(privateSettingsLoader.getPrivateSettings());
+        
+        CustomBeanFactory.init(privateSettingsLoader.getPrivateSettings(), publicSettings, springConsole);
+        GlobalEventChannel.INSTANCE.registerListenerHost(CustomBeanFactory.getInstance().characterRouter);
+    
     }
     
 }

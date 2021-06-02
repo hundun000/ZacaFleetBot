@@ -13,6 +13,7 @@ import com.hundun.mirai.bot.cp.penguin.PenguinService;
 import com.hundun.mirai.bot.cp.penguin.domain.report.MatrixReport;
 import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoReport;
 import com.hundun.mirai.bot.cp.weibo.WeiboService;
+import com.hundun.mirai.bot.cp.weibo.db.WeiboCardCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 
 /**
@@ -29,10 +30,18 @@ public class DataController {
     
     WeiboService weiboService = CustomBeanFactory.getInstance().weiboService;
     
+    WeiboCardCacheRepository cardCacheRepository = CustomBeanFactory.getInstance().weiboCardCacheRepository;
+    
     @RequestMapping(value="/weibo/updateAndGetTopBlog", method=RequestMethod.GET)
     public List<WeiboCardCache> updateAndGetTopBlog(
             @RequestParam("uid") String uid) {
         return weiboService.updateAndGetTopBlog(uid);
+    }
+    
+    @RequestMapping(value="/weibo/findTop5ByUidOrderByMblogCreatedDateTimeDesc", method=RequestMethod.GET)
+    public List<WeiboCardCache> findTop5ByUidOrderByMblogCreatedDateTimeDesc(
+            @RequestParam("uid") String uid) {
+        return cardCacheRepository.findTop5ByUidOrderByMblogCreatedDateTimeDesc(uid);
     }
     
     @RequestMapping(value="/penguin/resetCache", method=RequestMethod.GET)

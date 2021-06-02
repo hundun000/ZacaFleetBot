@@ -26,6 +26,7 @@ import com.hundun.mirai.bot.function.WeiboFunction;
 import kotlin.coroutines.CoroutineContext;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.EventHandler;
+import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.ListeningStatus;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
@@ -38,7 +39,7 @@ import net.mamoe.mirai.event.events.NudgeEvent;
 @Slf4j
 public class CharacterRouter extends SimpleListenerHost implements IManualWired {
 
-    BotService botService;
+    IConsole console;
     
     Amiya amiya;
     
@@ -69,14 +70,13 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     PrivateSettings privateSettings;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.console = CustomBeanFactory.getInstance().console;
         this.amiya = CustomBeanFactory.getInstance().amiya;
         this.zacaMusume = CustomBeanFactory.getInstance().zacaMusume;
         this.prinzEugen = CustomBeanFactory.getInstance().prinzEugen;
         this.neko = CustomBeanFactory.getInstance().neko;
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.privateSettings = CustomBeanFactory.getInstance().privateSettings;
-
 
     }
     
@@ -145,7 +145,7 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception { // 可以抛出任何异常, 将在 handleException 处理
 
         synchronized (this) {
-            if (event.getSender().getId() == botService.getSelfAccount()) {
+            if (event.getSender().getId() == console.getSelfAccount()) {
                 return ListeningStatus.LISTENING;
             }
             

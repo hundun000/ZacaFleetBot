@@ -58,8 +58,9 @@ import com.hundun.mirai.bot.function.reminder.RemiderTaskRepository;
 import com.hundun.mirai.bot.function.reminder.RemiderTaskRepositoryImplement;
 import com.hundun.mirai.bot.function.reminder.ReminderFunction;
 import com.hundun.mirai.bot.function.reminder.ReminderTask;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.CharacterRouter;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.file.FileService;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -105,13 +106,13 @@ public class CustomBeanFactory {
         }
     }
     
-    public static void init(PrivateSettings privateSettings, PublicSettings publicSettings) {
+    public static void init(PrivateSettings privateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
         instance = new CustomBeanFactory();
-        instance.initSelf(privateSettings, publicSettings);
-        instance.initFields();
+        instance.initSelf(privateSettings, publicSettings, consoleImplement);
+        instance.callChildrenInit();
     }
     
-    private void initFields () {
+    private void callChildrenInit () {
         StringBuilder namesBuilder = new StringBuilder();
         
         Class<?> clazz = CustomBeanFactory.class;   
@@ -147,9 +148,10 @@ public class CustomBeanFactory {
         }
     }
     
-    private void initSelf (PrivateSettings privateSettings, PublicSettings publicSettings) {
+    private void initSelf (PrivateSettings privateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
         this.privateSettings = privateSettings;
         this.publicSettings = publicSettings;
+        this.console = consoleImplement;
         
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
@@ -315,16 +317,15 @@ public class CustomBeanFactory {
     public GuideFunction guideFunction = new GuideFunction();
     
     public CharacterRouter characterRouter = new CharacterRouter();
-    public BotService botService = new BotService();
+    
     public FileService fileService = new FileService();
     public WeiboService weiboService = new WeiboService();
     public QuizService quizService = new QuizService();
     public PenguinService penguinService = new PenguinService();
     public KancolleWikiService kancolleWikiService = new KancolleWikiService();
 
-    
+    public IConsole console;
 
-    
 
     
 }

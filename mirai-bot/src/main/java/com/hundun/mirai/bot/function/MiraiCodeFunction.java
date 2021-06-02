@@ -11,7 +11,7 @@ import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.code.MiraiCode;
@@ -25,10 +25,10 @@ import net.mamoe.mirai.message.data.MessageChain;
 @Slf4j
 public class MiraiCodeFunction implements IFunction {
 
-    BotService botService;
+    IConsole offlineConsole;
     @Override
     public void manualWired() {
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
     }
     
     Map<String, SessionData> sessionDataMap = new HashMap<>();
@@ -43,14 +43,14 @@ public class MiraiCodeFunction implements IFunction {
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.DECODE_MIRAI_CODE) {
-                if (event.getSenderId() == botService.getAdminAccount()) {
+                if (event.getSenderId() == offlineConsole.getAdminAccount()) {
                     String miraiCode = subFunctionCallStatement.getArgs().get(0);
                     log.info("build MessageChain by miraiCode = {}", miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
-                    botService.sendToGroup(event.getGroupId(), chain);
+                    offlineConsole.sendToGroup(event.getGroupId(), chain);
                     return true;
                 } else {
-                    botService.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }     
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.ENCODE_LAST_TO_MIRAI_CODE) {
@@ -60,7 +60,7 @@ public class MiraiCodeFunction implements IFunction {
                     sessionDataMap.put(sessionId.id(), sessionData);
                 } 
                 String miraiCode = sessionDataMap.get(sessionId.id()).messageMiraiCode;
-                botService.sendToGroup(event.getGroupId(), miraiCode);
+                offlineConsole.sendToGroup(event.getGroupId(), miraiCode);
                 return true;
             }
         } else if (statement instanceof LiteralValueStatement) {

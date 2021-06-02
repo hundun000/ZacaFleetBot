@@ -1,75 +1,57 @@
-package com.hundun.mirai.bot.service;
+package com.hundun.mirai.server;
 
+import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.service.IConsole;
 
+import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.event.GlobalEventChannel;
+import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.Voice;
 import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.ExternalResource;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.IManualWired;
-import com.hundun.mirai.bot.configuration.PrivateSettings;
-
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author hundun
- * Created on 2021/04/21
+ * Created on 2021/06/03
  */
 @Slf4j
-public class BotService implements IManualWired {
-    
+public class SpringConsole implements IConsole {
+
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
-    boolean isBotOnline = false;
-    
-    CharacterRouter characterRouter;
     
     private Bot miraiBot;
     
+    boolean isBotOnline = false;
+    
     PrivateSettings privateSettings;
-    @Override
-    public void afterManualWired() {
-        this.initBot();
-    }
-    @Override
-    public void manualWired() {
-        this.privateSettings = CustomBeanFactory.getInstance().privateSettings;
-        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
-    }
     
-    
-
-    
-    //设备认证信息文件
+  //设备认证信息文件
     private final String deviceInfoPath = "device.json";
-
-    /**
-     * 启动BOT
-     */
-    public void initBot() {
+    
+    
+    public SpringConsole(PrivateSettings privateSettings) {
+        this.privateSettings = privateSettings;
+    }
+    
+    public void login() {
         if (null == privateSettings.getBotAccount() || null == privateSettings.getBotPwd()) {
             System.err.println("*****未配置账号或密码*****");
             log.warn("*****未配置账号或密码*****");
             return;
         }
         
-        //repeaterListener = GlobalEventChannel.INSTANCE.subscribeAlways(GroupMessageEvent.class, repeatConsumer);
-        GlobalEventChannel.INSTANCE.registerListenerHost(characterRouter);
-        
-    }
-    
-    
-    public void login() {
         if (!isBotOnline) {
             // the new thread will blocked by Bot.join()
             Thread thread = new Thread(){
                 @Override
                 public void run(){
+                    
+                    
                     miraiBot = BotFactory.INSTANCE.newBot(privateSettings.getBotAccount(), privateSettings.getBotPwd(), new BotConfiguration() {
                         {
                             //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
@@ -88,6 +70,7 @@ public class BotService implements IManualWired {
         }
     }
 
+    @Override
     public void sendToGroup(Long groupId, String message) {
         if (isBotOnline) {
             miraiBot.getGroupOrFail(groupId).sendMessage(message);
@@ -95,6 +78,8 @@ public class BotService implements IManualWired {
             log.info("[offline mode]sendToGroup groupId = {}, message = {}", groupId, message);
         }
     }
+
+    @Override
     public void sendToGroup(long groupId, MessageChain messageChain) {
         if (isBotOnline) {
             miraiBot.getGroupOrFail(groupId).sendMessage(messageChain);
@@ -103,17 +88,7 @@ public class BotService implements IManualWired {
         }
     }
 
-
-    public long getSelfAccount() {
-        return privateSettings.getBotAccount();
-    }
-    
-    public Long getAdminAccount() {
-        return privateSettings.getAdminAccount();
-    }
-
-
-
+    @Override
     public Image uploadImage(Long groupId, ExternalResource externalResource) {
         if (isBotOnline) {
             return miraiBot.getGroupOrFail(groupId).uploadImage(externalResource);
@@ -121,11 +96,9 @@ public class BotService implements IManualWired {
             log.info("[offline mode]uploadImage groupId = {}", groupId);
             return Image.fromId(offLineImageFakeId);
         }
-        
     }
 
-
-    
+    @Override
     public Voice uploadVoice(Long groupId, ExternalResource externalResource) {
         if (isBotOnline) {
             return miraiBot.getGroupOrFail(groupId).uploadVoice(externalResource);
@@ -133,7 +106,15 @@ public class BotService implements IManualWired {
             log.info("[offline mode]uploadVoice groupId = {}", groupId);
             return new Voice("", new byte[1], 0, 0, "");
         }
-        
     }
-    
+
+    @Override
+    public long getSelfAccount() {
+        return privateSettings.getBotAccount();
+    }
+
+    @Override
+    public Long getAdminAccount() {
+        return privateSettings.getBotAccount();
+    }
 }

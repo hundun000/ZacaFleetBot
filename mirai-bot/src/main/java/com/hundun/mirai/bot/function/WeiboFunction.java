@@ -20,7 +20,7 @@ import com.hundun.mirai.bot.cp.weibo.WeiboService;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.BotService;
+import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.CharacterRouter;
 
 import lombok.Data;
@@ -40,7 +40,7 @@ public class WeiboFunction implements IFunction {
     
     WeiboService weiboService;
     
-    BotService botService;
+    IConsole offlineConsole;
     
     CharacterRouter characterRouter;
     
@@ -51,7 +51,7 @@ public class WeiboFunction implements IFunction {
     @Override
     public void manualWired() {
         this.weiboService = CustomBeanFactory.getInstance().weiboService;
-        this.botService = CustomBeanFactory.getInstance().botService;
+        this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
@@ -129,7 +129,7 @@ public class WeiboFunction implements IFunction {
                             
                             if (newBlog.getSinglePicture() != null) {
                                 ExternalResource externalResource = ExternalResource.create(newBlog.getSinglePicture());
-                                Image image = botService.uploadImage(groupId, externalResource);
+                                Image image = offlineConsole.uploadImage(groupId, externalResource);
                                 chain = chain.plus(image);
                             } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
                                 StringBuilder builder = new StringBuilder();
@@ -143,7 +143,7 @@ public class WeiboFunction implements IFunction {
                             
                                 
                                 
-                            botService.sendToGroup(groupId, chain);
+                            offlineConsole.sendToGroup(groupId, chain);
 
                         }
 
@@ -187,12 +187,12 @@ public class WeiboFunction implements IFunction {
                     }
                 }
                 if (builder.length() == 0) {
-                    botService.sendToGroup(event.getGroupId(), "现在还没有饼哦~");
+                    offlineConsole.sendToGroup(event.getGroupId(), "现在还没有饼哦~");
                 } else {
-                    botService.sendToGroup(event.getGroupId(), builder.toString());
+                    offlineConsole.sendToGroup(event.getGroupId(), builder.toString());
                 }
             } else {
-                botService.sendToGroup(event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
+                offlineConsole.sendToGroup(event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
             }
             return true;
         }

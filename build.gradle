@@ -54,6 +54,10 @@ project(":mirai-server") {
           exclude group: 'net.mamoe', module: 'mirai-core-api'
           exclude group: 'net.mamoe', module: 'mirai-core-utils'
         }
+        implementation("net.mamoe:mirai-core-api-jvm:${MIRAI_VERSION}") {
+          exclude group: 'net.mamoe', module: 'mirai-core-utils'
+        }
+        implementation("net.mamoe:mirai-core-utils-jvm:${MIRAI_VERSION}")
 
         
         //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
@@ -105,7 +109,8 @@ project(":mirai-plugin") {
     dependencies {
         implementation project(":mirai-bot")
     
-        compileOnly("net.mamoe:mirai-console:${MIRAI_VERSION}") // 后端
+        implementation("net.mamoe.yamlkt:yamlkt:0.9.0")
+        implementation("net.mamoe:mirai-console:${MIRAI_VERSION}") // 后端
         
         compileOnly 'org.projectlombok:lombok:1.18.4'
         annotationProcessor 'org.projectlombok:lombok:1.18.4'

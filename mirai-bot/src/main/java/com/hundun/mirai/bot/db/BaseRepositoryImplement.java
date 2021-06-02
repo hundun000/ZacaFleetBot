@@ -8,7 +8,7 @@ import org.bson.conversions.Bson;
 
 import com.hundun.mirai.bot.function.reminder.ReminderTask;
 import com.mongodb.BasicDBObject;
-
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
@@ -95,14 +95,22 @@ public abstract class BaseRepositoryImplement<T> {
     }
 
     public List<T> findAllByFilter(Bson filter, Integer topLimit) {
+        return findAllByFilter(filter, null, topLimit);
+    }
+    
+    public List<T> findAllByFilter(Bson filter, Bson sorter, Integer topLimit) {
         List<T> result = new ArrayList<>();
-        MongoCursor<T> cursor = collection.find(filter).iterator();
+        FindIterable<T> findIterable = collection.find(filter);
+        
+        if (sorter != null) {
+            findIterable = findIterable.sort(sorter);
+        }
+        if (topLimit != null) {
+            findIterable = findIterable.limit(topLimit);
+        }
+        MongoCursor<T> cursor = findIterable.iterator();
         while (cursor.hasNext()) {
-            if (topLimit == null || result.size() < topLimit) {
-                result.add(cursor.next());
-            } else {
-                break;
-            }
+            result.add(cursor.next());
         }
         return result;
     }
