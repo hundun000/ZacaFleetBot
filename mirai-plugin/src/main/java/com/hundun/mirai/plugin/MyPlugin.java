@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.CustomBeanFactory;
@@ -15,6 +17,7 @@ import com.hundun.mirai.bot.configuration.PublicSettings;
 import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.console.extension.PluginComponentStorage;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
@@ -28,11 +31,11 @@ import net.mamoe.yamlkt.YamlMap;
  * Created on 2021/06/02
  */
 @Slf4j
-public class PluginMain extends JavaPlugin {
-    public static final PluginMain INSTANCE = new PluginMain(); // 可以像 Kotlin 一样静态初始化单例
+public class MyPlugin extends JavaPlugin {
+    public static final MyPlugin INSTANCE = new MyPlugin(); // 可以像 Kotlin 一样静态初始化单例
     ObjectMapper objectMapper = new ObjectMapper();
     
-    public PluginMain() {
+    public MyPlugin() {
         super(new JvmPluginDescriptionBuilder(
                 "org.example.test-plugin", // name
                 "1.0.0" // version
@@ -42,7 +45,8 @@ public class PluginMain extends JavaPlugin {
             .build());
     }
     
-    private void fakeOnLoad() {
+    @Override
+    public void onLoad(@NotNull PluginComponentStorage $this$onLoad) {
         File settingsFile = resolveConfigFile("private-settings.json");
         String content = new String(readAll(settingsFile), StandardCharsets.UTF_8);
         //YamlMap settings = Yaml.Default.decodeYamlMapFromString(content);
@@ -59,14 +63,15 @@ public class PluginMain extends JavaPlugin {
         
         PublicSettings publicSettings = new PublicSettings();
         
-        IConsole console = new ConsoleAdapter(privateSettings);
+        ConsoleAdapter console = new ConsoleAdapter(privateSettings);
         
         CustomBeanFactory.init(privateSettings, publicSettings, console);
+        
+        console.lateInitCharacterRouter(CustomBeanFactory.getInstance().characterRouter);
     }
     
     @Override
     public void onEnable() {
-        fakeOnLoad();
         
         GlobalEventChannel.INSTANCE.registerListenerHost(CustomBeanFactory.getInstance().characterRouter);
     }

@@ -1,6 +1,7 @@
 package com.hundun.mirai.plugin;
 
 import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.service.CharacterRouter;
 import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,14 @@ public class ConsoleAdapter implements IConsole {
     
     PrivateSettings privateSettings;
     
+    CharacterRouter characterRouter;
+    
     public ConsoleAdapter(PrivateSettings privateSettings) {
         this.privateSettings = privateSettings;
+    }
+    
+    public void lateInitCharacterRouter(CharacterRouter characterRouter) {
+        this.characterRouter = characterRouter;
     }
     
     

@@ -1,6 +1,9 @@
 package com.hundun.mirai.bot.core;
 
 import lombok.Data;
+import net.mamoe.mirai.contact.Group;
+import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.MessageChain;
 
 /**
@@ -14,4 +17,7 @@ public class EventInfo {
     long senderId;
     long targetId;
     MessageChain message;
+    
+    Group group;
+
 }
