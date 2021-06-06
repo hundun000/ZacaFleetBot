@@ -12,11 +12,18 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.32' apply false
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.32' apply false
+    id 'net.mamoe.mirai-console' version '2.6.1' apply false
+}
 
 allprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'java-library'
+    
+    
     
     group = 'com.mirai.hundun'
     version = '0.0.1-SNAPSHOT'
@@ -120,9 +127,6 @@ project(":mirai-plugin") {
         //testImplementation("net.mamoe:mirai-console-terminal:${MIRAI_VERSION}") // 前端, 用于启动测试
     }
 }
-
-
-
 
 
 

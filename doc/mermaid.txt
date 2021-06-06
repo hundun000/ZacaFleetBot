@@ -20,3 +20,36 @@ flowchart LR
         pluginMain --> |注册Command|adapter
     end
     adapter --> |指令名和指令参数|botlogic
+
+
+flowchart LR
+    classDef corehighlight fill:#f96,stroke:#333,stroke-width:3px;
+
+    subgraph botLogicSubProject ["botLogic包"]
+        botCommandlogic(纯bot逻辑of指令<br/>处理指令名和指令参数)
+        botEventlogic(纯bot逻辑of事件<br/>处理事件参数)
+    end
+
+    subgraph asApp ["作为独立应用"]
+        appEventAdapter(简单的适配器of事件<br/>)
+        customParser(手写的Parser<br/>把Event解析成指令名和指令参数)
+        appMain("Main入口<br/>new Bot(...).login();")
+        miraicoreqqandroid("mirai-core<br/>(QQAndroid 协议)"):::corehighlight
+        miraicoreqqandroid --> |提供api|appMain
+        appMain --> |注册SimpleListenerHost|customParser
+        appMain --> |注册SimpleListenerHost|appEventAdapter
+    end
+    customParser --> |指令名和指令参数|botCommandlogic
+    appEventAdapter --> |事件参数|botEventlogic
+
+    subgraph asPlugin ["作为插件"]
+        pluginEventAdapter(简单的适配器of事件<br/>)
+        commandAdapter(简单的适配器of指令<br/>)
+        pluginMain("BasePlugin")
+        miraiconsoleapi("mirai-console-api"):::corehighlight
+        miraiconsoleapi --> |提供api|pluginMain
+        pluginMain --> |注册Command|commandAdapter
+        pluginMain --> |注册SimpleListenerHost|pluginEventAdapter
+    end
+    commandAdapter --> |指令名和指令参数|botCommandlogic
+    pluginEventAdapter --> |事件参数|botEventlogic
