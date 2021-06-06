@@ -1,0 +1,22 @@
+flowchart LR
+    classDef corehighlight fill:#f96,stroke:#333,stroke-width:3px;
+
+    botlogic(纯bot逻辑<br/>处理指令名和指令参数)
+
+    subgraph asApp ["作为独立应用"]
+        customParser(手写的Parser<br/>把Event解析成指令名和指令参数)
+        appMain("Main入口<br/>new Bot(...).login();")
+        miraicoreqqandroid("mirai-core<br/>(QQAndroid 协议)"):::corehighlight
+        miraicoreqqandroid --> |提供api|appMain
+        appMain --> |注册SimpleListenerHost|customParser
+    end
+    customParser --> |指令名和指令参数|botlogic
+    
+    subgraph asPlugin ["作为插件"]
+        adapter(适配器<br/>)
+        pluginMain("BasePlugin")
+        miraiconsoleapi("mirai-console-api"):::corehighlight
+        miraiconsoleapi --> |提供api|pluginMain
+        pluginMain --> |注册Command|adapter
+    end
+    adapter --> |指令名和指令参数|botlogic

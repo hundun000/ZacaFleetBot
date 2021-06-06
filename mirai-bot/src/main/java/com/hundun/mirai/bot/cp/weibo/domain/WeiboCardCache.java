@@ -26,5 +26,5 @@ public class WeiboCardCache {
     
     List<String> picsLargeUrls;
     
-    File singlePicture;
+    //File singlePicture;
 }

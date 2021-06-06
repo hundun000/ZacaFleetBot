@@ -17,6 +17,7 @@ import com.hundun.mirai.bot.core.EventInfo;
 import com.hundun.mirai.bot.core.GroupConfig;
 import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.cp.weibo.WeiboService;
+import com.hundun.mirai.bot.cp.weibo.WeiboService.WeiboCardCacheAndImage;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
@@ -109,16 +110,18 @@ public class WeiboFunction implements IFunction {
                     log.info("groupId = {}, LastUpdateTime = {}, checkNewBlog: {}", groupId, sessionData.getLastUpdateTime(), blogUids);
                     
                     for (String blogUid : blogUids) {
-                        List<WeiboCardCache> topBlogs = weiboService.updateAndGetTopBlog(blogUid);
-                        List<WeiboCardCache> newBlogs = new ArrayList<>(0);
-                        for (WeiboCardCache blog : topBlogs) {
-                            if (blog.getMblogCreatedDateTime().isAfter(sessionData.getLastUpdateTime())) {
-                                newBlogs.add(blog);
+                        List<WeiboCardCacheAndImage> cardCacheAndImages = weiboService.updateAndGetTopBlog(blogUid);
+                        List<WeiboCardCacheAndImage> newCardCacheAndImages = new ArrayList<>(0);
+                        for (WeiboCardCacheAndImage cardCacheAndImage : cardCacheAndImages) {
+                            boolean isNew = cardCacheAndImage.getWeiboCardCache().getMblogCreatedDateTime().isAfter(sessionData.getLastUpdateTime());
+                            //boolean isNew = true;
+                            if (isNew) {
+                                newCardCacheAndImages.add(cardCacheAndImage);
                             }
                         }
                         
-                        for (WeiboCardCache newBlog : newBlogs) {
-
+                        for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
+                            WeiboCardCache newBlog = newCardCacheAndImage.getWeiboCardCache();
                             MessageChain chain = MessageUtils.newChain();
                             
                             chain = chain.plus(new PlainText("新饼！来自：" + newBlog.getScreenName() + "\n\n"));
@@ -127,8 +130,8 @@ public class WeiboFunction implements IFunction {
                                 chain = chain.plus(new PlainText(newBlog.getMblog_textDetail()));   
                             }
                             
-                            if (newBlog.getSinglePicture() != null) {
-                                ExternalResource externalResource = ExternalResource.create(newBlog.getSinglePicture());
+                            if (newCardCacheAndImage.getImage() != null) {
+                                ExternalResource externalResource = ExternalResource.create(newCardCacheAndImage.getImage());
                                 Image image = offlineConsole.uploadImage(groupId, externalResource);
                                 chain = chain.plus(image);
                             } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {

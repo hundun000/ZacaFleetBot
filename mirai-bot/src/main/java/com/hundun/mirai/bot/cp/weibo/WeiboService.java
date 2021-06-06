@@ -25,6 +25,9 @@ import com.hundun.mirai.bot.service.file.IFileProvider;
 
 import feign.Response;
 import gui.ava.html.image.generator.HtmlImageGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -183,8 +186,16 @@ public class WeiboService implements IFileProvider, IManualWired {
         System.out.println(localDateTime.toString());
     }
     
-    public List<WeiboCardCache> updateAndGetTopBlog(String uid) {
-        List<WeiboCardCache> newBlogs = new ArrayList<>(0);
+    @AllArgsConstructor
+    @Data
+    public class WeiboCardCacheAndImage {
+        WeiboCardCache weiboCardCache;
+        @ToString.Exclude
+        File image;
+    }
+    
+    public List<WeiboCardCacheAndImage> updateAndGetTopBlog(String uid) {
+        List<WeiboCardCacheAndImage> newBlogs = new ArrayList<>(0);
         WeiboUserInfoCache userInfoCacahe;
         if (!userInfoCacheRepository.existsById(uid)) {
             boolean success = updateUserInfoCache(uid);
@@ -204,6 +215,7 @@ public class WeiboService implements IFileProvider, IManualWired {
                     String itemid = cardNode.get("itemid").asText();
                     JsonNode mblog = cardNode.get("mblog");
                     WeiboCardCache cardCache;
+                    
                     if (!cardCacheRepository.existsById(itemid)) {
                         cardCache = new WeiboCardCache(); 
                         cardCache.setItemid(itemid);
@@ -230,16 +242,21 @@ public class WeiboService implements IFileProvider, IManualWired {
                         cardCache.setScreenName(userInfoCacahe.getScreen_name());
                         cardCache.setPicsLargeUrls(picsLargeUrls);
                         updateBlogDetail(cardCache);
-                        checkSingleImage(cardCache);
+                        
                         cardCacheRepository.save(cardCache);
                         
                         log.info("update cardCache: {}", itemid);
                     } else {
                         cardCache = cardCacheRepository.findById(itemid);
                     }
-                    newBlogs.add(cardCache);
+                    
+                    
+                    File imageFile = checkSingleImage(cardCache);
+                    WeiboCardCacheAndImage cardCacheAndImage = new WeiboCardCacheAndImage(cardCache, imageFile);
+                    newBlogs.add(cardCacheAndImage);
                 } catch (Exception e) {
-                    log.warn("itera card error: {}", cardNode);
+                    log.warn("itera card error {} by : {}", e.getMessage(), cardNode);
+                    e.printStackTrace();
                 }
             }
         } catch (Exception e) {
@@ -251,12 +268,14 @@ public class WeiboService implements IFileProvider, IManualWired {
 
 
 
-    private void checkSingleImage(WeiboCardCache cardCache) {
+    private File checkSingleImage(WeiboCardCache cardCache) {
         if (cardCache.getPicsLargeUrls() != null && cardCache.getPicsLargeUrls().size() == 1) {
             int lastSlash = cardCache.getPicsLargeUrls().get(0).lastIndexOf("/");
             String id = cardCache.getPicsLargeUrls().get(0).substring(lastSlash + 1);
             File file = fileService.downloadOrFromCache(id, this);
-            cardCache.setSinglePicture(file);
+            return file;
+        } else {
+            return null;
         }
     }
 

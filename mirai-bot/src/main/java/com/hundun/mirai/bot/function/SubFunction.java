@@ -98,7 +98,7 @@ public enum SubFunction {
                 
             case REMINDER_CREATE_TASK:
                 document.setSubFunctionIdentifier("创建提醒");
-                document.setSubFunctionDescription("事项提醒功能指令。提醒指的是在满足时间条件的时候发送指定消息。");
+                document.setSubFunctionDescription("事项提醒功能指令。提醒任务指的是在满足时间条件的时候发送指定消息。");
                 document.getParameterDescriptions().add("时间条件-月。-1表示不限制。");
                 document.getParameterDescriptions().add("时间条件-日。-1表示不限制。");
                 document.getParameterDescriptions().add("时间条件-星期数。-1表示不限制。");
@@ -107,11 +107,11 @@ public enum SubFunction {
                 break;
             case REMINDER_LIST_TASK:
                 document.setSubFunctionIdentifier("查看提醒");
-                document.setSubFunctionDescription("事项提醒功能指令。查看所有已创建提醒。");
+                document.setSubFunctionDescription("事项提醒功能指令。查看所有已创建提醒任务。");
                 break;
             case REMINDER_REMOVE_TASK:
                 document.setSubFunctionIdentifier("移除提醒");
-                document.setSubFunctionDescription("事项提醒功能指令。移除指定id的提醒。");
+                document.setSubFunctionDescription("事项提醒功能指令。移除指定id的提醒任务。");
                 document.getParameterDescriptions().add("提醒id。由查看提醒得到。");
                 break;
             default:

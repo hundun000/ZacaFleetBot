@@ -34,6 +34,7 @@ import net.mamoe.yamlkt.YamlMap;
 public class MyPlugin extends JavaPlugin {
     public static final MyPlugin INSTANCE = new MyPlugin(); // 可以像 Kotlin 一样静态初始化单例
     ObjectMapper objectMapper = new ObjectMapper();
+    ConsoleAdapter console;
     
     public MyPlugin() {
         super(new JvmPluginDescriptionBuilder(
@@ -54,7 +55,7 @@ public class MyPlugin extends JavaPlugin {
         PrivateSettings privateSettings;
         try {
             privateSettings = objectMapper.readValue(content, PrivateSettings.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             privateSettings = new PrivateSettings();
             e.printStackTrace();
         }
@@ -63,7 +64,7 @@ public class MyPlugin extends JavaPlugin {
         
         PublicSettings publicSettings = new PublicSettings();
         
-        ConsoleAdapter console = new ConsoleAdapter(privateSettings);
+        console = new ConsoleAdapter(privateSettings);
         
         CustomBeanFactory.init(privateSettings, publicSettings, console);
         
@@ -73,7 +74,7 @@ public class MyPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         
-        GlobalEventChannel.INSTANCE.registerListenerHost(CustomBeanFactory.getInstance().characterRouter);
+        GlobalEventChannel.INSTANCE.registerListenerHost(console);
     }
     
     /**

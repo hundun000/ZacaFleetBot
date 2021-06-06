@@ -111,6 +111,8 @@ project(":mirai-plugin") {
     
         implementation("net.mamoe.yamlkt:yamlkt:0.9.0")
         //implementation("net.mamoe:mirai-console:${MIRAI_VERSION}") // 后端
+        implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5'
+        
         
         compileOnly 'org.projectlombok:lombok:1.18.4'
         annotationProcessor 'org.projectlombok:lombok:1.18.4'

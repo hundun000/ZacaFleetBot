@@ -1,10 +1,17 @@
 package com.hundun.mirai.plugin;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.hundun.mirai.bot.configuration.PrivateSettings;
 import com.hundun.mirai.bot.service.CharacterRouter;
 import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.event.EventHandler;
+import net.mamoe.mirai.event.ListenerHost;
+import net.mamoe.mirai.event.ListeningStatus;
+import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.Voice;
@@ -15,7 +22,7 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/06/03
  */
 @Slf4j
-public class ConsoleAdapter implements IConsole {
+public class ConsoleAdapter implements IConsole, ListenerHost {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
@@ -31,6 +38,18 @@ public class ConsoleAdapter implements IConsole {
     
     public void lateInitCharacterRouter(CharacterRouter characterRouter) {
         this.characterRouter = characterRouter;
+    }
+    
+    @NotNull
+    @EventHandler
+    public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception {
+        return characterRouter.onMessage(event);
+    }
+    
+    @NotNull
+    @EventHandler
+    public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception {
+        return characterRouter.onMessage(event);
     }
     
     
