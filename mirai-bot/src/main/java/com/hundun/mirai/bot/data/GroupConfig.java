@@ -1,4 +1,4 @@
-package com.hundun.mirai.bot.core;
+package com.hundun.mirai.bot.data;
 
 import java.util.ArrayList;
 import java.util.List;

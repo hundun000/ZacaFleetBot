@@ -11,10 +11,11 @@ import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.configuration.PrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
-import com.hundun.mirai.bot.service.IConsole;
+import com.hundun.mirai.bot.export.BotLogic;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.console.extension.PluginComponentStorage;
@@ -35,6 +36,8 @@ public class MyPlugin extends JavaPlugin {
     public static final MyPlugin INSTANCE = new MyPlugin(); // 可以像 Kotlin 一样静态初始化单例
     ObjectMapper objectMapper = new ObjectMapper();
     ConsoleAdapter console;
+    
+    BotLogic botLogic;
     
     public MyPlugin() {
         super(new JvmPluginDescriptionBuilder(
@@ -66,15 +69,16 @@ public class MyPlugin extends JavaPlugin {
         
         console = new ConsoleAdapter(privateSettings);
         
-        CustomBeanFactory.init(privateSettings, publicSettings, console);
+        botLogic = new BotLogic(privateSettings, publicSettings, console);
+
         
-        console.lateInitCharacterRouter(CustomBeanFactory.getInstance().characterRouter);
     }
     
     @Override
     public void onEnable() {
         
-        GlobalEventChannel.INSTANCE.registerListenerHost(console);
+        botLogic.onEnable();
+        
     }
     
     /**

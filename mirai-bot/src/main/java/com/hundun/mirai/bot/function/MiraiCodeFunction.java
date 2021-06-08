@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.code.MiraiCode;
@@ -47,10 +47,10 @@ public class MiraiCodeFunction implements IFunction {
                     String miraiCode = subFunctionCallStatement.getArgs().get(0);
                     log.info("build MessageChain by miraiCode = {}", miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
-                    offlineConsole.sendToGroup(event.getGroupId(), chain);
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), chain);
                     return true;
                 } else {
-                    offlineConsole.sendToGroup(event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }     
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.ENCODE_LAST_TO_MIRAI_CODE) {
@@ -60,7 +60,7 @@ public class MiraiCodeFunction implements IFunction {
                     sessionDataMap.put(sessionId.id(), sessionData);
                 } 
                 String miraiCode = sessionDataMap.get(sessionId.id()).messageMiraiCode;
-                offlineConsole.sendToGroup(event.getGroupId(), miraiCode);
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), miraiCode);
                 return true;
             }
         } else if (statement instanceof LiteralValueStatement) {

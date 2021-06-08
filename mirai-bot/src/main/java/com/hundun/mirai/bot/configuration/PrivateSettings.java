@@ -6,8 +6,8 @@ package com.hundun.mirai.bot.configuration;
 
 import java.util.Map;
 
-import com.hundun.mirai.bot.core.GroupConfig;
-import com.hundun.mirai.bot.core.UserTagConfig;
+import com.hundun.mirai.bot.data.GroupConfig;
+import com.hundun.mirai.bot.data.UserTagConfig;
 
 import kotlinx.serialization.Serializable;
 import lombok.Data;

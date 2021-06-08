@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.IManualWired;
 import com.hundun.mirai.bot.cp.penguin.db.ItemRepository;
 import com.hundun.mirai.bot.cp.penguin.db.MatrixReportRepository;
@@ -24,6 +23,7 @@ import com.hundun.mirai.bot.cp.penguin.domain.report.MatrixReportNode;
 import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoNode;
 import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoReport;
 import com.hundun.mirai.bot.cp.penguin.feign.PenguinApiFeignClient;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
 
 import lombok.extern.slf4j.Slf4j;
 

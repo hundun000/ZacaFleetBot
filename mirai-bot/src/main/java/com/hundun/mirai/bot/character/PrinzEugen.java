@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
 import com.hundun.mirai.bot.function.KancolleWikiQuickSearchFunction;
 import com.hundun.mirai.bot.function.MiraiCodeFunction;
 import com.hundun.mirai.bot.function.PrinzEugenChatFunction;

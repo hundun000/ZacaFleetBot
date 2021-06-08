@@ -1,4 +1,4 @@
-package com.hundun.mirai.bot;
+package com.hundun.mirai.bot.export;
 
 
 import java.lang.reflect.Field;
@@ -10,12 +10,14 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+import com.hundun.mirai.bot.IManualWired;
 import com.hundun.mirai.bot.character.Amiya;
 import com.hundun.mirai.bot.character.Neko;
 import com.hundun.mirai.bot.character.PrinzEugen;
 import com.hundun.mirai.bot.character.ZacaMusume;
 import com.hundun.mirai.bot.configuration.PrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
+import com.hundun.mirai.bot.cp.FeignLogger;
 import com.hundun.mirai.bot.cp.kcwiki.KancolleWikiService;
 import com.hundun.mirai.bot.cp.kcwiki.feign.KcwikiApiFeignClient;
 import com.hundun.mirai.bot.cp.penguin.PenguinService;
@@ -58,9 +60,6 @@ import com.hundun.mirai.bot.function.reminder.RemiderTaskRepository;
 import com.hundun.mirai.bot.function.reminder.RemiderTaskRepositoryImplement;
 import com.hundun.mirai.bot.function.reminder.ReminderFunction;
 import com.hundun.mirai.bot.function.reminder.ReminderTask;
-import com.hundun.mirai.bot.service.IConsole;
-import com.hundun.mirai.bot.service.CharacterRouter;
-import com.hundun.mirai.bot.service.IConsole;
 import com.hundun.mirai.bot.service.file.FileService;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -94,19 +93,9 @@ public class CustomBeanFactory {
     
     private List<IManualWired> beans = new ArrayList<>();
 
+
     
-    
-    public static void afterInit() {
-        for (IManualWired bean : instance.beans) {
-            try {
-                bean.afterManualWired();
-            } catch (Exception e) {
-                log.error("Beans afterManualWired error: ", e);
-            }
-        }
-    }
-    
-    public static void init(PrivateSettings privateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
+    static void init(PrivateSettings privateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
         instance = new CustomBeanFactory();
         instance.initSelf(privateSettings, publicSettings, consoleImplement);
         instance.callChildrenInit();

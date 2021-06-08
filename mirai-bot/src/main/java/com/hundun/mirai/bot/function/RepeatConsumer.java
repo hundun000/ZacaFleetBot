@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.code.MiraiCode;
@@ -69,7 +69,7 @@ public class RepeatConsumer implements IFunction {
 
             
             if (sessionData.count == 3) {
-                offlineConsole.sendToGroup(event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
                 return true;
             }
         }

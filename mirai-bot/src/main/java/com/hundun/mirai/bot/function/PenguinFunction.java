@@ -3,18 +3,18 @@ package com.hundun.mirai.bot.function;
 import java.util.Arrays;
 import java.util.List;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.cp.penguin.PenguinService;
 import com.hundun.mirai.bot.cp.penguin.domain.DropType;
 import com.hundun.mirai.bot.cp.penguin.domain.report.MatrixReport;
 import com.hundun.mirai.bot.cp.penguin.domain.report.MatrixReportNode;
 import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoNode;
 import com.hundun.mirai.bot.cp.penguin.domain.report.StageInfoReport;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,10 +62,10 @@ public class PenguinFunction implements IFunction {
                         builder.append(node.getGainRateString()).append("\t");
                         builder.append(node.getCostExpectationString()).append("\n");
                     }
-                    offlineConsole.sendToGroup(event.getGroupId(), builder.toString());
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
                     
                 } else {
-                    offlineConsole.sendToGroup(event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
@@ -101,14 +101,14 @@ public class PenguinFunction implements IFunction {
                         builder.append("\n");
                     }
                     
-                    offlineConsole.sendToGroup(event.getGroupId(), builder.toString());
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
                 } else {
-                    offlineConsole.sendToGroup(event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
-                offlineConsole.sendToGroup(event.getGroupId(), "好的");
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "好的");
                 return true;
             }
         }

@@ -1,4 +1,4 @@
-package com.hundun.mirai.bot;
+package com.hundun.mirai.bot.cp;
 
 import java.io.IOException;
 

@@ -12,20 +12,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.GroupConfig;
-import com.hundun.mirai.bot.core.SessionId;
 import com.hundun.mirai.bot.cp.weibo.WeiboService;
 import com.hundun.mirai.bot.cp.weibo.WeiboService.WeiboCardCacheAndImage;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.GroupConfig;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CharacterRouter;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.IConsole;
-import com.hundun.mirai.bot.service.CharacterRouter;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageUtils;
@@ -94,11 +95,39 @@ public class WeiboFunction implements IFunction {
         return allBlogUids;
     }
     
+    
+    private void sendNewBlogByOneBot(WeiboCardCacheAndImage newCardCacheAndImage, Bot bot , long groupId) {
+        WeiboCardCache newBlog = newCardCacheAndImage.getWeiboCardCache();
+        MessageChain chain = MessageUtils.newChain();
+        
+        chain = chain.plus(new PlainText("新饼！来自：" + newBlog.getScreenName() + "\n\n"));
+        
+        if (newBlog.getMblog_textDetail() != null) {
+            chain = chain.plus(new PlainText(newBlog.getMblog_textDetail()));   
+        }
+        
+        if (newCardCacheAndImage.getImage() != null) {
+            ExternalResource externalResource = ExternalResource.create(newCardCacheAndImage.getImage());
+            Image image = offlineConsole.uploadImage(bot, groupId, externalResource);
+            chain = chain.plus(image);
+        } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("\n图片资源：\n");
+            for (String url : newBlog.getPicsLargeUrls()) {
+                builder.append(url).append("\n");
+            }
+            chain = chain.plus(new PlainText(builder.toString()));       
+        }
+
+        offlineConsole.sendToGroup(bot, groupId, chain);
+    }
+    
     public void registerSchedule() {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 log.info("checkNewBlog Scheduled arrival");
+                
                 
                 for (GroupConfig entry : characterRouter.getGroupConfigs().values()) {
                     Long groupId = entry.getGroupId();
@@ -121,33 +150,11 @@ public class WeiboFunction implements IFunction {
                         }
                         
                         for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
-                            WeiboCardCache newBlog = newCardCacheAndImage.getWeiboCardCache();
-                            MessageChain chain = MessageUtils.newChain();
-                            
-                            chain = chain.plus(new PlainText("新饼！来自：" + newBlog.getScreenName() + "\n\n"));
-                            
-                            if (newBlog.getMblog_textDetail() != null) {
-                                chain = chain.plus(new PlainText(newBlog.getMblog_textDetail()));   
+                            // FIXME
+                            List<Bot> bots = offlineConsole.getBots();
+                            for (Bot bot: bots) {
+                                sendNewBlogByOneBot(newCardCacheAndImage, bot, groupId);
                             }
-                            
-                            if (newCardCacheAndImage.getImage() != null) {
-                                ExternalResource externalResource = ExternalResource.create(newCardCacheAndImage.getImage());
-                                Image image = offlineConsole.uploadImage(groupId, externalResource);
-                                chain = chain.plus(image);
-                            } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
-                                StringBuilder builder = new StringBuilder();
-                                builder.append("\n图片资源：\n");
-                                for (String url : newBlog.getPicsLargeUrls()) {
-                                    builder.append(url).append("\n");
-                                }
-                                chain = chain.plus(new PlainText(builder.toString()));       
-                            }
-                            
-                            
-                                
-                                
-                            offlineConsole.sendToGroup(groupId, chain);
-
                         }
 
                     }
@@ -190,12 +197,12 @@ public class WeiboFunction implements IFunction {
                     }
                 }
                 if (builder.length() == 0) {
-                    offlineConsole.sendToGroup(event.getGroupId(), "现在还没有饼哦~");
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "现在还没有饼哦~");
                 } else {
-                    offlineConsole.sendToGroup(event.getGroupId(), builder.toString());
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
                 }
             } else {
-                offlineConsole.sendToGroup(event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
             }
             return true;
         }

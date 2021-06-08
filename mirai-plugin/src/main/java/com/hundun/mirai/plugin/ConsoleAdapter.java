@@ -1,12 +1,16 @@
 package com.hundun.mirai.plugin;
 
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 
 import com.hundun.mirai.bot.configuration.PrivateSettings;
-import com.hundun.mirai.bot.service.CharacterRouter;
-import com.hundun.mirai.bot.service.IConsole;
+import com.hundun.mirai.bot.export.BotLogic;
+import com.hundun.mirai.bot.export.CharacterRouter;
+import com.hundun.mirai.bot.export.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.ListenerHost;
 import net.mamoe.mirai.event.ListeningStatus;
@@ -22,7 +26,7 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/06/03
  */
 @Slf4j
-public class ConsoleAdapter implements IConsole, ListenerHost {
+public class ConsoleAdapter implements IConsole {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
@@ -30,40 +34,19 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     
     PrivateSettings privateSettings;
     
-    CharacterRouter characterRouter;
+
     
     public ConsoleAdapter(PrivateSettings privateSettings) {
         this.privateSettings = privateSettings;
     }
     
-    public void lateInitCharacterRouter(CharacterRouter characterRouter) {
-        this.characterRouter = characterRouter;
-    }
-    
-    @NotNull
-    @EventHandler
-    public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception {
-        return characterRouter.onMessage(event);
-    }
-    
-    @NotNull
-    @EventHandler
-    public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception {
-        return characterRouter.onMessage(event);
-    }
+
     
     
-    @Override
-    public void sendToGroup(Long groupId, String message) {
-        if (isBotOnline) {
-            // TODO
-        } else {
-            log.info("[offline mode]sendToGroup groupId = {}, message = {}", groupId, message);
-        }
-    }
+
 
     @Override
-    public void sendToGroup(long groupId, MessageChain messageChain) {
+    public void sendToGroup(Bot bot, long groupId, MessageChain messageChain) {
         if (isBotOnline) {
             // TODO
         } else {
@@ -72,7 +55,7 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     }
 
     @Override
-    public Image uploadImage(Long groupId, ExternalResource externalResource) {
+    public Image uploadImage(Bot bot, long groupId, ExternalResource externalResource) {
         if (isBotOnline) {
             // TODO
             return null;
@@ -83,7 +66,7 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     }
 
     @Override
-    public Voice uploadVoice(Long groupId, ExternalResource externalResource) {
+    public Voice uploadVoice(Bot bot, long groupId, ExternalResource externalResource) {
         if (isBotOnline) {
          // TODO
             return null;
@@ -91,6 +74,12 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
             log.info("[offline mode]uploadVoice groupId = {}", groupId);
             return new Voice("", new byte[1], 0, 0, "");
         }
+    }
+    
+    @Override
+    public List<Bot> getBots() {
+     // TODO
+        return null;
     }
 
     @Override

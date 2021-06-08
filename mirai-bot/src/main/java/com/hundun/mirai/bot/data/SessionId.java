@@ -1,4 +1,4 @@
-package com.hundun.mirai.bot.core;
+package com.hundun.mirai.bot.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

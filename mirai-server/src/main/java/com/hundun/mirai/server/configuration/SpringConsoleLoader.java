@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.configuration.PublicSettings;
-import com.hundun.mirai.bot.service.IConsole;
+import com.hundun.mirai.bot.export.BotLogic;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.server.SpringConsole;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,10 +47,9 @@ public class SpringConsoleLoader {
         publicSettings.prinzEugenListenWeiboUids = prinzEugenListenWeiboUids;
         publicSettings.zacaMusumeListenWeiboUids = zacaMusumeListenWeiboUids;
         
-        springConsole = new SpringConsole(privateSettingsLoader.getPrivateSettings());
+        springConsole = new SpringConsole(privateSettingsLoader.getPrivateSettings(), publicSettings);
+
         
-        CustomBeanFactory.init(privateSettingsLoader.getPrivateSettings(), publicSettings, springConsole);
-        GlobalEventChannel.INSTANCE.registerListenerHost(CustomBeanFactory.getInstance().characterRouter);
     
     }
     

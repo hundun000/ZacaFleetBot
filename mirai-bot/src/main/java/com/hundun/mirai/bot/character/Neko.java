@@ -3,14 +3,14 @@ package com.hundun.mirai.bot.character;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.function.QuizHandler;
 import com.hundun.mirai.bot.parser.StatementType;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -3,8 +3,8 @@ package com.hundun.mirai.bot.function;
 import java.util.List;
 
 import com.hundun.mirai.bot.IManualWired;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
 import com.hundun.mirai.bot.parser.statement.Statement;
 
 /**

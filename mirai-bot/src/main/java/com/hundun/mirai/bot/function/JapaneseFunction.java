@@ -7,12 +7,12 @@ import java.util.regex.Pattern;
 
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.IConsole;
 
 /**
  * @author hundun
@@ -36,7 +36,7 @@ public class JapaneseFunction implements IFunction {
                 StringBuilder allArg = new StringBuilder();
                 subFunctionCallStatement.getArgs().forEach(item -> allArg.append(item).append(" "));
                 String result = funAllLines(allArg.toString(), "\n");
-                offlineConsole.sendToGroup(event.getGroupId(), result);
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), result);
                 return true;
             }
             

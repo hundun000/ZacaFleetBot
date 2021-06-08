@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.Statement;
 import com.hundun.mirai.bot.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -65,15 +65,15 @@ public class GuideFunction implements IFunction {
                         String subFunctionIdentifier = subFunctionCallStatement.getArgs().get(0);
                         SubFunction targetFunction = sessionData.getIdentifierToSubFunction().get(subFunctionIdentifier);
                         if (targetFunction == null) {
-                            offlineConsole.sendToGroup(eventinfo.getGroupId(), "“" + subFunctionIdentifier + "”不是一个有效的指令id。");
+                            offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "“" + subFunctionIdentifier + "”不是一个有效的指令id。");
                             return true;
                         }
                         SubFunctionDocument document = sessionData.getSubFunctionDocuments().get(targetFunction);
                         if (document != null) {
-                            offlineConsole.sendToGroup(eventinfo.getGroupId(), document.toDetailText());
+                            offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), document.toDetailText());
                             return true;
                         } else {
-                            offlineConsole.sendToGroup(eventinfo.getGroupId(), "该功能找不到帮助。");
+                            offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "该功能找不到帮助。");
                             return true;
                         }
                     } else {
@@ -88,11 +88,11 @@ public class GuideFunction implements IFunction {
                             }
                             
                         }
-                        offlineConsole.sendToGroup(eventinfo.getGroupId(), stringBuilder.toString());
+                        offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), stringBuilder.toString());
                         return true;
                     }
                 } else {
-                    offlineConsole.sendToGroup(eventinfo.getGroupId(), "该角色找不到帮助。");
+                    offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "该角色找不到帮助。");
                     return true;
                 }
             }

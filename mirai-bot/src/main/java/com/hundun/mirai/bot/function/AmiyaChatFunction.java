@@ -7,15 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
-import com.hundun.mirai.bot.core.UserTag;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.data.UserTag;
+import com.hundun.mirai.bot.export.CharacterRouter;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.AtStatement;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.IConsole;
-import com.hundun.mirai.bot.service.CharacterRouter;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.At;
@@ -118,43 +118,43 @@ public class AmiyaChatFunction implements IFunction {
             if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == offlineConsole.getAdminAccount()) {
                 todayIsHoliday = LocalDateTime.now().getDayOfYear();
                 todayIsWorkday = -1;
-                offlineConsole.sendToGroup(event.getGroupId(), "好耶");
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "好耶");
                 return true;
             } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == offlineConsole.getAdminAccount()) {
                 todayIsHoliday = -1;
                 todayIsWorkday = LocalDateTime.now().getDayOfYear();
-                offlineConsole.sendToGroup(event.getGroupId(), "哼");
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "哼");
                 return true;
             } else if (newMessage.contains("下班")) {
                 boolean canRelax = canRelax();
                 if (canRelax) {
-                    Image image = offlineConsole.uploadImage(event.getGroupId(), canRelaxExternalResource);
-                    offlineConsole.sendToGroup(event.getGroupId(), 
+                    Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), canRelaxExternalResource);
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                             new PlainText(canRelaxTalk)
                             .plus(image)
                             );
                 } else {
-                    Image image = offlineConsole.uploadImage(event.getGroupId(), cannotRelaxExternalResource);
-                    offlineConsole.sendToGroup(event.getGroupId(), 
+                    Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), cannotRelaxExternalResource);
+                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                             new PlainText(cannotRelaxTalk)
                             .plus(image)
                             );
                 }
                 return true;
             } else if (newMessage.contains("damedane")) {
-                Voice voice = offlineConsole.uploadVoice(event.getGroupId(), damedaneVoiceExternalResource);
+                Voice voice = offlineConsole.uploadVoice(event.getBot(), event.getGroupId(), damedaneVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
                 builder.add(voice);
                 MessageChain messageChain = builder.build();
 
-                offlineConsole.sendToGroup(event.getGroupId(), 
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                         messageChain
                         );
                 return true;
             }
         } else if (statement instanceof AtStatement) {
             if (((AtStatement)statement).getTarget() == offlineConsole.getSelfAccount()) {
-                offlineConsole.sendToGroup(event.getGroupId(), 
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                         talks.get(rand.nextInt(talks.size()))
                         //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
                         );
@@ -164,16 +164,16 @@ public class AmiyaChatFunction implements IFunction {
         return false;
     }
 
-    public boolean acceptNudged(EventInfo eventInfo) {
+    public boolean acceptNudged(EventInfo event) {
         Image image = null;
-        if (eventInfo.getTargetId() == offlineConsole.getSelfAccount()) {
-            image = offlineConsole.uploadImage(eventInfo.getGroupId(), faces.get(rand.nextInt(faces.size())));
+        if (event.getTargetId() == offlineConsole.getSelfAccount()) {
+            image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
         } else {
-            List<UserTag> tags = characterRouter.getUserTags(eventInfo.getTargetId());
+            List<UserTag> tags = characterRouter.getUserTags(event.getTargetId());
             if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
-                image = offlineConsole.uploadImage(eventInfo.getGroupId(), ceoboNodgeResource);
+                image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
             } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {
-                image = offlineConsole.uploadImage(eventInfo.getGroupId(), angelinaNodgeResource);
+                image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), angelinaNodgeResource);
             } 
 
         }
@@ -182,8 +182,8 @@ public class AmiyaChatFunction implements IFunction {
             
         
         if (image != null) {
-            offlineConsole.sendToGroup(eventInfo.getGroupId(), 
-                    new At(eventInfo.getSenderId())
+            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                    new At(event.getSenderId())
                     .plus(image)
                     );
             return true;

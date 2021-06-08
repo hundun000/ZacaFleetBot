@@ -1,4 +1,4 @@
-package com.hundun.mirai.bot.core;
+package com.hundun.mirai.bot.data;
 
 
 import net.mamoe.mirai.event.events.GroupMessageEvent;
@@ -18,6 +18,7 @@ public class EventInfoFactory {
         eventInfo.targetId = -1;
         eventInfo.message = event.getMessage();
         eventInfo.characterId = characterId;
+        eventInfo.bot = event.getBot();
         return eventInfo;
     }
     public static EventInfo get(NudgeEvent event, String characterId) {
@@ -27,6 +28,7 @@ public class EventInfoFactory {
         eventInfo.targetId = event.getTarget().getId();
         eventInfo.message = null;
         eventInfo.characterId = characterId;
+        eventInfo.bot = event.getBot();
         return eventInfo;
     }
     
@@ -34,13 +36,16 @@ public class EventInfoFactory {
             long groupId,
             long senderId,
             long targetId,
-            String message
+            String message, 
+            String characterId
             ) {
         EventInfo eventInfo = new EventInfo();
         eventInfo.groupId = groupId;
         eventInfo.senderId = senderId;
         eventInfo.targetId = targetId;
+        eventInfo.characterId = characterId;
         eventInfo.message = MessageUtils.newChain(new PlainText(message));
+        eventInfo.bot = null;
         return eventInfo;
     }
 }

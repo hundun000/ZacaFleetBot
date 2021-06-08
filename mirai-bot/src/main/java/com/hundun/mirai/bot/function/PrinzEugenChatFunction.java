@@ -4,12 +4,12 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
-import com.hundun.mirai.bot.core.EventInfo;
-import com.hundun.mirai.bot.core.SessionId;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.parser.statement.Statement;
-import com.hundun.mirai.bot.service.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.Image;
@@ -55,19 +55,19 @@ public class PrinzEugenChatFunction implements IFunction {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.contains("噗噗")) {
-                Image image = offlineConsole.uploadImage(event.getGroupId(), pupuExternalResource);
-                offlineConsole.sendToGroup(event.getGroupId(), 
+                Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), pupuExternalResource);
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                         new PlainText("")
                         .plus(image)
                         );
                 return true;
             } else if (newMessage.contains("咻咻咻") || newMessage.contains("西姆咻")) {
-                Voice voice = offlineConsole.uploadVoice(event.getGroupId(), xiuXiuXiuVoiceExternalResource);
+                Voice voice = offlineConsole.uploadVoice(event.getBot(), event.getGroupId(), xiuXiuXiuVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
                 builder.add(voice);
                 MessageChain messageChain = builder.build();
 
-                offlineConsole.sendToGroup(event.getGroupId(), 
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                         messageChain
                         );
                 return true;

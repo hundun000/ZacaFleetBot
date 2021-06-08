@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.IManualWired;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
 import com.hundun.mirai.bot.service.file.FileService;
 import com.hundun.mirai.bot.service.file.IFileProvider;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;

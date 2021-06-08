@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.hundun.mirai.bot.CustomBeanFactory;
 import com.hundun.mirai.bot.IManualWired;
-import com.hundun.mirai.bot.core.EventInfo;
+import com.hundun.mirai.bot.data.EventInfo;
+import com.hundun.mirai.bot.export.CustomBeanFactory;
 import com.hundun.mirai.bot.function.GuideFunction;
 import com.hundun.mirai.bot.function.SubFunction;
 import com.hundun.mirai.bot.parser.Parser;
