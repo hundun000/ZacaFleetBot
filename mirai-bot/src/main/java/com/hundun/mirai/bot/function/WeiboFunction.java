@@ -3,6 +3,7 @@ package com.hundun.mirai.bot.function;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -128,9 +129,9 @@ public class WeiboFunction implements IFunction {
             public void run() {
                 log.info("checkNewBlog Scheduled arrival");
                 
-                List<Bot> bots = offlineConsole.getBots();
+                Collection<Bot> bots = offlineConsole.getBots();
                 for (Bot bot: bots) {
-                    for (GroupConfig entry : characterRouter.getGroupConfigs(bot.getId()).values()) {
+                    for (GroupConfig entry : characterRouter.getGroupConfigsOrEmpty(bot.getId())) {
                         Long groupId = entry.getGroupId();
                         Set<String> blogUids = getDataByGroupId(entry.getEnableCharacters());
                         if (!groupIdToSessionData.containsKey(groupId)) {

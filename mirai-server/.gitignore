@@ -1,6 +1,6 @@
 MxLibData/
 cache/
-device.json
+*_device.json
 file_cache/
 
 HELP.md

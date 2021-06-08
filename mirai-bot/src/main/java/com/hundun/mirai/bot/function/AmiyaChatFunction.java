@@ -169,7 +169,7 @@ public class AmiyaChatFunction implements IFunction {
         if (event.getTargetId() == event.getBot().getId()) {
             image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
         } else {
-            List<UserTag> tags = characterRouter.getUserTags(event.getBot().getId(), event.getTargetId());
+            List<UserTag> tags = characterRouter.getUserTagsOrEmpty(event.getBot().getId(), event.getTargetId());
             if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
                 image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
             } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {

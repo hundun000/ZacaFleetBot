@@ -1,7 +1,11 @@
 package com.hundun.mirai.server;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
@@ -30,18 +34,17 @@ public class SpringConsole implements IConsole {
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
     
-    private Bot miraiBot;
+    //private Bot miraiBot;
     
-    private List<Bot> bots = Arrays.asList((Bot) null);
+    private Map<Long, Bot> bots = new HashMap<>();
     
     BotLogic botLogic;
     
-    boolean isBotOnline = false;
     
     AppPrivateSettings appPrivateSettings;
     
   //设备认证信息文件
-    private final String deviceInfoPath = "device.json";
+    //private final String deviceInfoPath = "device.json";
     
     
     public SpringConsole(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
@@ -51,38 +54,58 @@ public class SpringConsole implements IConsole {
         botLogic.onEnable();
     }
     
-    public void login() {
-        BotPrivateSettings botPrivateSettings = appPrivateSettings.getBotPrivateSettingsMap().values().iterator().next();
-        if (null == botPrivateSettings.getBotAccount() || null == botPrivateSettings.getBotPwd()) {
-            System.err.println("*****未配置账号或密码*****");
-            log.warn("*****未配置账号或密码*****");
-            return;
+    
+    private class BotThread extends Thread {
+        BotPrivateSettings botPrivateSettings;
+        public BotThread(BotPrivateSettings botPrivateSettings) {
+            this.botPrivateSettings = botPrivateSettings;
         }
         
-        if (!isBotOnline) {
-            // the new thread will blocked by Bot.join()
-            Thread thread = new Thread(){
-                @Override
-                public void run(){
-                    
-                    
-                    miraiBot = BotFactory.INSTANCE.newBot(botPrivateSettings.getBotAccount(), botPrivateSettings.getBotPwd(), new BotConfiguration() {
-                        {
-                            //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
-                            fileBasedDeviceInfo(deviceInfoPath);
-                            setProtocol(MiraiProtocol.ANDROID_PHONE); // 切换协议
-                            // 开启所有列表缓存
-                            enableContactCache();
-                        }
-                    });
-                    miraiBot.login();
-                    isBotOnline = true;
-                    bots = Arrays.asList(miraiBot);
-                    miraiBot.join();
+        @Override
+        public void run(){
+            String deviceInfoFileName = botPrivateSettings.getBotAccount() + "_device.json";
+            Bot miraiBot = BotFactory.INSTANCE.newBot(botPrivateSettings.getBotAccount(), botPrivateSettings.getBotPwd(), new BotConfiguration() {
+                {
+                    //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
+                    fileBasedDeviceInfo(deviceInfoFileName);
+                    setProtocol(MiraiProtocol.ANDROID_PHONE); // 切换协议
+                    // 开启所有列表缓存
+                    enableContactCache();
                 }
-            };
-            thread.start();
+            });
+            miraiBot.login();
+            bots.put(botPrivateSettings.getBotAccount(), miraiBot);
+            miraiBot.join();
         }
+    }
+    
+    public String login(long botAccount) {
+        Collection<BotPrivateSettings> allBotPrivateSettings = appPrivateSettings.getBotPrivateSettingsMap().values();
+        BotPrivateSettings targetBotPrivateSettings = null;
+        for (BotPrivateSettings botPrivateSettings : allBotPrivateSettings) {
+            if (botPrivateSettings.getBotAccount() == botAccount) {
+                targetBotPrivateSettings = botPrivateSettings;
+                break;
+            }
+        }
+        
+        if (targetBotPrivateSettings == null) {
+            log.warn("botAccount = {} 未找到 BotPrivateSettings", botAccount);
+            return "botAccount未找到 BotPrivateSettings";
+        }
+        
+        
+        
+        if (bots.containsKey(botAccount)) {
+            log.warn("botAccount = {} 已存在", botAccount);
+            return"botAccount已存在";
+        }
+        
+        // the new thread will blocked by Bot.join()
+        Thread thread = new BotThread(targetBotPrivateSettings);
+        thread.start();
+        
+        return "OK";
     }
 
 
@@ -118,12 +141,12 @@ public class SpringConsole implements IConsole {
 
     
     @Override
-    public List<Bot> getBots() {
-        return bots;
+    public Collection<Bot> getBots() {
+        return bots.values();
     }
 
     @Override
     public Bot getBot(long botId) {
-        return miraiBot;
+        return bots.get(botId);
     }
 }

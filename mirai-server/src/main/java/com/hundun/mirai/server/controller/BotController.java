@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hundun.mirai.bot.cp.quiz.QuizService;
@@ -51,9 +52,11 @@ public class BotController {
 //        return "OK";
 //    }
     
-    @RequestMapping(value="/login", method=RequestMethod.GET)
-    public String login() {
-        springConsoleLoader.springConsole.login();
+    @RequestMapping(value="/login", method=RequestMethod.POST)
+    public String login(
+            @RequestParam("botAccount") long botAccount
+            ) {
+        springConsoleLoader.springConsole.login(botAccount);
         return "OK";
     }
     

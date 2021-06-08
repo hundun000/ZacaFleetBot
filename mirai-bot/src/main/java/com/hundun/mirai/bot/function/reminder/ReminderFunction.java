@@ -3,6 +3,7 @@ package com.hundun.mirai.bot.function.reminder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,9 +208,9 @@ public class ReminderFunction implements IFunction, IManualWired {
     public void checkCharacterTasks() {
         log.info("checkCharacterTasks Scheduled arrival");
         LocalDateTime now = LocalDateTime.now();
-        List<Bot> bots = offlineConsole.getBots();
+        Collection<Bot> bots = offlineConsole.getBots();
         for (Bot bot: bots) {
-            for (GroupConfig entry : characterRouter.getGroupConfigs(bot.getId()).values()) {
+            for (GroupConfig entry : characterRouter.getGroupConfigsOrEmpty(bot.getId())) {
                 Long groupId = entry.getGroupId();
                 List<String> characterIds = entry.getEnableCharacters();
                 log.info("checkCharacterTasks for groupId = {}", groupId);

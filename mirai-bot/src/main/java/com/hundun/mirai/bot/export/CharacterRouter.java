@@ -1,6 +1,7 @@
 package com.hundun.mirai.bot.export;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,22 +191,25 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     }
 
 
-    public Map<Long, GroupConfig> getGroupConfigs(long botAccountId) {
-        return botIdToGroupConfigs.get(botAccountId);
+    public Collection<GroupConfig> getGroupConfigsOrEmpty(long botAccountId) {
+        if (!botIdToGroupConfigs.containsKey(botAccountId)) {
+            return new ArrayList<>(0);
+        }
+        return botIdToGroupConfigs.get(botAccountId).values();
     }
 
-    public List<UserTag> getUserTags(long botId, Long userId) {
+    public List<UserTag> getUserTagsOrEmpty(long botId, Long userId) {
         if (!botIdToUserTagConfigs.containsKey(botId)) {
-            return new ArrayList<>();
+            return new ArrayList<>(0);
         }
         Map<Long, UserTagConfig> userTagConfigs = botIdToUserTagConfigs.get(botId);
         if (!userTagConfigs.containsKey(userId)) {
-            return new ArrayList<>();
+            return new ArrayList<>(0);
         }
         return userTagConfigs.get(userId).getTags();
     }
 
-    public List<String> getGroupCharacterIds(long botId, Long groupId) {
+    public List<String> getGroupCharacterIdsOrEmpty(long botId, Long groupId) {
         if (!botIdToGroupConfigs.containsKey(botId)) {
             return new ArrayList<>();
         }

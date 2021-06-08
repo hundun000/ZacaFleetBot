@@ -1,5 +1,6 @@
 package com.hundun.mirai.bot.export;
 
+import java.util.Collection;
 import java.util.List;
 
 import net.mamoe.mirai.Bot;
@@ -26,6 +27,6 @@ public interface IConsole {
     public Voice uploadVoice(Bot bot, long groupId, ExternalResource externalResource);
     
     
-    List<Bot> getBots();
+    Collection<Bot> getBots();
     Bot getBot(long botId);
 }
