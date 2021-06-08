@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class ReminderTask {
     String id;
+    long botId;
     int count;
     long targetGroup;
     String text;

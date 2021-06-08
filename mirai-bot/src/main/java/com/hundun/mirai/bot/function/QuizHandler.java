@@ -12,6 +12,7 @@ import com.hundun.mirai.bot.cp.quiz.QuizService;
 import com.hundun.mirai.bot.cp.quiz.QuizService.MatchType;
 import com.hundun.mirai.bot.data.EventInfo;
 import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CharacterRouter;
 import com.hundun.mirai.bot.export.CustomBeanFactory;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
@@ -70,6 +71,8 @@ public class QuizHandler implements IFunction {
     
     IConsole offlineConsole;
     
+    CharacterRouter characterRouter;
+    
     Map<String, SessionData> sessionDataMap = new HashMap<>();
 
     @Override
@@ -77,6 +80,7 @@ public class QuizHandler implements IFunction {
         this.quizService = CustomBeanFactory.getInstance().quizService;
         this.fileService = CustomBeanFactory.getInstance().fileService;
         this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
     @Data
@@ -132,7 +136,7 @@ public class QuizHandler implements IFunction {
                         }
                         break;
                     case QUIZ_EXIT:
-                        if (event.getSenderId() == offlineConsole.getAdminAccount()) {
+                        if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                             sessionData.matchSituationDTO = null;
                             offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
                             return true;
@@ -159,7 +163,7 @@ public class QuizHandler implements IFunction {
                         }
                         break;
                     case QUIZ_UPDATE_TEAM:
-                        if (event.getSenderId() == offlineConsole.getAdminAccount()) {
+                        if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                             String teamName = subFunctionCallStatement.getArgs().get(0);
                             List<String> pickTags = Arrays.asList(subFunctionCallStatement.getArgs().get(1).split("&"));
                             List<String> banTags = Arrays.asList(subFunctionCallStatement.getArgs().get(2).split("&"));

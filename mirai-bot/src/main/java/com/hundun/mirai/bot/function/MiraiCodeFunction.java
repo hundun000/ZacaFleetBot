@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.hundun.mirai.bot.data.EventInfo;
 import com.hundun.mirai.bot.data.SessionId;
+import com.hundun.mirai.bot.export.CharacterRouter;
 import com.hundun.mirai.bot.export.CustomBeanFactory;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.parser.statement.LiteralValueStatement;
@@ -29,6 +30,7 @@ public class MiraiCodeFunction implements IFunction {
     @Override
     public void manualWired() {
         this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
     Map<String, SessionData> sessionDataMap = new HashMap<>();
@@ -38,12 +40,14 @@ public class MiraiCodeFunction implements IFunction {
         
     }
     
+    CharacterRouter characterRouter;
+    
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.DECODE_MIRAI_CODE) {
-                if (event.getSenderId() == offlineConsole.getAdminAccount()) {
+                if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                     String miraiCode = subFunctionCallStatement.getArgs().get(0);
                     log.info("build MessageChain by miraiCode = {}", miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);

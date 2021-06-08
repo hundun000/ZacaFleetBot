@@ -101,7 +101,7 @@ public class ReminderFunction implements IFunction, IManualWired {
             int minuteCondition,
             String text
             ) {
-        return createTask(-1, -1, -1, hourCondition, minuteCondition, -1, text, -1);
+        return createTask(-1, -1, -1, hourCondition, minuteCondition, -1, text, -1, -1);
     }
     
     public ReminderTask createTask(
@@ -112,7 +112,8 @@ public class ReminderFunction implements IFunction, IManualWired {
             int minuteCondition,
             int count,
             String text,
-            long targetGroup
+            long targetGroup,
+            long botId
             ) {
         ReminderTask task = new ReminderTask();
         try {
@@ -124,6 +125,7 @@ public class ReminderFunction implements IFunction, IManualWired {
             task.count = count;
             task.text = text;
             task.targetGroup = targetGroup;
+            task.botId = botId;
         } catch (Exception e) {
             log.error("addTask error:", e);
             return null;
@@ -139,7 +141,7 @@ public class ReminderFunction implements IFunction, IManualWired {
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
-                if (event.getSenderId() != offlineConsole.getAdminAccount()) {
+                if (event.getSenderId() != characterRouter.getAdminAccount(event.getBot().getId())) {
                     offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
@@ -151,7 +153,8 @@ public class ReminderFunction implements IFunction, IManualWired {
                         Integer.valueOf(subFunctionCallStatement.getArgs().get(4)),  
                         Integer.valueOf(subFunctionCallStatement.getArgs().get(5)), 
                         subFunctionCallStatement.getArgs().get(6), 
-                        event.getGroupId()
+                        event.getGroupId(),
+                        event.getBot().getId()
                         );
                 if (task != null) {
                     taskRepository.save(task);
@@ -162,7 +165,7 @@ public class ReminderFunction implements IFunction, IManualWired {
                 
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
-                if (event.getSenderId() != offlineConsole.getAdminAccount()) {
+                if (event.getSenderId() != characterRouter.getAdminAccount(event.getBot().getId())) {
                     offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
@@ -204,26 +207,25 @@ public class ReminderFunction implements IFunction, IManualWired {
     public void checkCharacterTasks() {
         log.info("checkCharacterTasks Scheduled arrival");
         LocalDateTime now = LocalDateTime.now();
-        for (GroupConfig entry : characterRouter.getGroupConfigs().values()) {
-            Long groupId = entry.getGroupId();
-            List<String> characterIds = entry.getEnableCharacters();
-            log.info("checkCharacterTasks for groupId = {}", groupId);
-            for (String characterId : characterIds) {
-                List<ReminderTask> tasks = characterTasks.get(characterId);
-                if (tasks != null) {
-                    for (ReminderTask task : tasks) {
-                        boolean triggered = checkTask(task, now);
-                        if (triggered) {
-                            // FIXME
-                            List<Bot> bots = offlineConsole.getBots();
-                            for (Bot bot: bots) {
+        List<Bot> bots = offlineConsole.getBots();
+        for (Bot bot: bots) {
+            for (GroupConfig entry : characterRouter.getGroupConfigs(bot.getId()).values()) {
+                Long groupId = entry.getGroupId();
+                List<String> characterIds = entry.getEnableCharacters();
+                log.info("checkCharacterTasks for groupId = {}", groupId);
+                for (String characterId : characterIds) {
+                    List<ReminderTask> tasks = characterTasks.get(characterId);
+                    if (tasks != null) {
+                        for (ReminderTask task : tasks) {
+                            boolean triggered = checkTask(task, now);
+                            if (triggered) {
                                 offlineConsole.sendToGroup(bot, groupId, task.text);
                             }
                         }
                     }
                 }
+                
             }
-            
         }
     }
     
@@ -258,12 +260,10 @@ public class ReminderFunction implements IFunction, IManualWired {
                 String miraiCode = task.text;
                 log.info("build MessageChain by miraiCode = {}", miraiCode);
                 MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
-                // FIXME
-                List<Bot> bots = offlineConsole.getBots();
-                for (Bot bot: bots) {
-                    offlineConsole.sendToGroup(bot, task.targetGroup, chain);
-                }
                 
+                Bot bot = offlineConsole.getBot(task.getBotId());
+                offlineConsole.sendToGroup(bot, task.targetGroup, chain);
+
                 
                 if (task.count != -1) {
                     task.count--;

@@ -15,7 +15,7 @@ import com.hundun.mirai.bot.character.Amiya;
 import com.hundun.mirai.bot.character.Neko;
 import com.hundun.mirai.bot.character.PrinzEugen;
 import com.hundun.mirai.bot.character.ZacaMusume;
-import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
 import com.hundun.mirai.bot.cp.FeignLogger;
 import com.hundun.mirai.bot.cp.kcwiki.KancolleWikiService;
@@ -95,9 +95,9 @@ public class CustomBeanFactory {
 
 
     
-    static void init(PrivateSettings privateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
+    static void init(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
         instance = new CustomBeanFactory();
-        instance.initSelf(privateSettings, publicSettings, consoleImplement);
+        instance.initSelf(appPrivateSettings, publicSettings, consoleImplement);
         instance.callChildrenInit();
     }
     
@@ -137,8 +137,8 @@ public class CustomBeanFactory {
         }
     }
     
-    private void initSelf (PrivateSettings privateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
-        this.privateSettings = privateSettings;
+    private void initSelf (AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
+        this.appPrivateSettings = appPrivateSettings;
         this.publicSettings = publicSettings;
         this.console = consoleImplement;
         
@@ -258,7 +258,7 @@ public class CustomBeanFactory {
                 ;
     }
     
-    public PrivateSettings privateSettings;
+    public AppPrivateSettings appPrivateSettings;
     public PublicSettings publicSettings;
 
     MongoClient mongoClient;

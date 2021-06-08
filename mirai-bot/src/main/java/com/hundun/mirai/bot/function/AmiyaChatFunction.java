@@ -115,12 +115,12 @@ public class AmiyaChatFunction implements IFunction {
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
-            if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == offlineConsole.getAdminAccount()) {
+            if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = LocalDateTime.now().getDayOfYear();
                 todayIsWorkday = -1;
                 offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "好耶");
                 return true;
-            } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == offlineConsole.getAdminAccount()) {
+            } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = -1;
                 todayIsWorkday = LocalDateTime.now().getDayOfYear();
                 offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "哼");
@@ -153,7 +153,7 @@ public class AmiyaChatFunction implements IFunction {
                 return true;
             }
         } else if (statement instanceof AtStatement) {
-            if (((AtStatement)statement).getTarget() == offlineConsole.getSelfAccount()) {
+            if (((AtStatement)statement).getTarget() == event.getBot().getId()) {
                 offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
                         talks.get(rand.nextInt(talks.size()))
                         //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
@@ -166,10 +166,10 @@ public class AmiyaChatFunction implements IFunction {
 
     public boolean acceptNudged(EventInfo event) {
         Image image = null;
-        if (event.getTargetId() == offlineConsole.getSelfAccount()) {
+        if (event.getTargetId() == event.getBot().getId()) {
             image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
         } else {
-            List<UserTag> tags = characterRouter.getUserTags(event.getTargetId());
+            List<UserTag> tags = characterRouter.getUserTags(event.getBot().getId(), event.getTargetId());
             if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
                 image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
             } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {

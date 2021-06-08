@@ -40,14 +40,14 @@ public class SpringConsoleLoader {
     
     @PostConstruct
     public void load() {
-        log.info("PrivateSettings = {}", privateSettingsLoader.getPrivateSettings());
+        log.info("PrivateSettings = {}", privateSettingsLoader.getAppPrivateSettings());
         
         PublicSettings publicSettings = new PublicSettings();
         publicSettings.amiyaListenWeiboUids = amiyaListenWeiboUids;
         publicSettings.prinzEugenListenWeiboUids = prinzEugenListenWeiboUids;
         publicSettings.zacaMusumeListenWeiboUids = zacaMusumeListenWeiboUids;
         
-        springConsole = new SpringConsole(privateSettingsLoader.getPrivateSettings(), publicSettings);
+        springConsole = new SpringConsole(privateSettingsLoader.getAppPrivateSettings(), publicSettings);
 
         
     

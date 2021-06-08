@@ -25,7 +25,7 @@ public interface IConsole {
     public Image uploadImage(Bot bot, long groupId, ExternalResource externalResource);
     public Voice uploadVoice(Bot bot, long groupId, ExternalResource externalResource);
     
-    public long getSelfAccount();
-    public Long getAdminAccount();
+    
     List<Bot> getBots();
+    Bot getBot(long botId);
 }

@@ -14,7 +14,8 @@ import com.hundun.mirai.bot.character.BaseCharacter;
 import com.hundun.mirai.bot.character.Neko;
 import com.hundun.mirai.bot.character.PrinzEugen;
 import com.hundun.mirai.bot.character.ZacaMusume;
-import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.configuration.AppPrivateSettings;
+import com.hundun.mirai.bot.data.BotPrivateSettings;
 import com.hundun.mirai.bot.data.EventInfo;
 import com.hundun.mirai.bot.data.EventInfoFactory;
 import com.hundun.mirai.bot.data.GroupConfig;
@@ -50,9 +51,9 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     
     WeiboFunction weiboFunction;
 
-    Map<Long, GroupConfig> groupConfigs = new HashMap<>();
+    Map<Long, Map<Long, GroupConfig>> botIdToGroupConfigs = new HashMap<>();
 
-    Map<Long, UserTagConfig> userTagConfigs = new HashMap<>();
+    Map<Long, Map<Long, UserTagConfig>> botIdToUserTagConfigs = new HashMap<>();
     
 //    @Value("${account.group.arknights}")
 //    public long arknightsGroupId;
@@ -66,7 +67,7 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     List<BaseCharacter> characters = new ArrayList<>();
     
     
-    PrivateSettings privateSettings;
+    AppPrivateSettings appPrivateSettings;
     @Override
     public void manualWired() {
         this.console = CustomBeanFactory.getInstance().console;
@@ -75,21 +76,34 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
         this.prinzEugen = CustomBeanFactory.getInstance().prinzEugen;
         this.neko = CustomBeanFactory.getInstance().neko;
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.privateSettings = CustomBeanFactory.getInstance().privateSettings;
+        this.appPrivateSettings = CustomBeanFactory.getInstance().appPrivateSettings;
 
     }
     
     private void readConfigFile() {
-        for (Entry<String, GroupConfig> entry : privateSettings.getGroupConfigs().entrySet()) {
-            GroupConfig config = entry.getValue();
-            config.setGroupDescription(entry.getKey());
-            groupConfigs.put(config.getGroupId(), config);
+        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsMap().values()) {
+            
+            Map<Long, GroupConfig> groupConfigs = new HashMap<>();
+            for (Entry<String, GroupConfig> entry : botPrivateSettings.getGroupConfigs().entrySet()) {
+                GroupConfig config = entry.getValue();
+                config.setGroupDescription(entry.getKey());
+                
+                groupConfigs.put(config.getGroupId(), config);
+                
+            }
+            botIdToGroupConfigs.put(botPrivateSettings.getBotAccount(), groupConfigs);
+            
+            Map<Long, UserTagConfig> userTagConfigs = new HashMap<>();
+            for (Entry<String, UserTagConfig> entry : botPrivateSettings.getUserTagConfigs().entrySet()) {
+                UserTagConfig config = entry.getValue();
+                
+                userTagConfigs.put(config.getId(), config);
+                
+            }
+            botIdToUserTagConfigs.put(botPrivateSettings.getBotAccount(), userTagConfigs);
         }
         
-        for (Entry<String, UserTagConfig> entry : privateSettings.getUserTagConfigs().entrySet()) {
-            UserTagConfig config = entry.getValue();
-            userTagConfigs.put(config.getId(), config);
-        }
+        
     }
 
     
@@ -118,7 +132,7 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception {
         
         synchronized (this) {
-            GroupConfig config = groupConfigs.get(event.getSubject().getId());
+            GroupConfig config = botIdToGroupConfigs.get(event.getBot().getId()).get(event.getSubject().getId());
             if (config == null) {
                 return ListeningStatus.LISTENING;
             }
@@ -144,12 +158,18 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception { // 可以抛出任何异常, 将在 handleException 处理
 
         synchronized (this) {
-            if (event.getSender().getId() == console.getSelfAccount()) {
+            if (event.getSender().getId() == event.getBot().getId()) {
                 return ListeningStatus.LISTENING;
             }
             
+            Map<Long, GroupConfig> groupConfigs = botIdToGroupConfigs.get(event.getBot().getId());
+            if (groupConfigs == null) {
+                log.info("bot {} no groupConfigs, onMessage do nothing", event.getBot().getId());
+                return ListeningStatus.LISTENING;
+            }
             GroupConfig config = groupConfigs.get(event.getGroup().getId());
             if (config == null) {
+                log.info("grop {} no groupConfig in {}, onMessage do nothing", event.getGroup().getId(), groupConfigs);
                 return ListeningStatus.LISTENING;
             }
             
@@ -170,21 +190,39 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     }
 
 
-    public Map<Long, GroupConfig> getGroupConfigs() {
-        return groupConfigs;
+    public Map<Long, GroupConfig> getGroupConfigs(long botAccountId) {
+        return botIdToGroupConfigs.get(botAccountId);
     }
 
-    public List<UserTag> getUserTags(Long userId) {
+    public List<UserTag> getUserTags(long botId, Long userId) {
+        if (!botIdToUserTagConfigs.containsKey(botId)) {
+            return new ArrayList<>();
+        }
+        Map<Long, UserTagConfig> userTagConfigs = botIdToUserTagConfigs.get(botId);
         if (!userTagConfigs.containsKey(userId)) {
             return new ArrayList<>();
         }
         return userTagConfigs.get(userId).getTags();
     }
 
-    public List<String> getGroupCharacterIds(Long groupId) {
+    public List<String> getGroupCharacterIds(long botId, Long groupId) {
+        if (!botIdToGroupConfigs.containsKey(botId)) {
+            return new ArrayList<>();
+        }
+        Map<Long, GroupConfig> groupConfigs = botIdToGroupConfigs.get(botId);
         if (!groupConfigs.containsKey(groupId)) {
             return new ArrayList<>();
         }
         return groupConfigs.get(groupId).getEnableCharacters();
+    }
+
+    public long getAdminAccount(long botId) {
+        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsMap().values()) {
+            if (botPrivateSettings.getBotAccount() == botId) {
+                return botPrivateSettings.getAdminAccount();
+            }
+        }
+        
+        return -1;
     }
 }

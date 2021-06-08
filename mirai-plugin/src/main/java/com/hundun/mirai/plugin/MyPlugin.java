@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogic;
 import com.hundun.mirai.bot.export.CustomBeanFactory;
@@ -55,21 +55,21 @@ public class MyPlugin extends JavaPlugin {
         String content = new String(readAll(settingsFile), StandardCharsets.UTF_8);
         //YamlMap settings = Yaml.Default.decodeYamlMapFromString(content);
         
-        PrivateSettings privateSettings;
+        AppPrivateSettings appPrivateSettings;
         try {
-            privateSettings = objectMapper.readValue(content, PrivateSettings.class);
+            appPrivateSettings = objectMapper.readValue(content, AppPrivateSettings.class);
         } catch (Exception e) {
-            privateSettings = new PrivateSettings();
+            appPrivateSettings = new AppPrivateSettings();
             e.printStackTrace();
         }
         
-        log.info("PrivateSettings = {}", privateSettings);
+        log.info("PrivateSettings = {}", appPrivateSettings);
         
         PublicSettings publicSettings = new PublicSettings();
         
-        console = new ConsoleAdapter(privateSettings);
+        console = new ConsoleAdapter(appPrivateSettings);
         
-        botLogic = new BotLogic(privateSettings, publicSettings, console);
+        botLogic = new BotLogic(appPrivateSettings, publicSettings, console);
 
         
     }

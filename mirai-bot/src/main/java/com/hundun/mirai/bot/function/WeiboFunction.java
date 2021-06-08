@@ -128,39 +128,37 @@ public class WeiboFunction implements IFunction {
             public void run() {
                 log.info("checkNewBlog Scheduled arrival");
                 
-                
-                for (GroupConfig entry : characterRouter.getGroupConfigs().values()) {
-                    Long groupId = entry.getGroupId();
-                    Set<String> blogUids = getDataByGroupId(entry.getEnableCharacters());
-                    if (!groupIdToSessionData.containsKey(groupId)) {
-                        groupIdToSessionData.put(groupId, new SessionData());
-                    }
-                    SessionData sessionData = groupIdToSessionData.get(groupId);
-                    log.info("groupId = {}, LastUpdateTime = {}, checkNewBlog: {}", groupId, sessionData.getLastUpdateTime(), blogUids);
-                    
-                    for (String blogUid : blogUids) {
-                        List<WeiboCardCacheAndImage> cardCacheAndImages = weiboService.updateAndGetTopBlog(blogUid);
-                        List<WeiboCardCacheAndImage> newCardCacheAndImages = new ArrayList<>(0);
-                        for (WeiboCardCacheAndImage cardCacheAndImage : cardCacheAndImages) {
-                            boolean isNew = cardCacheAndImage.getWeiboCardCache().getMblogCreatedDateTime().isAfter(sessionData.getLastUpdateTime());
-                            //boolean isNew = true;
-                            if (isNew) {
-                                newCardCacheAndImages.add(cardCacheAndImage);
-                            }
+                List<Bot> bots = offlineConsole.getBots();
+                for (Bot bot: bots) {
+                    for (GroupConfig entry : characterRouter.getGroupConfigs(bot.getId()).values()) {
+                        Long groupId = entry.getGroupId();
+                        Set<String> blogUids = getDataByGroupId(entry.getEnableCharacters());
+                        if (!groupIdToSessionData.containsKey(groupId)) {
+                            groupIdToSessionData.put(groupId, new SessionData());
                         }
+                        SessionData sessionData = groupIdToSessionData.get(groupId);
+                        log.info("groupId = {}, LastUpdateTime = {}, checkNewBlog: {}", groupId, sessionData.getLastUpdateTime(), blogUids);
                         
-                        for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
-                            // FIXME
-                            List<Bot> bots = offlineConsole.getBots();
-                            for (Bot bot: bots) {
+                        for (String blogUid : blogUids) {
+                            List<WeiboCardCacheAndImage> cardCacheAndImages = weiboService.updateAndGetTopBlog(blogUid);
+                            List<WeiboCardCacheAndImage> newCardCacheAndImages = new ArrayList<>(0);
+                            for (WeiboCardCacheAndImage cardCacheAndImage : cardCacheAndImages) {
+                                boolean isNew = cardCacheAndImage.getWeiboCardCache().getMblogCreatedDateTime().isAfter(sessionData.getLastUpdateTime());
+                                //boolean isNew = true;
+                                if (isNew) {
+                                    newCardCacheAndImages.add(cardCacheAndImage);
+                                }
+                            }
+                            
+                            for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
                                 sendNewBlogByOneBot(newCardCacheAndImage, bot, groupId);
                             }
+    
                         }
-
+                        
+                        sessionData.setLastUpdateTime(LocalDateTime.now());
+                        
                     }
-                    
-                    sessionData.setLastUpdateTime(LocalDateTime.now());
-                    
                 }
             }
         }, 5, 5, TimeUnit.MINUTES);

@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.export.BotLogic;
 import com.hundun.mirai.bot.export.CharacterRouter;
 import com.hundun.mirai.bot.export.IConsole;
@@ -32,12 +32,12 @@ public class ConsoleAdapter implements IConsole {
     
     boolean isBotOnline = false;
     
-    PrivateSettings privateSettings;
+    AppPrivateSettings appPrivateSettings;
     
 
     
-    public ConsoleAdapter(PrivateSettings privateSettings) {
-        this.privateSettings = privateSettings;
+    public ConsoleAdapter(AppPrivateSettings appPrivateSettings) {
+        this.appPrivateSettings = appPrivateSettings;
     }
     
 
@@ -82,14 +82,14 @@ public class ConsoleAdapter implements IConsole {
         return null;
     }
 
-    @Override
-    public long getSelfAccount() {
-        return privateSettings.getBotAccount();
-    }
+
+
+
 
     @Override
-    public Long getAdminAccount() {
-        return privateSettings.getBotAccount();
+    public Bot getBot(long botId) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @ConfigurationProperties(prefix = "")
 @PropertySource(value = "classpath:private-settings.yml", factory = YamlPropertySourceFactory.class)
 public class PrivateSettingsLoader {
-    public PrivateSettings privateSettings;
+    public AppPrivateSettings appPrivateSettings;
 
 }

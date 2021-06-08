@@ -3,8 +3,9 @@ package com.hundun.mirai.server;
 import java.util.Arrays;
 import java.util.List;
 
-import com.hundun.mirai.bot.configuration.PrivateSettings;
+import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
+import com.hundun.mirai.bot.data.BotPrivateSettings;
 import com.hundun.mirai.bot.export.BotLogic;
 import com.hundun.mirai.bot.export.IConsole;
 
@@ -37,20 +38,22 @@ public class SpringConsole implements IConsole {
     
     boolean isBotOnline = false;
     
-    PrivateSettings privateSettings;
+    AppPrivateSettings appPrivateSettings;
     
   //设备认证信息文件
     private final String deviceInfoPath = "device.json";
     
     
-    public SpringConsole(PrivateSettings privateSettings, PublicSettings publicSettings) {
-        this.privateSettings = privateSettings;
+    public SpringConsole(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
+        this.appPrivateSettings = appPrivateSettings;
         
-        this.botLogic = new BotLogic(privateSettings, publicSettings, this);
+        this.botLogic = new BotLogic(appPrivateSettings, publicSettings, this);
+        botLogic.onEnable();
     }
     
     public void login() {
-        if (null == privateSettings.getBotAccount() || null == privateSettings.getBotPwd()) {
+        BotPrivateSettings botPrivateSettings = appPrivateSettings.getBotPrivateSettingsMap().values().iterator().next();
+        if (null == botPrivateSettings.getBotAccount() || null == botPrivateSettings.getBotPwd()) {
             System.err.println("*****未配置账号或密码*****");
             log.warn("*****未配置账号或密码*****");
             return;
@@ -63,7 +66,7 @@ public class SpringConsole implements IConsole {
                 public void run(){
                     
                     
-                    miraiBot = BotFactory.INSTANCE.newBot(privateSettings.getBotAccount(), privateSettings.getBotPwd(), new BotConfiguration() {
+                    miraiBot = BotFactory.INSTANCE.newBot(botPrivateSettings.getBotAccount(), botPrivateSettings.getBotPwd(), new BotConfiguration() {
                         {
                             //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
                             fileBasedDeviceInfo(deviceInfoPath);
@@ -74,7 +77,6 @@ public class SpringConsole implements IConsole {
                     });
                     miraiBot.login();
                     isBotOnline = true;
-                    botLogic.onEnable();
                     bots = Arrays.asList(miraiBot);
                     miraiBot.join();
                 }
@@ -114,18 +116,14 @@ public class SpringConsole implements IConsole {
         }
     }
 
-    @Override
-    public long getSelfAccount() {
-        return privateSettings.getBotAccount();
-    }
-
-    @Override
-    public Long getAdminAccount() {
-        return privateSettings.getBotAccount();
-    }
     
     @Override
     public List<Bot> getBots() {
         return bots;
+    }
+
+    @Override
+    public Bot getBot(long botId) {
+        return miraiBot;
     }
 }
