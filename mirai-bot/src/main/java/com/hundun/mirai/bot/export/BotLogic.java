@@ -38,9 +38,6 @@ public class BotLogic {
         return characterRouter.onMessage(event);
     }
     
-    public void onEnable() {
-        log.info("BotLogic onEnable");
-        GlobalEventChannel.INSTANCE.registerListenerHost(characterRouter);
-    }
+
     
 }

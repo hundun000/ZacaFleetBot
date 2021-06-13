@@ -5,6 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 import com.hundun.mirai.bot.configuration.AppPrivateSettings;
+import com.hundun.mirai.bot.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogic;
 import com.hundun.mirai.bot.export.CharacterRouter;
 import com.hundun.mirai.bot.export.IConsole;
@@ -26,7 +27,7 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/06/03
  */
 @Slf4j
-public class ConsoleAdapter implements IConsole {
+public class ConsoleAdapter implements IConsole, ListenerHost {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
@@ -34,14 +35,26 @@ public class ConsoleAdapter implements IConsole {
     
     AppPrivateSettings appPrivateSettings;
     
-
+    BotLogic botLogic;
     
-    public ConsoleAdapter(AppPrivateSettings appPrivateSettings) {
+    public ConsoleAdapter(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
         this.appPrivateSettings = appPrivateSettings;
+        
+        botLogic = new BotLogic(appPrivateSettings, publicSettings, this);
     }
     
 
+    @NotNull
+    @EventHandler
+    public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception { 
+        return botLogic.onMessage(event);
+    }
     
+    @NotNull
+    @EventHandler
+    public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception { 
+        return botLogic.onMessage(event);
+    }
     
 
 

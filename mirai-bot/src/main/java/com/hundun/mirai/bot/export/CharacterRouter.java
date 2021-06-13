@@ -38,7 +38,7 @@ import net.mamoe.mirai.event.events.NudgeEvent;
  * Created on 2021/04/28
  */
 @Slf4j
-public class CharacterRouter extends SimpleListenerHost implements IManualWired {
+public class CharacterRouter implements IManualWired {
 
     IConsole console;
     
@@ -120,16 +120,8 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
 
     }
     
-
-    
-    @Override
-    public void handleException(@NotNull CoroutineContext context, @NotNull Throwable exception){
-        // 处理事件处理时抛出的异常
-        log.warn("事件处理时异常:", exception);
-    }
     
     @NotNull
-    @EventHandler
     public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception {
         
         synchronized (this) {
@@ -155,7 +147,6 @@ public class CharacterRouter extends SimpleListenerHost implements IManualWired 
     }
 
     @NotNull
-    @EventHandler
     public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception { // 可以抛出任何异常, 将在 handleException 处理
 
         synchronized (this) {

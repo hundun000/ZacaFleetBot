@@ -37,7 +37,7 @@ public class MyPlugin extends JavaPlugin {
     ObjectMapper objectMapper = new ObjectMapper();
     ConsoleAdapter console;
     
-    BotLogic botLogic;
+    
     
     public MyPlugin() {
         super(new JvmPluginDescriptionBuilder(
@@ -67,9 +67,9 @@ public class MyPlugin extends JavaPlugin {
         
         PublicSettings publicSettings = new PublicSettings();
         
-        console = new ConsoleAdapter(appPrivateSettings);
+        console = new ConsoleAdapter(appPrivateSettings, publicSettings);
         
-        botLogic = new BotLogic(appPrivateSettings, publicSettings, console);
+        
 
         
     }
@@ -77,7 +77,7 @@ public class MyPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         
-        botLogic.onEnable();
+        GlobalEventChannel.INSTANCE.registerListenerHost(console);
         
     }
     

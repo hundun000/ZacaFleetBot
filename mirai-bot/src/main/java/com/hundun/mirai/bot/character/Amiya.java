@@ -92,7 +92,7 @@ public class Amiya extends BaseCharacter {
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
                 23, 0, "二十三点到了。有什么想喝的吗，博士？"));
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                0, 0, "呜哇！？正好0点！今天是，由阿米娅来担当助力的工作呢。我不会辜负大家的。"));
+                0, 0, "呜哇！？正好0点！今天是，由阿米娅来担当助理的工作呢。我不会辜负大家的。"));
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
                 1, 0, "凌晨一点到啦！凯尔希医生教导过我，工作的时候一定要保持全神贯注......嗯，全神贯注。"));
         reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(

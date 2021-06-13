@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.hundun.mirai.bot.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.configuration.PublicSettings;
 import com.hundun.mirai.bot.data.BotPrivateSettings;
@@ -16,8 +18,13 @@ import com.hundun.mirai.bot.export.IConsole;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.GlobalEventChannel;
+import net.mamoe.mirai.event.ListenerHost;
+import net.mamoe.mirai.event.ListeningStatus;
 import net.mamoe.mirai.event.SimpleListenerHost;
+import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.Voice;
@@ -29,7 +36,7 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/06/03
  */
 @Slf4j
-public class SpringConsole implements IConsole {
+public class SpringConsole implements IConsole, ListenerHost {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
@@ -51,7 +58,8 @@ public class SpringConsole implements IConsole {
         this.appPrivateSettings = appPrivateSettings;
         
         this.botLogic = new BotLogic(appPrivateSettings, publicSettings, this);
-        botLogic.onEnable();
+        
+        
     }
     
     
@@ -108,6 +116,17 @@ public class SpringConsole implements IConsole {
         return "OK";
     }
 
+    @NotNull
+    @EventHandler
+    public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception { 
+        return botLogic.onMessage(event);
+    }
+    
+    @NotNull
+    @EventHandler
+    public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception { 
+        return botLogic.onMessage(event);
+    }
 
 
     @Override

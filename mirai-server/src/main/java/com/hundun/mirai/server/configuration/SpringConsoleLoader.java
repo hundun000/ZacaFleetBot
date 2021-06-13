@@ -39,7 +39,15 @@ public class SpringConsoleLoader {
     public SpringConsole springConsole;
     
     @PostConstruct
-    public void load() {
+    public void loadAndEnable() {
+        
+
+        onLoad();
+        onEnable();
+    
+    }
+    
+    private void onLoad() {
         log.info("PrivateSettings = {}", privateSettingsLoader.getAppPrivateSettings());
         
         PublicSettings publicSettings = new PublicSettings();
@@ -48,9 +56,10 @@ public class SpringConsoleLoader {
         publicSettings.zacaMusumeListenWeiboUids = zacaMusumeListenWeiboUids;
         
         springConsole = new SpringConsole(privateSettingsLoader.getAppPrivateSettings(), publicSettings);
-
-        
+    }
     
+    private void onEnable() {
+        GlobalEventChannel.INSTANCE.registerListenerHost(springConsole);
     }
     
 }
