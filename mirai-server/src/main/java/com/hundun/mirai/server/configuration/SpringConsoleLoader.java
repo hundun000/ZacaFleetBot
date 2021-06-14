@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.hundun.mirai.bot.configuration.PublicSettings;
-import com.hundun.mirai.bot.export.BotLogic;
-import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.server.SpringConsole;
 

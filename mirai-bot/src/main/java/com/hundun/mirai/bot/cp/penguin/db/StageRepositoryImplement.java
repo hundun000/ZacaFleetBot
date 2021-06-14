@@ -3,8 +3,8 @@ package com.hundun.mirai.bot.cp.penguin.db;
 import org.bson.conversions.Bson;
 
 import com.hundun.mirai.bot.cp.penguin.domain.Stage;
-import com.hundun.mirai.bot.db.BaseRepositoryImplement;
-import com.hundun.mirai.bot.db.CollectionSettings;
+import com.hundun.mirai.bot.helper.db.BaseRepositoryImplement;
+import com.hundun.mirai.bot.helper.db.CollectionSettings;
 import com.mongodb.client.model.Filters;
 
 /**

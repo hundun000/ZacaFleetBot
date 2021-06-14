@@ -12,16 +12,16 @@ import java.util.Locale;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.IManualWired;
+import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.cp.weibo.db.WeiboCardCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.db.WeiboUserInfoCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboUserInfoCache;
 import com.hundun.mirai.bot.cp.weibo.feign.WeiboApiFeignClient;
 import com.hundun.mirai.bot.cp.weibo.feign.WeiboPictureApiFeignClient;
-import com.hundun.mirai.bot.export.CustomBeanFactory;
-import com.hundun.mirai.bot.service.file.FileService;
-import com.hundun.mirai.bot.service.file.IFileProvider;
+import com.hundun.mirai.bot.helper.file.FileService;
+import com.hundun.mirai.bot.helper.file.IFileProvider;
 
 import feign.Response;
 import gui.ava.html.image.generator.HtmlImageGenerator;

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.cp.quiz.QuizService;
 import com.hundun.mirai.bot.cp.weibo.WeiboService;
-import com.hundun.mirai.bot.export.CustomBeanFactory;
 import com.hundun.mirai.server.SpringConsole;
 import com.hundun.mirai.server.configuration.SpringConsoleLoader;
 

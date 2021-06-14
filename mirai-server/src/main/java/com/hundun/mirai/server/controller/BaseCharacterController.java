@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.hundun.mirai.bot.character.BaseCharacter;
-import com.hundun.mirai.bot.data.EventInfo;
-import com.hundun.mirai.bot.data.EventInfoFactory;
-import com.hundun.mirai.bot.parser.statement.Statement;
+import com.hundun.mirai.bot.core.character.BaseCharacter;
+import com.hundun.mirai.bot.core.data.EventInfo;
+import com.hundun.mirai.bot.core.data.EventInfoFactory;
+import com.hundun.mirai.bot.core.parser.statement.Statement;
 
 /**
  * @author hundun
@@ -33,7 +33,7 @@ public abstract class BaseCharacterController {
             @RequestParam("message") String message
             ) throws Exception {
         
-        EventInfo eventInfo = EventInfoFactory.get(groupId, senderId, targetId, message, character.getId());
+        EventInfo eventInfo = EventInfoFactory.get(groupId, senderId, targetId, message);
         
         return character.testOnGroupMessageEventMessage(eventInfo);
     }

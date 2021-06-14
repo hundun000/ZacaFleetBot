@@ -1,8 +1,8 @@
 package com.hundun.mirai.bot.cp.weibo.db;
 
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboUserInfoCache;
-import com.hundun.mirai.bot.db.BaseRepositoryImplement;
-import com.hundun.mirai.bot.db.CollectionSettings;
+import com.hundun.mirai.bot.helper.db.BaseRepositoryImplement;
+import com.hundun.mirai.bot.helper.db.CollectionSettings;
 
 /**
  * @author hundun

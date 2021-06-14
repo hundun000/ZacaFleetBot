@@ -5,14 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import com.hundun.mirai.bot.IManualWired;
+import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiInitEquip;
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.hundun.mirai.bot.cp.kcwiki.feign.KcwikiApiFeignClient;
-import com.hundun.mirai.bot.export.CustomBeanFactory;
-import com.hundun.mirai.bot.service.file.IFileProvider;
+import com.hundun.mirai.bot.helper.file.IFileProvider;
 
 import lombok.extern.slf4j.Slf4j;
 

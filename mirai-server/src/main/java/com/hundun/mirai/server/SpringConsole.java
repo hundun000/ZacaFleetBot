@@ -9,10 +9,11 @@ import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 
-import com.hundun.mirai.bot.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.configuration.PublicSettings;
-import com.hundun.mirai.bot.data.BotPrivateSettings;
-import com.hundun.mirai.bot.export.BotLogic;
+import com.hundun.mirai.bot.core.BaseBotLogic;
+import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
+import com.hundun.mirai.bot.core.data.configuration.BotPrivateSettings;
+import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class SpringConsole implements IConsole, ListenerHost {
     
     private Map<Long, Bot> bots = new HashMap<>();
     
-    BotLogic botLogic;
+    BaseBotLogic botLogic;
     
     
     AppPrivateSettings appPrivateSettings;
@@ -57,7 +58,7 @@ public class SpringConsole implements IConsole, ListenerHost {
     public SpringConsole(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
         this.appPrivateSettings = appPrivateSettings;
         
-        this.botLogic = new BotLogic(appPrivateSettings, publicSettings, this);
+        this.botLogic = new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, this);
         
         
     }

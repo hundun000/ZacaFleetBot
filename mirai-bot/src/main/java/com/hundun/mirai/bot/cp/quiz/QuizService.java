@@ -5,10 +5,10 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.IManualWired;
-import com.hundun.mirai.bot.export.CustomBeanFactory;
-import com.hundun.mirai.bot.service.file.FileService;
-import com.hundun.mirai.bot.service.file.IFileProvider;
+import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IManualWired;
+import com.hundun.mirai.bot.helper.file.FileService;
+import com.hundun.mirai.bot.helper.file.IFileProvider;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;
 import com.zaca.stillstanding.dto.ApiResult;
 import com.zaca.stillstanding.dto.match.MatchConfigDTO;

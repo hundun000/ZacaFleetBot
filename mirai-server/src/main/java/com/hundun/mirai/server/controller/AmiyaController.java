@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hundun.mirai.bot.character.Amiya;
-import com.hundun.mirai.bot.export.CustomBeanFactory;
+import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.character.Amiya;
 
 
 /**

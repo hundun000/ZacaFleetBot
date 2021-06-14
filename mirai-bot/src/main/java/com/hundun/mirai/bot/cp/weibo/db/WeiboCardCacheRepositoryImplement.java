@@ -7,8 +7,8 @@ import java.util.List;
 import org.bson.conversions.Bson;
 
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
-import com.hundun.mirai.bot.db.BaseRepositoryImplement;
-import com.hundun.mirai.bot.db.CollectionSettings;
+import com.hundun.mirai.bot.helper.db.BaseRepositoryImplement;
+import com.hundun.mirai.bot.helper.db.CollectionSettings;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 
