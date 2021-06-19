@@ -210,7 +210,7 @@ public class WeiboService implements IFileProvider, IManualWired {
             //JsonNode responseJson = mapper.readTree(responseString);
             JsonNode responseJson = weiboApiFeignClient.get(uid, API_TYPE_PARAM, uid, userInfoCacahe.getWeibo_containerid());
             JsonNode cardsNode = responseJson.get("data").get("cards");
-            File imageFile;
+            
             for (final JsonNode cardNode : cardsNode) {
                 try {
                     String itemid = cardNode.get("itemid").asText();
@@ -245,14 +245,15 @@ public class WeiboService implements IFileProvider, IManualWired {
                         updateBlogDetail(cardCache);
                         
                         cardCacheRepository.save(cardCache);
-                        imageFile = checkSingleImage(cardCache);
+                        
                         
                         
                         log.info("update cardCache: {}", itemid);
                     } else {
                         cardCache = cardCacheRepository.findById(itemid);
-                        imageFile = null;
+                        
                     }
+                    File imageFile = checkSingleImage(cardCache);
                     WeiboCardCacheAndImage cardCacheAndImage = new WeiboCardCacheAndImage(cardCache, imageFile);
                     
                     

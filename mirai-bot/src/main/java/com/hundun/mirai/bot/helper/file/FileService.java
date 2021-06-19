@@ -18,19 +18,21 @@ public class FileService implements IManualWired {
     
     private static final String RESOURCE_DOWNLOAD_FOLDER = "file_cache/";
     
+    
+    
     @Override
     public void manualWired() {
         // TODO Auto-generated method stub
         
     }
     
-    private void checkFolder(String subFolerName) {
-        File directory = new File(RESOURCE_DOWNLOAD_FOLDER);
+    public void checkFolder(String subFolerName, String parentFoler) {
+        File directory = new File(parentFoler);
         if (! directory.exists()){
             directory.mkdir();
         }
         
-        File subFoler = new File(RESOURCE_DOWNLOAD_FOLDER + subFolerName);
+        File subFoler = new File(parentFoler + subFolerName);
         if (! subFoler.exists()){
             subFoler.mkdir();
         }
@@ -45,7 +47,7 @@ public class FileService implements IManualWired {
     
     private String getCacheFilePath(String fileId, IFileProvider provider) {
         String subFolerName = provider.getCacheSubFolderName();
-        checkFolder(subFolerName);
+        checkFolder(subFolerName, RESOURCE_DOWNLOAD_FOLDER);
         String saveFilePathName = RESOURCE_DOWNLOAD_FOLDER + subFolerName + "/" + fileId;
         
         
@@ -57,7 +59,7 @@ public class FileService implements IManualWired {
         String saveFilePathName = getCacheFilePath(fileId, provider);
         File file = new File(saveFilePathName);
         if (file.exists()) {
-            log.info("image from cache :{}", subFolerName + "---" + fileId);
+            log.debug("image from cache :{}", subFolerName + "---" + fileId);
         } else {
             InputStream inputStream = provider.download(fileId);
             

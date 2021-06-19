@@ -1,4 +1,4 @@
-package com.hundun.mirai.plugin.router;
+package com.hundun.mirai.plugin.export;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,6 +16,7 @@ import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
+import com.hundun.mirai.plugin.ConsoleAdapter;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.console.extension.PluginComponentStorage;
@@ -41,7 +42,7 @@ public class RouterPlugin extends JavaPlugin {
     
     public RouterPlugin() {
         super(new JvmPluginDescriptionBuilder(
-                "org.example.test-plugin", // name
+                "org.example.RouterPlugin", // name
                 "1.0.0" // version
             )
             // .author("...")
@@ -51,8 +52,10 @@ public class RouterPlugin extends JavaPlugin {
     
     @Override
     public void onLoad(@NotNull PluginComponentStorage $this$onLoad) {
+        getLogger().info("RouterPlugin onLoad!");
+        
         File settingsFile = resolveConfigFile("private-settings.json");
-        String content = new String(readAll(settingsFile), StandardCharsets.UTF_8);
+        String content = new String(readAll(settingsFile), StandardCharsets.UTF_8).replace("\r", "").replace("\n", "");
         //YamlMap settings = Yaml.Default.decodeYamlMapFromString(content);
         
         AppPrivateSettings appPrivateSettings;
@@ -69,13 +72,14 @@ public class RouterPlugin extends JavaPlugin {
         
         console = new ConsoleAdapter(appPrivateSettings, publicSettings);
         
-        
+        console.laterInitBotLogic(new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, console));
 
         
     }
     
     @Override
     public void onEnable() {
+        getLogger().info("RouterPlugin onEnable!");
         
         GlobalEventChannel.INSTANCE.registerListenerHost(console);
         

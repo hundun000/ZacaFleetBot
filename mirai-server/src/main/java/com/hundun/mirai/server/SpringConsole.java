@@ -1,5 +1,6 @@
 package com.hundun.mirai.server;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,13 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.CustomAutowireConfigurer;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
+import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.BotPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
+import com.hundun.mirai.bot.helper.file.FileService;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
@@ -39,6 +43,8 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Slf4j
 public class SpringConsole implements IConsole, ListenerHost {
 
+    private static final String MIRAI_CORE_CACHE_FOLDER = "mirai_core_cache/";
+    
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
     
@@ -48,7 +54,7 @@ public class SpringConsole implements IConsole, ListenerHost {
     
     BaseBotLogic botLogic;
     
-    
+    FileService fileService;
     AppPrivateSettings appPrivateSettings;
     
   //设备认证信息文件
@@ -60,7 +66,7 @@ public class SpringConsole implements IConsole, ListenerHost {
         
         this.botLogic = new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, this);
         
-        
+        this.fileService = CustomBeanFactory.getInstance().fileService;
     }
     
     
@@ -72,13 +78,16 @@ public class SpringConsole implements IConsole, ListenerHost {
         
         @Override
         public void run(){
-            String deviceInfoFileName = botPrivateSettings.getBotAccount() + "_device.json";
+ 
+            fileService.checkFolder(String.valueOf(botPrivateSettings.getBotAccount()), MIRAI_CORE_CACHE_FOLDER);
+            String accountWorkDirPathName = MIRAI_CORE_CACHE_FOLDER + botPrivateSettings.getBotAccount();
+            File accountWorkDir = new File(accountWorkDirPathName);
+            String deviceInfoFileName = "device.json";
             Bot miraiBot = BotFactory.INSTANCE.newBot(botPrivateSettings.getBotAccount(), botPrivateSettings.getBotPwd(), new BotConfiguration() {
                 {
-                    //保存设备信息到文件deviceInfo.json文件里相当于是个设备认证信息
+                    setWorkingDir(accountWorkDir);
                     fileBasedDeviceInfo(deviceInfoFileName);
-                    setProtocol(MiraiProtocol.ANDROID_PHONE); // 切换协议
-                    // 开启所有列表缓存
+                    setProtocol(MiraiProtocol.ANDROID_PHONE);
                     enableContactCache();
                 }
             });
@@ -86,6 +95,18 @@ public class SpringConsole implements IConsole, ListenerHost {
             bots.put(botPrivateSettings.getBotAccount(), miraiBot);
             miraiBot.join();
         }
+    }
+    
+    public String logout(long botAccount) {
+        
+        if (!bots.containsKey(botAccount)) {
+            log.warn("登出时 botAccount = {} 不存在", botAccount);
+            return"botAccount不存在";
+        }
+        
+        bots.get(botAccount).close();
+        
+        return "OK";
     }
     
     public String login(long botAccount) {
@@ -99,14 +120,14 @@ public class SpringConsole implements IConsole, ListenerHost {
         }
         
         if (targetBotPrivateSettings == null) {
-            log.warn("botAccount = {} 未找到 BotPrivateSettings", botAccount);
+            log.warn("登录时 botAccount = {} 未找到 BotPrivateSettings", botAccount);
             return "botAccount未找到 BotPrivateSettings";
         }
         
         
         
         if (bots.containsKey(botAccount)) {
-            log.warn("botAccount = {} 已存在", botAccount);
+            log.warn("登录时 botAccount = {} 已存在", botAccount);
             return"botAccount已存在";
         }
         

@@ -1,4 +1,4 @@
-package com.hundun.mirai.plugin.router;
+package com.hundun.mirai.plugin;
 
 import java.util.List;
 
@@ -32,7 +32,6 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
-    boolean isBotOnline = false;
     
     AppPrivateSettings appPrivateSettings;
     
@@ -40,8 +39,11 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     
     public ConsoleAdapter(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
         this.appPrivateSettings = appPrivateSettings;
-        
-        botLogic = new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, this);
+
+    }
+    
+    public void laterInitBotLogic(BaseBotLogic botLogic) {
+        this.botLogic = botLogic;
     }
     
 
@@ -61,8 +63,8 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
 
     @Override
     public void sendToGroup(Bot bot, long groupId, MessageChain messageChain) {
-        if (isBotOnline) {
-            // TODO
+        if (bot != null) {
+            bot.getGroupOrFail(groupId).sendMessage(messageChain);
         } else {
             log.info("[offline mode]sendToGroup groupId = {}, messageChain = {}", groupId, messageChain.serializeToMiraiCode());
         }
@@ -70,9 +72,8 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
 
     @Override
     public Image uploadImage(Bot bot, long groupId, ExternalResource externalResource) {
-        if (isBotOnline) {
-            // TODO
-            return null;
+        if (bot != null) {
+            return bot.getGroupOrFail(groupId).uploadImage(externalResource);
         } else {
             log.info("[offline mode]uploadImage groupId = {}", groupId);
             return Image.fromId(offLineImageFakeId);
@@ -81,9 +82,8 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
 
     @Override
     public Voice uploadVoice(Bot bot, long groupId, ExternalResource externalResource) {
-        if (isBotOnline) {
-         // TODO
-            return null;
+        if (bot != null) {
+            return bot.getGroupOrFail(groupId).uploadVoice(externalResource);
         } else {
             log.info("[offline mode]uploadVoice groupId = {}", groupId);
             return new Voice("", new byte[1], 0, 0, "");

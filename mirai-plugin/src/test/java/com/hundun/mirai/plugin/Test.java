@@ -1,6 +1,7 @@
 package com.hundun.mirai.plugin;
 
-import com.hundun.mirai.plugin.amiya.AmiyaPlugin;
+import com.hundun.mirai.plugin.export.AmiyaPlugin;
+import com.hundun.mirai.plugin.export.RouterPlugin;
 
 import kotlinx.coroutines.BuildersKt;
 import kotlinx.coroutines.GlobalScope;
@@ -15,12 +16,10 @@ import net.mamoe.mirai.console.plugin.PluginManager;
  */
 public class Test {
     public static void main(String[] args) throws InterruptedException {
-     
-        //MiraiConsoleTerminalLoader.INSTANCE.startAsDaemon(new MiraiConsoleImplementationTerminal());
-        MiraiConsoleTerminalLoader.main(args);
+        MiraiConsoleTerminalLoader.INSTANCE.startAsDaemon(new MiraiConsoleImplementationTerminal());
         
-        PluginManager.INSTANCE.loadPlugin(AmiyaPlugin.INSTANCE);
-        PluginManager.INSTANCE.enablePlugin(AmiyaPlugin.INSTANCE);
-        
+        PluginManager.INSTANCE.loadPlugin(RouterPlugin.INSTANCE);
+        PluginManager.INSTANCE.enablePlugin(RouterPlugin.INSTANCE);
+ 
     }
 }

@@ -104,9 +104,11 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 log.info("no shipDetail");
             }
             
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), chainBuilder.build());
-            return true;
-  
+            if (!chainBuilder.isEmpty()) {
+                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), chainBuilder.build());
+                return true;
+            } 
+
         }
         return false;
     }

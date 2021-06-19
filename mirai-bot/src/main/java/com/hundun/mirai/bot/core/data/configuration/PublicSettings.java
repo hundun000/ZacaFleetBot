@@ -8,8 +8,8 @@ import lombok.Data;
  */
 @Data
 public class PublicSettings {
-    public String[] amiyaListenWeiboUids;
-    public String[] prinzEugenListenWeiboUids;
-    public String[] zacaMusumeListenWeiboUids;
+    public String[] amiyaListenWeiboUids = new String[0];
+    public String[] prinzEugenListenWeiboUids = new String[0];
+    public String[] zacaMusumeListenWeiboUids = new String[0];
 
 }

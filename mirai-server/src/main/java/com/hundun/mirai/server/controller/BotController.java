@@ -60,6 +60,14 @@ public class BotController {
         return "OK";
     }
     
+    @RequestMapping(value="/logout", method=RequestMethod.POST)
+    public String logout(
+            @RequestParam("botAccount") long botAccount
+            ) {
+        springConsoleLoader.springConsole.logout(botAccount);
+        return "OK";
+    }
+    
 //    @RequestMapping(value="/getQuestion", method=RequestMethod.GET)
 //    public Question getQuestion() {
 //        Question question = quizService.getQuestion();
