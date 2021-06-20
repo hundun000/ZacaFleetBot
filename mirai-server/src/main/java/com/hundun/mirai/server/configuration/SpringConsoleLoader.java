@@ -1,5 +1,7 @@
 package com.hundun.mirai.server.configuration;
 
+import java.io.File;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
+import com.hundun.mirai.bot.helper.Utils;
 import com.hundun.mirai.server.SpringConsole;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +27,12 @@ import net.mamoe.mirai.event.GlobalEventChannel;
 @Slf4j
 @Configuration
 public class SpringConsoleLoader {
-    @Autowired
-    PrivateSettingsLoader privateSettingsLoader;
+//    @Autowired
+//    PrivateSettingsLoader privateSettingsLoader;
     
-    @Value("${character.amiya.listenWeiboUids:}")
-    public String[] amiyaListenWeiboUids;
+
     
-    @Value("${character.prinzEugen.listenWeiboUids:}")
-    public String[] prinzEugenListenWeiboUids;
-    
-    @Value("${character.zacaMusume.listenWeiboUids:}")
-    public String[] zacaMusumeListenWeiboUids;
-    
-    
-    public SpringConsole springConsole;
+    public SpringConsole console;
     
     @PostConstruct
     public void loadAndEnable() {
@@ -48,18 +44,33 @@ public class SpringConsoleLoader {
     }
     
     private void onLoad() {
-        log.info("PrivateSettings = {}", privateSettingsLoader.getAppPrivateSettings());
         
-        PublicSettings publicSettings = new PublicSettings();
-        publicSettings.amiyaListenWeiboUids = amiyaListenWeiboUids;
-        publicSettings.prinzEugenListenWeiboUids = prinzEugenListenWeiboUids;
-        publicSettings.zacaMusumeListenWeiboUids = zacaMusumeListenWeiboUids;
+        try {
+            String folderPath = Utils.checkFolder("spring_console_config", "");
+            File settingsFile = new File(folderPath + "private-settings.json");
+            AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
+            
+            log.info("PrivateSettings = {}", appPrivateSettings);
+            
+            File publicSettingsFile = new File(folderPath + "public-settings.json");
+            PublicSettings publicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
+            
+            log.info("publicSettings = {}", publicSettings);
+            
+            console = new SpringConsole(appPrivateSettings, publicSettings);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
-        springConsole = new SpringConsole(privateSettingsLoader.getAppPrivateSettings(), publicSettings);
+        
     }
     
     private void onEnable() {
-        GlobalEventChannel.INSTANCE.registerListenerHost(springConsole);
+        if (console != null) {
+            GlobalEventChannel.INSTANCE.registerListenerHost(console);
+        } else {
+            log.error("cannot enable");
+        }
     }
     
 }

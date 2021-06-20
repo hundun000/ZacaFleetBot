@@ -1,5 +1,6 @@
 package com.hundun.mirai.bot.core.data.configuration;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
@@ -15,5 +16,5 @@ public class BotPrivateSettings {
     public String botPwd;
     
     public Map<String, UserTagConfig> userTagConfigs;
-    public Map<String, GroupConfig> groupConfigs;
+    public List<GroupConfig> groupConfigs;
 }

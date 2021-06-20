@@ -16,5 +16,5 @@ import lombok.extern.slf4j.Slf4j;
 @Serializable
 public class AppPrivateSettings {
     
-    Map<String ,BotPrivateSettings> botPrivateSettingsMap;
+    List<BotPrivateSettings> botPrivateSettingsList;
 }

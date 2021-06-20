@@ -18,7 +18,7 @@ import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
 import com.hundun.mirai.bot.cp.quiz.QuizService;
 import com.hundun.mirai.bot.cp.quiz.QuizService.MatchType;
 import com.hundun.mirai.bot.export.IConsole;
-import com.hundun.mirai.bot.helper.file.FileService;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 import com.zaca.stillstanding.dto.buff.BuffDTO;
 import com.zaca.stillstanding.dto.event.AnswerResultEvent;
 import com.zaca.stillstanding.dto.event.EventType;
@@ -67,7 +67,7 @@ public class QuizHandler implements IFunction {
     
     QuizService quizService;
     
-    FileService fileService;
+    FileOperationDelegate fileOperationDelegate;
     
     IConsole offlineConsole;
     
@@ -78,7 +78,6 @@ public class QuizHandler implements IFunction {
     @Override
     public void manualWired() {
         this.quizService = CustomBeanFactory.getInstance().quizService;
-        this.fileService = CustomBeanFactory.getInstance().fileService;
         this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
@@ -341,7 +340,7 @@ public class QuizHandler implements IFunction {
         QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
         if (questionDTO.getResource().getType() == ResourceType.IMAGE) {
             String imageResourceId = questionDTO.getResource().getData();
-            sessionData.resource = fileService.downloadOrFromCache(imageResourceId, quizService);
+            sessionData.resource = quizService.downloadOrFromCache(imageResourceId);
         } else {
             sessionData.resource = null;
         }

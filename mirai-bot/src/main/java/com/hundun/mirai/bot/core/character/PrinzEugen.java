@@ -32,7 +32,7 @@ public class PrinzEugen extends BaseCharacter {
     public String[] listenWeiboUids = new String[0];
     
     public PrinzEugen() {
-        super("PrinzEugen");
+        super("CHARACTER_PRINZ_EUGEN");
     }
 
     WeiboFunction weiboFunction;
@@ -51,7 +51,7 @@ public class PrinzEugen extends BaseCharacter {
     public void manualWired() {
         super.manualWired();
         
-        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.prinzEugenListenWeiboUids;
+        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.valueOrDefault(getId());
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.chatFunction = CustomBeanFactory.getInstance().prinzEugenChatFunction;

@@ -11,11 +11,13 @@ import org.jetbrains.annotations.NotNull;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hundun.mirai.bot.core.BaseBotLogic;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
+import com.hundun.mirai.bot.helper.Utils;
 import com.hundun.mirai.plugin.ConsoleAdapter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +34,8 @@ import net.mamoe.yamlkt.YamlMap;
  * @author hundun
  * Created on 2021/06/02
  */
-@Slf4j
-public class RouterPlugin extends JavaPlugin {
+public class RouterPlugin extends MyPlugin {
     public static final RouterPlugin INSTANCE = new RouterPlugin(); // 可以像 Kotlin 一样静态初始化单例
-    ObjectMapper objectMapper = new ObjectMapper();
-    ConsoleAdapter console;
-    
     
     
     public RouterPlugin() {
@@ -49,87 +47,15 @@ public class RouterPlugin extends JavaPlugin {
             // .info("...")
             .build());
     }
-    
+
+
     @Override
-    public void onLoad(@NotNull PluginComponentStorage $this$onLoad) {
-        getLogger().info("RouterPlugin onLoad!");
-        
-        File settingsFile = resolveConfigFile("private-settings.json");
-        String content = new String(readAll(settingsFile), StandardCharsets.UTF_8).replace("\r", "").replace("\n", "");
-        //YamlMap settings = Yaml.Default.decodeYamlMapFromString(content);
-        
-        AppPrivateSettings appPrivateSettings;
-        try {
-            appPrivateSettings = objectMapper.readValue(content, AppPrivateSettings.class);
-        } catch (Exception e) {
-            appPrivateSettings = new AppPrivateSettings();
-            e.printStackTrace();
-        }
-        
-        log.info("PrivateSettings = {}", appPrivateSettings);
-        
-        PublicSettings publicSettings = new PublicSettings();
-        
-        console = new ConsoleAdapter(appPrivateSettings, publicSettings);
-        
-        console.laterInitBotLogic(new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, console));
+    protected BaseBotLogic getBotLogicImpl(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings,
+            IConsole console) {
+        return new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, console);
+    }
 
-        
-    }
-    
-    @Override
-    public void onEnable() {
-        getLogger().info("RouterPlugin onEnable!");
-        
-        GlobalEventChannel.INSTANCE.registerListenerHost(console);
-        
-    }
-    
-    /**
-     * Read all content from input stream.<br>
-     * 从数据流读取全部数据
-     * 
-     * @param i the input stream<br>
-     *          数据流
-     * @return return all read data <br>
-     *         返回读入的所有数据
-     * @throws IOException Signals that an I/O exception has occurred.<br>
-     *                     发生IO错误
-     */
-    public static byte[] readAll(InputStream i) throws IOException {
-        ByteArrayOutputStream ba = new ByteArrayOutputStream(16384);
-        int nRead;
-        byte[] data = new byte[4096];
 
-        try {
-            while ((nRead = i.read(data, 0, data.length)) != -1) {
-                ba.write(data, 0, nRead);
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            throw e;
-        }
-
-        return ba.toByteArray();
-    }
-    
-    /**
-     * Read all content from File.<br>
-     * 从文件读取全部数据
-     * 
-     * @param i the file<br>
-     *          文件
-     * @return return all read data <br>
-     *         返回读入的所有数据
-     */
-    public static byte[] readAll(File i) {
-        try (FileInputStream fis = new FileInputStream(i)) {
-            return readAll(fis);
-        } catch (IOException ignored) {
-            // TODO Auto-generated catch block
-        }
-        return new byte[0];
-    }
 
 
 }

@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Amiya extends BaseCharacter {
     
     public Amiya() {
-        super("Amiya");
+        super("CHARACTER_AMIYA");
     }
 
 
@@ -63,7 +63,7 @@ public class Amiya extends BaseCharacter {
     public void manualWired() {
         super.manualWired();
         
-        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.amiyaListenWeiboUids;
+        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.valueOrDefault(getId());
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.amiyaChatFunction = CustomBeanFactory.getInstance().amiyaChatFunction;

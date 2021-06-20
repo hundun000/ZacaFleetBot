@@ -12,7 +12,8 @@ import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.hundun.mirai.bot.cp.kcwiki.feign.KcwikiApiFeignClient;
-import com.hundun.mirai.bot.helper.file.IFileProvider;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
+import com.hundun.mirai.bot.helper.file.IFileOperationDelegator;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,15 +22,18 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/05/20
  */
 @Slf4j
-public class KancolleWikiService implements IFileProvider, IManualWired {
+public class KancolleWikiService implements IFileOperationDelegator, IManualWired {
 
     KcwikiApiFeignClient apiFeignClient;
     
     String kancolleGameDataFolder =  "./data/images/kancolle_game_data";
     
+    FileOperationDelegate fileOperationDelegate;
+    
     @Override
     public void manualWired() {
         this.apiFeignClient = CustomBeanFactory.getInstance().kcwikiApiFeignClient;
+        this.fileOperationDelegate = new FileOperationDelegate(this);
     }
     
     public String getStandardName(String fuzzyName) {
@@ -107,6 +111,10 @@ public class KancolleWikiService implements IFileProvider, IManualWired {
     @Override
     public String getCacheSubFolderName() {
         return "kancolle_wiki";
+    }
+
+    public File downloadOrFromCache(String fileId) {
+        return fileOperationDelegate.downloadOrFromCache(fileId);
     }
 
 }

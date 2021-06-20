@@ -56,7 +56,7 @@ public class BotController {
     public String login(
             @RequestParam("botAccount") long botAccount
             ) {
-        springConsoleLoader.springConsole.login(botAccount);
+        springConsoleLoader.console.login(botAccount);
         return "OK";
     }
     
@@ -64,7 +64,7 @@ public class BotController {
     public String logout(
             @RequestParam("botAccount") long botAccount
             ) {
-        springConsoleLoader.springConsole.logout(botAccount);
+        springConsoleLoader.console.logout(botAccount);
         return "OK";
     }
     

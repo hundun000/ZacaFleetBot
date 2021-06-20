@@ -9,10 +9,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = {"com.hundun.mirai", "com.zaca.stillstanding"})
 @EnableConfigurationProperties
-public class DemoApplication {
+public class MiraiServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(MiraiServerApplication.class, args);
 	}
 	
 }

@@ -18,7 +18,8 @@ import com.hundun.mirai.bot.core.data.configuration.BotPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
-import com.hundun.mirai.bot.helper.file.FileService;
+import com.hundun.mirai.bot.helper.Utils;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
@@ -54,7 +55,6 @@ public class SpringConsole implements IConsole, ListenerHost {
     
     BaseBotLogic botLogic;
     
-    FileService fileService;
     AppPrivateSettings appPrivateSettings;
     
   //设备认证信息文件
@@ -66,7 +66,7 @@ public class SpringConsole implements IConsole, ListenerHost {
         
         this.botLogic = new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, this);
         
-        this.fileService = CustomBeanFactory.getInstance().fileService;
+        
     }
     
     
@@ -78,9 +78,7 @@ public class SpringConsole implements IConsole, ListenerHost {
         
         @Override
         public void run(){
- 
-            fileService.checkFolder(String.valueOf(botPrivateSettings.getBotAccount()), MIRAI_CORE_CACHE_FOLDER);
-            String accountWorkDirPathName = MIRAI_CORE_CACHE_FOLDER + botPrivateSettings.getBotAccount();
+            String accountWorkDirPathName = Utils.checkFolder(String.valueOf(botPrivateSettings.getBotAccount()), MIRAI_CORE_CACHE_FOLDER);
             File accountWorkDir = new File(accountWorkDirPathName);
             String deviceInfoFileName = "device.json";
             Bot miraiBot = BotFactory.INSTANCE.newBot(botPrivateSettings.getBotAccount(), botPrivateSettings.getBotPwd(), new BotConfiguration() {
@@ -110,7 +108,7 @@ public class SpringConsole implements IConsole, ListenerHost {
     }
     
     public String login(long botAccount) {
-        Collection<BotPrivateSettings> allBotPrivateSettings = appPrivateSettings.getBotPrivateSettingsMap().values();
+        Collection<BotPrivateSettings> allBotPrivateSettings = appPrivateSettings.getBotPrivateSettingsList();
         BotPrivateSettings targetBotPrivateSettings = null;
         for (BotPrivateSettings botPrivateSettings : allBotPrivateSettings) {
             if (botPrivateSettings.getBotAccount() == botAccount) {

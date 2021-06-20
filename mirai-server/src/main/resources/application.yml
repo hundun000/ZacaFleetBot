@@ -2,15 +2,7 @@
         
 server:
     port: 10099
-
-
-character:
-    amiya:
-        listenWeiboUids: 6279793937,6441489862
-    prinzEugen:
-        listenWeiboUids: 3837704366
-    zacaMusume:
-        listenWeiboUids: 1833959560    
+   
 
     
 spring:

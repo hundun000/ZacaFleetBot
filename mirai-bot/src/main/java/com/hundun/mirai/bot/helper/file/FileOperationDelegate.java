@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import com.hundun.mirai.bot.core.IManualWired;
+import com.hundun.mirai.bot.core.function.KancolleWikiQuickSearchFunction;
+import com.hundun.mirai.bot.helper.Utils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,49 +16,38 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/05/06
  */
 @Slf4j
-public class FileService implements IManualWired {
+public class FileOperationDelegate {
     
     private static final String RESOURCE_DOWNLOAD_FOLDER = "file_cache/";
+
+    IFileOperationDelegator provider;
     
-    
-    
-    @Override
-    public void manualWired() {
-        // TODO Auto-generated method stub
-        
+    public FileOperationDelegate(IFileOperationDelegator delegator) {
+        this.provider = delegator;
     }
-    
-    public void checkFolder(String subFolerName, String parentFoler) {
-        File directory = new File(parentFoler);
-        if (! directory.exists()){
-            directory.mkdir();
-        }
-        
-        File subFoler = new File(parentFoler + subFolerName);
-        if (! subFoler.exists()){
-            subFoler.mkdir();
-        }
-    }
+
+
     
     
-    public boolean fileCacheExists(String fileId, IFileProvider provider) {
-        String saveFilePathName = getCacheFilePath(fileId, provider);
+    
+    private boolean fileCacheExists(String fileId) {
+        String saveFilePathName = getCacheFilePath(fileId);
         File file = new File(saveFilePathName);
         return file.exists();
     }
     
-    private String getCacheFilePath(String fileId, IFileProvider provider) {
+    private String getCacheFilePath(String fileId) {
         String subFolerName = provider.getCacheSubFolderName();
-        checkFolder(subFolerName, RESOURCE_DOWNLOAD_FOLDER);
+        Utils.checkFolder(subFolerName, RESOURCE_DOWNLOAD_FOLDER);
         String saveFilePathName = RESOURCE_DOWNLOAD_FOLDER + subFolerName + "/" + fileId;
         
         
         return saveFilePathName;
     }
 
-    public File downloadOrFromCache(String fileId, IFileProvider provider) {
+    public File downloadOrFromCache(String fileId) {
         String subFolerName = provider.getCacheSubFolderName();
-        String saveFilePathName = getCacheFilePath(fileId, provider);
+        String saveFilePathName = getCacheFilePath(fileId);
         File file = new File(saveFilePathName);
         if (file.exists()) {
             log.debug("image from cache :{}", subFolerName + "---" + fileId);

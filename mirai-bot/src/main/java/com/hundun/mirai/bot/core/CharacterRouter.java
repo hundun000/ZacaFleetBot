@@ -83,12 +83,10 @@ public class CharacterRouter implements IManualWired, IMyEventHandler {
     }
     
     private void readConfigFile() {
-        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsMap().values()) {
+        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsList()) {
             
             Map<Long, GroupConfig> groupConfigs = new HashMap<>();
-            for (Entry<String, GroupConfig> entry : botPrivateSettings.getGroupConfigs().entrySet()) {
-                GroupConfig config = entry.getValue();
-                config.setGroupDescription(entry.getKey());
+            for (GroupConfig config : botPrivateSettings.getGroupConfigs()) {
                 
                 groupConfigs.put(config.getGroupId(), config);
                 
@@ -155,7 +153,7 @@ public class CharacterRouter implements IManualWired, IMyEventHandler {
     }
 
     public long getAdminAccount(long botId) {
-        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsMap().values()) {
+        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsList()) {
             if (botPrivateSettings.getBotAccount() == botId) {
                 return botPrivateSettings.getAdminAccount();
             }

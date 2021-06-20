@@ -28,7 +28,7 @@ public class ZacaMusume extends BaseCharacter {
     public String[] listenWeiboUids = new String[0];
     
     public ZacaMusume() {
-        super("ZacaMusume");
+        super("CHARACTER_ZACA_MUSUME");
     }
 
     WeiboFunction weiboFunction;
@@ -45,7 +45,7 @@ public class ZacaMusume extends BaseCharacter {
     public void manualWired() {
         super.manualWired();
         
-        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.zacaMusumeListenWeiboUids;
+        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.valueOrDefault(getId());
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.offlineConsole = CustomBeanFactory.getInstance().console;

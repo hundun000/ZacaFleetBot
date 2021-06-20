@@ -60,7 +60,7 @@ import com.hundun.mirai.bot.cp.weibo.feign.WeiboApiFeignClient;
 import com.hundun.mirai.bot.cp.weibo.feign.WeiboPictureApiFeignClient;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.helper.db.CollectionSettings;
-import com.hundun.mirai.bot.helper.file.FileService;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
@@ -307,7 +307,7 @@ public class CustomBeanFactory {
     
     public CharacterRouter characterRouter = new CharacterRouter();
     
-    public FileService fileService = new FileService();
+    
     public WeiboService weiboService = new WeiboService();
     public QuizService quizService = new QuizService();
     public PenguinService penguinService = new PenguinService();

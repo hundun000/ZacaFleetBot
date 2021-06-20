@@ -20,8 +20,8 @@ import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboUserInfoCache;
 import com.hundun.mirai.bot.cp.weibo.feign.WeiboApiFeignClient;
 import com.hundun.mirai.bot.cp.weibo.feign.WeiboPictureApiFeignClient;
-import com.hundun.mirai.bot.helper.file.FileService;
-import com.hundun.mirai.bot.helper.file.IFileProvider;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
+import com.hundun.mirai.bot.helper.file.IFileOperationDelegator;
 
 import feign.Response;
 import gui.ava.html.image.generator.HtmlImageGenerator;
@@ -35,11 +35,11 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/23
  */
 @Slf4j
-public class WeiboService implements IFileProvider, IManualWired {
+public class WeiboService implements IFileOperationDelegator, IManualWired {
     ObjectMapper mapper = new ObjectMapper();
     
     
-    FileService fileService;
+    FileOperationDelegate fileOperationDelegate;
     
     WeiboApiFeignClient weiboApiFeignClient;
     
@@ -59,7 +59,7 @@ public class WeiboService implements IFileProvider, IManualWired {
     
     @Override
     public void manualWired() {
-        this.fileService = CustomBeanFactory.getInstance().fileService;
+        this.fileOperationDelegate = new FileOperationDelegate(this);
         this.weiboApiFeignClient = CustomBeanFactory.getInstance().weiboApiFeignClient;
         this.weiboPictureApiFeignClient = CustomBeanFactory.getInstance().weiboPictureApiFeignClient;
         this.userInfoCacheRepository = CustomBeanFactory.getInstance().weiboUserInfoCacheRepository;
@@ -276,7 +276,7 @@ public class WeiboService implements IFileProvider, IManualWired {
         if (cardCache.getPicsLargeUrls() != null && cardCache.getPicsLargeUrls().size() == 1) {
             int lastSlash = cardCache.getPicsLargeUrls().get(0).lastIndexOf("/");
             String id = cardCache.getPicsLargeUrls().get(0).substring(lastSlash + 1);
-            File file = fileService.downloadOrFromCache(id, this);
+            File file = fileOperationDelegate.downloadOrFromCache(id);
             return file;
         } else {
             return null;
@@ -303,6 +303,13 @@ public class WeiboService implements IFileProvider, IManualWired {
     @Override
     public String getCacheSubFolderName() {
         return "weibo";
+    }
+
+
+
+    @Override
+    public File downloadOrFromCache(String fileId) {
+        return fileOperationDelegate.downloadOrFromCache(fileId);
     }
     
 }

@@ -16,7 +16,7 @@ import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipStats;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipUpgradeLink;
 import com.hundun.mirai.bot.export.IConsole;
-import com.hundun.mirai.bot.helper.file.FileService;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.Image;
@@ -35,12 +35,12 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
     
     KancolleWikiService kancolleWikiService;
     
-    FileService fileService;
+    
     @Override
     public void manualWired() {
         this.offlineConsole = CustomBeanFactory.getInstance().console;
         this.kancolleWikiService = CustomBeanFactory.getInstance().kancolleWikiService;
-        this.fileService = CustomBeanFactory.getInstance().fileService;
+        
     }
     
     @Override
@@ -91,7 +91,7 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 int firstId = upgradeLink.getUpgradeLinkIds().get(0);
                 ShipInfo firstDetail = upgradeLink.getShipDetails().get(firstId);
                 String fileId = String.valueOf(firstDetail.getId());
-                File imageFile = fileService.downloadOrFromCache(fileId, kancolleWikiService);
+                File imageFile = kancolleWikiService.downloadOrFromCache(fileId);
                 if (imageFile != null) {
                     ExternalResource externalResource = ExternalResource.create(imageFile);
                     Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), externalResource);

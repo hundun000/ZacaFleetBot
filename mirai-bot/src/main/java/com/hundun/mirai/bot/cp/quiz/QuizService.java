@@ -1,5 +1,6 @@
 package com.hundun.mirai.bot.cp.quiz;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -7,8 +8,8 @@ import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.IManualWired;
-import com.hundun.mirai.bot.helper.file.FileService;
-import com.hundun.mirai.bot.helper.file.IFileProvider;
+import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
+import com.hundun.mirai.bot.helper.file.IFileOperationDelegator;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;
 import com.zaca.stillstanding.dto.ApiResult;
 import com.zaca.stillstanding.dto.match.MatchConfigDTO;
@@ -23,17 +24,17 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/25
  */
 @Slf4j
-public class QuizService implements IFileProvider, IManualWired {
+public class QuizService implements IFileOperationDelegator, IManualWired {
     ObjectMapper mapper = new ObjectMapper();
     
     
-    FileService fileService;
+    FileOperationDelegate fileOperationDelegate;
     
     StillstandingApiFeignClient stillstandingApiService;
     
     @Override
     public void manualWired() {
-        this.fileService = CustomBeanFactory.getInstance().fileService;
+        this.fileOperationDelegate = new FileOperationDelegate(this);
         this.stillstandingApiService = CustomBeanFactory.getInstance().stillstandingApiFeignClient;
     }
     
@@ -151,6 +152,12 @@ public class QuizService implements IFileProvider, IManualWired {
             log.warn("updateTeam error: {}", apiResult);
             return null;
         }
+    }
+
+
+    @Override
+    public File downloadOrFromCache(String fileId) {
+        return downloadOrFromCache(fileId);
     }
     
 }

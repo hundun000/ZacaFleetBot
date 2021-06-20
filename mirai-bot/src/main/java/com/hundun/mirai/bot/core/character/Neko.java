@@ -24,7 +24,7 @@ public class Neko extends BaseCharacter {
 
     
     public Neko() {
-        super("neko");
+        super("CHARACTER_NEKO");
     }
 
 
