@@ -28,14 +28,6 @@ public class FileOperationDelegate {
 
 
     
-    
-    
-    private boolean fileCacheExists(String fileId) {
-        String saveFilePathName = getCacheFilePath(fileId);
-        File file = new File(saveFilePathName);
-        return file.exists();
-    }
-    
     private String getCacheFilePath(String fileId) {
         String subFolerName = provider.getCacheSubFolderName();
         Utils.checkFolder(subFolerName, RESOURCE_DOWNLOAD_FOLDER);

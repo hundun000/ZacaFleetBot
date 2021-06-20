@@ -1,8 +1,3 @@
-MxLibData/
-cache/
-device.json
-file_cache/
-
 HELP.md
 .gradle
 build/

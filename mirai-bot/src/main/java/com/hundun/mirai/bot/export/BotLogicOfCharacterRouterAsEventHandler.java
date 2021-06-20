@@ -23,8 +23,8 @@ import net.mamoe.mirai.event.events.NudgeEvent;
 public class BotLogicOfCharacterRouterAsEventHandler extends BaseBotLogic {
     
     
-    public BotLogicOfCharacterRouterAsEventHandler(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
-        super(appPrivateSettings, publicSettings, consoleImplement);
+    public BotLogicOfCharacterRouterAsEventHandler(IConsole console) throws Exception {
+        super(console);
         this.myEventHandler = CustomBeanFactory.getInstance().characterRouter;
     }
     

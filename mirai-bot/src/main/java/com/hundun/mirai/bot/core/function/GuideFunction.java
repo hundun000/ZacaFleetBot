@@ -36,11 +36,11 @@ public class GuideFunction implements IFunction {
         Map<String, SubFunction> identifierToSubFunction = new HashMap<>();
     }
     
-    IConsole offlineConsole;
+    IConsole console;
     
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
     }
     
 
@@ -65,15 +65,15 @@ public class GuideFunction implements IFunction {
                         String subFunctionIdentifier = subFunctionCallStatement.getArgs().get(0);
                         SubFunction targetFunction = sessionData.getIdentifierToSubFunction().get(subFunctionIdentifier);
                         if (targetFunction == null) {
-                            offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "“" + subFunctionIdentifier + "”不是一个有效的指令id。");
+                            console.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "“" + subFunctionIdentifier + "”不是一个有效的指令id。");
                             return true;
                         }
                         SubFunctionDocument document = sessionData.getSubFunctionDocuments().get(targetFunction);
                         if (document != null) {
-                            offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), document.toDetailText());
+                            console.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), document.toDetailText());
                             return true;
                         } else {
-                            offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "该功能找不到帮助。");
+                            console.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "该功能找不到帮助。");
                             return true;
                         }
                     } else {
@@ -88,11 +88,11 @@ public class GuideFunction implements IFunction {
                             }
                             
                         }
-                        offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), stringBuilder.toString());
+                        console.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), stringBuilder.toString());
                         return true;
                     }
                 } else {
-                    offlineConsole.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "该角色找不到帮助。");
+                    console.sendToGroup(eventinfo.getBot(), eventinfo.getGroupId(), "该角色找不到帮助。");
                     return true;
                 }
             }

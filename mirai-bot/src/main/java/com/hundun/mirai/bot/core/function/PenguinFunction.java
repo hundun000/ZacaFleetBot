@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author hundun
  * Created on 2021/04/25
  */
-@Slf4j
 public class PenguinFunction implements IFunction {
 
     
@@ -38,10 +37,10 @@ public class PenguinFunction implements IFunction {
     
     PenguinService penguinService;
     
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.penguinService = CustomBeanFactory.getInstance().penguinService;
     }
 
@@ -51,7 +50,7 @@ public class PenguinFunction implements IFunction {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
                 String itemFuzzyName = subFunctionCallStatement.getArgs().get(0);
-                log.info("{} by {}", subFunctionCallStatement.getSubFunction(), itemFuzzyName);
+                console.getLogger().info(subFunctionCallStatement.getSubFunction() + " by " + itemFuzzyName);
                 MatrixReport report = penguinService.getTopResultNode(itemFuzzyName, 3);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -62,15 +61,15 @@ public class PenguinFunction implements IFunction {
                         builder.append(node.getGainRateString()).append("\t");
                         builder.append(node.getCostExpectationString()).append("\n");
                     }
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
+                    console.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
                     
                 } else {
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
+                    console.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
                 String stageCode = subFunctionCallStatement.getArgs().get(0);
-                log.info("{} by {}", subFunctionCallStatement.getSubFunction(), stageCode);
+                console.getLogger().info(subFunctionCallStatement.getSubFunction() + " by " + stageCode);
                 StageInfoReport report = penguinService.getStageInfoReport(stageCode);
                 if (report != null) {
                     StringBuilder builder = new StringBuilder();
@@ -101,14 +100,14 @@ public class PenguinFunction implements IFunction {
                         builder.append("\n");
                     }
                     
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
+                    console.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
                 } else {
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
+                    console.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "好的");
+                console.sendToGroup(event.getBot(), event.getGroupId(), "好的");
                 return true;
             }
         }

@@ -1,0 +1,20 @@
+{
+    "apps":[
+    {
+        "name":"mcl",
+        "cwd":".",
+        "script":"/usr/bin/java",
+        "args":[
+            "-jar",
+            "-Xmx512m",
+            "mcl.jar"
+        ],
+        "node_args":[],
+        "exec_interpreter":"",
+        "autorestart" : false,
+        "exec_mode":"fork",
+        "error_file" : "mcl-err.log",
+        "out_file"   : "mcl-out.log"
+     }
+   ]
+}

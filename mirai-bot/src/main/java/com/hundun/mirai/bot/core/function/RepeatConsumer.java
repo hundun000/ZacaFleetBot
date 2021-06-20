@@ -19,13 +19,12 @@ import net.mamoe.mirai.message.code.MiraiCode;
  * @author hundun
  * Created on 2021/04/21
  */
-@Slf4j
 public class RepeatConsumer implements IFunction {
 
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
     }
     
     @Override
@@ -69,7 +68,7 @@ public class RepeatConsumer implements IFunction {
 
             
             if (sessionData.count == 3) {
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
+                console.sendToGroup(event.getBot(), event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
                 return true;
             }
         }

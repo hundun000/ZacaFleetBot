@@ -36,6 +36,8 @@ import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.Voice;
 import net.mamoe.mirai.utils.BotConfiguration;
 import net.mamoe.mirai.utils.ExternalResource;
+import net.mamoe.mirai.utils.MiraiLogger;
+import net.mamoe.mirai.utils.MiraiLoggerPlatformBase;
 
 /**
  * @author hundun
@@ -43,29 +45,33 @@ import net.mamoe.mirai.utils.ExternalResource;
  */
 @Slf4j
 public class SpringConsole implements IConsole, ListenerHost {
-
-    private static final String MIRAI_CORE_CACHE_FOLDER = "mirai_console_cache/";
+    public static final String MIRAI_CONSOLE_CONFIG_FOLDER = "mirai_console_config/";
+    public static final String MIRAI_CONSOLE_DATA_FOLDER = "mirai_console_data/";
+    public static final String MIRAI_CONSOLE_BOTS_FOLDER = "mirai_console_bots/";
     
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
     
     //private Bot miraiBot;
     
-    private Map<Long, Bot> bots = new HashMap<>();
+
     
     BaseBotLogic botLogic;
     
-    AppPrivateSettings appPrivateSettings;
     
   //设备认证信息文件
     //private final String deviceInfoPath = "device.json";
     
     
-    public SpringConsole(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
-        this.appPrivateSettings = appPrivateSettings;
+    public SpringConsole() {
         
-        this.botLogic = new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, this);
         
+        try {
+            this.botLogic = new BotLogicOfCharacterRouterAsEventHandler(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         
     }
     
@@ -78,7 +84,7 @@ public class SpringConsole implements IConsole, ListenerHost {
         
         @Override
         public void run(){
-            String accountWorkDirPathName = Utils.checkFolder(String.valueOf(botPrivateSettings.getBotAccount()), MIRAI_CORE_CACHE_FOLDER);
+            String accountWorkDirPathName = Utils.checkFolder(String.valueOf(botPrivateSettings.getBotAccount()), MIRAI_CONSOLE_BOTS_FOLDER);
             File accountWorkDir = new File(accountWorkDirPathName);
             String deviceInfoFileName = "device.json";
             Bot miraiBot = BotFactory.INSTANCE.newBot(botPrivateSettings.getBotAccount(), botPrivateSettings.getBotPwd(), new BotConfiguration() {
@@ -90,28 +96,22 @@ public class SpringConsole implements IConsole, ListenerHost {
                 }
             });
             miraiBot.login();
-            bots.put(botPrivateSettings.getBotAccount(), miraiBot);
+
             miraiBot.join();
-            bots.remove(botPrivateSettings.getBotAccount());
+
         }
     }
     
     public String logout(long botAccount) {
         
-        if (!bots.containsKey(botAccount)) {
-            log.warn("登出时 botAccount = {} 不存在", botAccount);
-            return"botAccount不存在";
-        }
-        
-        bots.remove(botAccount);
-        bots.get(botAccount).close();
-        
+
+        Bot.getInstance(botAccount).close();
         
         return "OK";
     }
     
     public String login(long botAccount) {
-        Collection<BotPrivateSettings> allBotPrivateSettings = appPrivateSettings.getBotPrivateSettingsList();
+        Collection<BotPrivateSettings> allBotPrivateSettings = botLogic.appPrivateSettings.getBotPrivateSettingsList();
         BotPrivateSettings targetBotPrivateSettings = null;
         for (BotPrivateSettings botPrivateSettings : allBotPrivateSettings) {
             if (botPrivateSettings.getBotAccount() == botAccount) {
@@ -127,10 +127,6 @@ public class SpringConsole implements IConsole, ListenerHost {
         
         
         
-        if (bots.containsKey(botAccount)) {
-            log.warn("登录时 botAccount = {} 已存在", botAccount);
-            return"botAccount已存在";
-        }
         
         // the new thread will blocked by Bot.join()
         Thread thread = new BotThread(targetBotPrivateSettings);
@@ -184,11 +180,64 @@ public class SpringConsole implements IConsole, ListenerHost {
     
     @Override
     public Collection<Bot> getBots() {
-        return bots.values();
+        return Bot.getInstances();
     }
 
     @Override
-    public Bot getBot(long botId) {
-        return bots.get(botId);
+    public Bot getBotOrNull(long botId) {
+        return Bot.getInstanceOrNull(botId);
+    }
+
+    @Override
+    public File resolveDataFile(String subPathName) {
+        return new File(MIRAI_CONSOLE_DATA_FOLDER + subPathName);
+    }
+
+    @Override
+    public File resolveConfigFile(String subPathName) {
+        return new File(MIRAI_CONSOLE_CONFIG_FOLDER + subPathName);
+    }
+
+    @Override
+    public MiraiLogger getLogger() {
+        return MyLogger.INSTANCE;
+    }
+    
+    static class MyLogger extends MiraiLoggerPlatformBase {
+
+        static MyLogger INSTANCE = new MyLogger();
+
+        @Override
+        public String getIdentity() {
+            return "SpringConsoleLogger";
+        }
+
+        @Override
+        protected void debug0(String arg0, Throwable arg1) {
+            log.debug(arg0, arg1);
+        }
+
+        @Override
+        protected void error0(String arg0, Throwable arg1) {
+            log.error(arg0, arg1);
+        }
+
+        @Override
+        protected void info0(String arg0, Throwable arg1) {
+            log.info(arg0, arg1);
+        }
+
+        @Override
+        protected void verbose0(String arg0, Throwable arg1) {
+            log.info(arg0, arg1);
+        }
+
+        @Override
+        protected void warning0(String arg0, Throwable arg1) {
+            log.warn(arg0, arg1);
+        }
+        
+        
+        
     }
 }

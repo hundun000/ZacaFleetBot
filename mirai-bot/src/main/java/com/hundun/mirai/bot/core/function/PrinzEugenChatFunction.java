@@ -23,13 +23,13 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/28
  */
-@Slf4j
 public class PrinzEugenChatFunction implements IFunction {
 
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
+        initExternalResource();
     }
 
     ExternalResource pupuExternalResource;
@@ -40,13 +40,18 @@ public class PrinzEugenChatFunction implements IFunction {
         return Arrays.asList();
     }
     
-    public PrinzEugenChatFunction() {
+    private void initExternalResource() {
         try {
-            pupuExternalResource = ExternalResource.create(new File("./data/images/chat/噗噗.jpg"));
-            xiuXiuXiuVoiceExternalResource = ExternalResource.create(new File("./data/voices/prinz_eugen_chat/咻咻咻.amr"));
+            pupuExternalResource = ExternalResource.create(console.resolveDataFile("images/prinz_eugen_chat/噗噗.jpg"));
+            xiuXiuXiuVoiceExternalResource = ExternalResource.create(console.resolveDataFile("voices/prinz_eugen_chat/咻咻咻.amr"));
         } catch (Exception e) {
-            log.error("open cannotRelaxImage error: {}", e.getMessage());
+            console.getLogger().error("open cannotRelaxImage error: " + e.getMessage());
         }
+    }
+    
+    
+    public PrinzEugenChatFunction() {
+        
         
     }
     
@@ -55,19 +60,19 @@ public class PrinzEugenChatFunction implements IFunction {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.contains("噗噗")) {
-                Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), pupuExternalResource);
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                Image image = console.uploadImage(event.getBot(), event.getGroupId(), pupuExternalResource);
+                console.sendToGroup(event.getBot(), event.getGroupId(), 
                         new PlainText("")
                         .plus(image)
                         );
                 return true;
             } else if (newMessage.contains("咻咻咻") || newMessage.contains("西姆咻")) {
-                Voice voice = offlineConsole.uploadVoice(event.getBot(), event.getGroupId(), xiuXiuXiuVoiceExternalResource);
+                Voice voice = console.uploadVoice(event.getBot(), event.getGroupId(), xiuXiuXiuVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
                 builder.add(voice);
                 MessageChain messageChain = builder.build();
 
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                console.sendToGroup(event.getBot(), event.getGroupId(), 
                         messageChain
                         );
                 return true;

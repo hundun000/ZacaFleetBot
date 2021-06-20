@@ -49,7 +49,6 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/25
  */
-@Slf4j
 public class QuizHandler implements IFunction {
 
 
@@ -69,7 +68,7 @@ public class QuizHandler implements IFunction {
     
     FileOperationDelegate fileOperationDelegate;
     
-    IConsole offlineConsole;
+    IConsole console;
     
     CharacterRouter characterRouter;
     
@@ -78,7 +77,7 @@ public class QuizHandler implements IFunction {
     @Override
     public void manualWired() {
         this.quizService = CustomBeanFactory.getInstance().quizService;
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
@@ -113,34 +112,34 @@ public class QuizHandler implements IFunction {
                 switch (subFunctionCallStatement.getSubFunction()) {
                     case QUIZ_NEXT_QUEST:
                         if (sessionData.matchSituationDTO == null) {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "没有进行中的比赛");
+                            console.sendToGroup(event.getBot(), event.getGroupId(), "没有进行中的比赛");
                             result = true;
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_GENERATE_QUESTION) {
                             result = handleNextQustion(sessionData, event);
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "上一个问题还没回答哦~");
+                            console.sendToGroup(event.getBot(), event.getGroupId(), "上一个问题还没回答哦~");
                             result = true;
                         }
                         break;
                     case QUIZ_USE_SKILL:
                         if (sessionData.matchSituationDTO == null) {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "没有进行中的比赛");
+                            console.sendToGroup(event.getBot(), event.getGroupId(), "没有进行中的比赛");
                             result = true;
                         } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
                             String skillName = subFunctionCallStatement.getArgs().get(0);
                             result = handleUseSkill(sessionData, event, skillName);
                         } else {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "当前不能使用技能");
+                            console.sendToGroup(event.getBot(), event.getGroupId(), "当前不能使用技能");
                             result = true;
                         }
                         break;
                     case QUIZ_EXIT:
                         if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                             sessionData.matchSituationDTO = null;
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
+                            console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
                             return true;
                         } else {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                            console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                             return true;
                         }
                     case QUIZ_START_MATCH:   
@@ -157,7 +156,7 @@ public class QuizHandler implements IFunction {
                             }
                             result = handleCreateAndStartMatch(sessionData, event, matchMode, questionPackageName, teamName, showCompletedSituation);
                         } else {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "目前已在比赛中");
+                            console.sendToGroup(event.getBot(), event.getGroupId(), "目前已在比赛中");
                             result = true;
                         }
                         break;
@@ -174,7 +173,7 @@ public class QuizHandler implements IFunction {
                             teamConstInfoDTO.setRoleName(roleName);
                             result = handleUpdateTeam(sessionData, event, teamConstInfoDTO);
                         } else {
-                            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                            console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                             return true;
                         }
                         break;
@@ -198,10 +197,10 @@ public class QuizHandler implements IFunction {
     private boolean handleUpdateTeam(SessionData sessionData, EventInfo event, TeamConstInfoDTO teamConstInfoDTO) {
         List<TeamConstInfoDTO> payload = quizService.updateTeam(sessionData.getMatchSituationDTO().getId(), teamConstInfoDTO);
         if (payload != null)  {
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍成功。");
+            console.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍成功。");
             return true;
         } else {
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍失败。");
+            console.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍失败。");
             return true;
         }
     }
@@ -212,7 +211,7 @@ public class QuizHandler implements IFunction {
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
         } else {
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "使用技能失败。");
+            console.sendToGroup(event.getBot(), event.getGroupId(), "使用技能失败。");
             return true;
         }
         
@@ -268,7 +267,7 @@ public class QuizHandler implements IFunction {
                             }
                             break;
                         default:
-                            log.info("do nothing for {} as default", skillResultEvent.getSkillName());
+                            console.getLogger().info("do nothing for " + skillResultEvent.getSkillName() + " as default");
                             break;
                     }
                 } catch (Exception e) {
@@ -280,7 +279,7 @@ public class QuizHandler implements IFunction {
             } else {
                 messageChainBuilder.add(new PlainText("使用技能失败，技能点已耗尽。"));
             }
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), messageChainBuilder.build());
+            console.sendToGroup(event.getBot(), event.getGroupId(), messageChainBuilder.build());
             return true;
         }
         
@@ -298,7 +297,7 @@ public class QuizHandler implements IFunction {
         } else if (matchMode.equals("复赛模式")) {
             newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName.split("&")), MatchType.MAIN);
         } else {
-            log.warn("unkown functionName: {}", matchMode);
+            console.getLogger().warning("unkown functionName: " + matchMode);
             newSituationDTO = null;
         }
         
@@ -318,10 +317,10 @@ public class QuizHandler implements IFunction {
             }
             
             
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), stringBuilder.toString());
+            console.sendToGroup(event.getBot(), event.getGroupId(), stringBuilder.toString());
             return true;
         } else {
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "开始比赛失败");
+            console.sendToGroup(event.getBot(), event.getGroupId(), "开始比赛失败");
             return true;
         }
         
@@ -333,7 +332,7 @@ public class QuizHandler implements IFunction {
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
         } else {
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "出题失败");
+            console.sendToGroup(event.getBot(), event.getGroupId(), "出题失败");
             return true;
         }
         
@@ -367,10 +366,10 @@ public class QuizHandler implements IFunction {
         MessageChain messageChain = new PlainText(builder.toString()).plus(new PlainText(""));
         if (sessionData.resource != null) {
             ExternalResource externalResource = ExternalResource.create(sessionData.resource);
-            Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), externalResource);
+            Image image = console.uploadImage(event.getBot(), event.getGroupId(), externalResource);
             messageChain = messageChain.plus(image);
         }
-        offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), messageChain);
+        console.sendToGroup(event.getBot(), event.getGroupId(), messageChain);
         return true;
     }
     
@@ -427,7 +426,7 @@ public class QuizHandler implements IFunction {
                 sessionData.matchSituationDTO = null;
             }
             
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), messageChainBuilder.build());
+            console.sendToGroup(event.getBot(), event.getGroupId(), messageChainBuilder.build());
             return true;
         } else {
             return false;

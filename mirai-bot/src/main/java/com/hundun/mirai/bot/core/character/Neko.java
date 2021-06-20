@@ -28,7 +28,7 @@ public class Neko extends BaseCharacter {
     }
 
 
-    IConsole offlineConsole;
+    IConsole console;
     
     QuizHandler quizHandler;
 
@@ -37,7 +37,7 @@ public class Neko extends BaseCharacter {
         super.manualWired();
         
         this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
     }
     
     @Override

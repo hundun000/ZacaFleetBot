@@ -1,8 +1,10 @@
 package com.hundun.mirai.plugin;
 
+import java.io.File;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
 import com.hundun.mirai.bot.core.CharacterRouter;
@@ -10,9 +12,11 @@ import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
+import com.hundun.mirai.plugin.export.MyPlugin;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
+import net.mamoe.mirai.console.plugin.jvm.JvmPlugin;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.ListenerHost;
 import net.mamoe.mirai.event.ListeningStatus;
@@ -22,6 +26,7 @@ import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.Voice;
 import net.mamoe.mirai.utils.ExternalResource;
+import net.mamoe.mirai.utils.MiraiLogger;
 
 /**
  * @author hundun
@@ -33,12 +38,13 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
     
-    AppPrivateSettings appPrivateSettings;
-    
     BaseBotLogic botLogic;
     
-    public ConsoleAdapter(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings) {
-        this.appPrivateSettings = appPrivateSettings;
+    final JvmPlugin plugin;
+    
+    public ConsoleAdapter(JvmPlugin plugin) {
+        
+        this.plugin = plugin;
 
     }
     
@@ -92,18 +98,27 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     
     @Override
     public List<Bot> getBots() {
-     // TODO
-        return null;
+        return Bot.getInstances();
     }
 
-
-
-
+    @Override
+    public Bot getBotOrNull(long botId) {
+        return Bot.getInstanceOrNull(botId);
+    }
 
     @Override
-    public Bot getBot(long botId) {
-        // TODO Auto-generated method stub
-        return null;
+    public File resolveDataFile(String subPathName) {
+        return plugin.resolveDataFile(subPathName);
+    }
+
+    @Override
+    public File resolveConfigFile(String subPathName) {
+        return plugin.resolveConfigFile(subPathName);
+    }
+
+    @Override
+    public MiraiLogger getLogger() {
+        return plugin.getLogger();
     }
 
 }

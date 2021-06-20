@@ -46,18 +46,8 @@ public class SpringConsoleLoader {
     private void onLoad() {
         
         try {
-            String folderPath = Utils.checkFolder("mirai_console_config", "");
-            File settingsFile = new File(folderPath + "private-settings.json");
-            AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
-            
-            log.info("PrivateSettings = {}", appPrivateSettings);
-            
-            File publicSettingsFile = new File(folderPath + "public-settings.json");
-            PublicSettings publicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
-            
-            log.info("publicSettings = {}", publicSettings);
-            
-            console = new SpringConsole(appPrivateSettings, publicSettings);
+
+            console = new SpringConsole();
         } catch (Exception e) {
             e.printStackTrace();
         }

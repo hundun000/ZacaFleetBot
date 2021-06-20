@@ -22,10 +22,10 @@ public class JapaneseFunction implements IFunction {
 
     static Tokenizer tokenizer = new Tokenizer();
     
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
     }
     
     @Override
@@ -36,7 +36,7 @@ public class JapaneseFunction implements IFunction {
                 StringBuilder allArg = new StringBuilder();
                 subFunctionCallStatement.getArgs().forEach(item -> allArg.append(item).append(" "));
                 String result = funAllLines(allArg.toString(), "\n");
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), result);
+                console.sendToGroup(event.getBot(), event.getGroupId(), result);
                 return true;
             }
             

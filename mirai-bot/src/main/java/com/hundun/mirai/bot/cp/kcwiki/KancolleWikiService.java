@@ -26,7 +26,7 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
 
     KcwikiApiFeignClient apiFeignClient;
     
-    String kancolleGameDataFolder =  "./data/images/kancolle_game_data";
+    //String kancolleGameDataFolder =  "./data/images/kancolle_game_data";
     
     FileOperationDelegate fileOperationDelegate;
     
@@ -88,22 +88,24 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
         return null;
     }
     
-    public File findGameDataImage(String shipId) {
-        String fourBitId = shipId;
-        int numAddZero = 4 - shipId.length();
-        for (int i = 0; i < numAddZero; i++) {
-            fourBitId = "0" + fourBitId;
-        }
 
-        File folder = new File(kancolleGameDataFolder);
-        if (folder.exists() && folder.isDirectory()) {
-            File[] filesInFolder = folder.listFiles();
-            for (File file : filesInFolder) {
-                if (file.getName().startsWith(fourBitId + "_")) {
-                   return file;
-                }
-            }
-        }
+    public File findGameDataImage(String shipId) {
+        // FIXME 为了解耦不依赖mirai，不应直接使用console.resolve
+//        String fourBitId = shipId;
+//        int numAddZero = 4 - shipId.length();
+//        for (int i = 0; i < numAddZero; i++) {
+//            fourBitId = "0" + fourBitId;
+//        }
+//
+//        File folder = new File(kancolleGameDataFolder);
+//        if (folder.exists() && folder.isDirectory()) {
+//            File[] filesInFolder = folder.listFiles();
+//            for (File file : filesInFolder) {
+//                if (file.getName().startsWith(fourBitId + "_")) {
+//                   return file;
+//                }
+//            }
+//        }
         return null;
     }
     

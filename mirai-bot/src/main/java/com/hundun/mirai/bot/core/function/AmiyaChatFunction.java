@@ -30,17 +30,20 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/25
  */
-@Slf4j
 public class AmiyaChatFunction implements IFunction {
     
     CharacterRouter characterRouter;
     
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
+        
+        initExternalResources();
     }
+    
+
     
     private List<String> talks = new ArrayList<>(Arrays.asList(
             "凯尔希医生教导过我，工作的时候一定要保持全神贯注......嗯，全神贯注。", 
@@ -63,26 +66,29 @@ public class AmiyaChatFunction implements IFunction {
     ExternalResource ceoboNodgeResource;
     ExternalResource angelinaNodgeResource;
     
-    
-    public AmiyaChatFunction() {
+    private void initExternalResources() {
         try {
-            ceoboNodgeResource = ExternalResource.create(new File("./data/images/amiya_chat/yukiNodge.png"));
-            angelinaNodgeResource = ExternalResource.create(new File("./data/images/amiya_chat/angelinaNodge.png"));
-            cannotRelaxExternalResource = ExternalResource.create(new File("./data/images/amiya_chat/cannotRelax.png"));
-            canRelaxExternalResource = ExternalResource.create(new File("./data/images/amiya_chat/canRelax.png"));
-            damedaneVoiceExternalResource = ExternalResource.create(new File("./data/voices/amiya_chat/damedane.amr"));
+            ceoboNodgeResource = ExternalResource.create(console.resolveDataFile("images/amiya_chat/yukiNodge.png"));
+            angelinaNodgeResource = ExternalResource.create(console.resolveDataFile("images/amiya_chat/angelinaNodge.png"));
+            cannotRelaxExternalResource = ExternalResource.create(console.resolveDataFile("images/amiya_chat/cannotRelax.png"));
+            canRelaxExternalResource = ExternalResource.create(console.resolveDataFile("images/amiya_chat/canRelax.png"));
+            damedaneVoiceExternalResource = ExternalResource.create(console.resolveDataFile("voices/amiya_chat/damedane.amr"));
             int faceSize = 16;
             for (int i = 1; i <= faceSize; i++) {
                 if (i == 3) {
                     continue;
                 }
-                faces.add(ExternalResource.create(new File("./data/images/face/face" + i + ".png")));
+                faces.add(ExternalResource.create(console.resolveDataFile("images/amiya_chat/face/face" + i + ".png")));
             }
         } catch (Exception e) {
-            log.error("open cannotRelaxImage error: {}", e.getMessage());
+            console.getLogger().error("open cannotRelaxImage error: " + e.getMessage());
         }
-        
     }
+    
+    
+    public AmiyaChatFunction() {
+    }
+    
     @Override
     public List<SubFunction> getSubFunctions() {
         return Arrays.asList();
@@ -118,43 +124,43 @@ public class AmiyaChatFunction implements IFunction {
             if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = LocalDateTime.now().getDayOfYear();
                 todayIsWorkday = -1;
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "好耶");
+                console.sendToGroup(event.getBot(), event.getGroupId(), "好耶");
                 return true;
             } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = -1;
                 todayIsWorkday = LocalDateTime.now().getDayOfYear();
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "哼");
+                console.sendToGroup(event.getBot(), event.getGroupId(), "哼");
                 return true;
             } else if (newMessage.contains("下班")) {
                 boolean canRelax = canRelax();
                 if (canRelax) {
-                    Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), canRelaxExternalResource);
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                    Image image = console.uploadImage(event.getBot(), event.getGroupId(), canRelaxExternalResource);
+                    console.sendToGroup(event.getBot(), event.getGroupId(), 
                             new PlainText(canRelaxTalk)
                             .plus(image)
                             );
                 } else {
-                    Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), cannotRelaxExternalResource);
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                    Image image = console.uploadImage(event.getBot(), event.getGroupId(), cannotRelaxExternalResource);
+                    console.sendToGroup(event.getBot(), event.getGroupId(), 
                             new PlainText(cannotRelaxTalk)
                             .plus(image)
                             );
                 }
                 return true;
             } else if (newMessage.contains("damedane")) {
-                Voice voice = offlineConsole.uploadVoice(event.getBot(), event.getGroupId(), damedaneVoiceExternalResource);
+                Voice voice = console.uploadVoice(event.getBot(), event.getGroupId(), damedaneVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
                 builder.add(voice);
                 MessageChain messageChain = builder.build();
 
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                console.sendToGroup(event.getBot(), event.getGroupId(), 
                         messageChain
                         );
                 return true;
             }
         } else if (statement instanceof AtStatement) {
             if (((AtStatement)statement).getTarget() == event.getBot().getId()) {
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+                console.sendToGroup(event.getBot(), event.getGroupId(), 
                         talks.get(rand.nextInt(talks.size()))
                         //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
                         );
@@ -167,13 +173,13 @@ public class AmiyaChatFunction implements IFunction {
     public boolean acceptNudged(EventInfo event) {
         Image image = null;
         if (event.getTargetId() == event.getBot().getId()) {
-            image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
+            image = console.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
         } else {
             List<UserTag> tags = characterRouter.getUserTagsOrEmpty(event.getBot().getId(), event.getTargetId());
             if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
-                image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
+                image = console.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
             } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {
-                image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), angelinaNodgeResource);
+                image = console.uploadImage(event.getBot(), event.getGroupId(), angelinaNodgeResource);
             } 
 
         }
@@ -182,7 +188,7 @@ public class AmiyaChatFunction implements IFunction {
             
         
         if (image != null) {
-            offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), 
+            console.sendToGroup(event.getBot(), event.getGroupId(), 
                     new At(event.getSenderId())
                     .plus(image)
                     );

@@ -28,17 +28,16 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/05/19
  */
-@Slf4j
 public class KancolleWikiQuickSearchFunction implements IFunction {
 
-    IConsole offlineConsole;
+    IConsole console;
     
     KancolleWikiService kancolleWikiService;
     
     
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.kancolleWikiService = CustomBeanFactory.getInstance().kancolleWikiService;
         
     }
@@ -66,7 +65,7 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                                 java.nio.charset.StandardCharsets.UTF_8.toString()
                               );
                     } catch (UnsupportedEncodingException e) {
-                        log.warn("Urlencolde fail: {}", name);
+                        console.getLogger().warning("Urlencolde fail: " + name);
                         urlEncodedArg = name;
                     }
                     String wikiUrl = "https://zh.kcwiki.cn/wiki/" + urlEncodedArg;
@@ -94,18 +93,18 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 File imageFile = kancolleWikiService.downloadOrFromCache(fileId);
                 if (imageFile != null) {
                     ExternalResource externalResource = ExternalResource.create(imageFile);
-                    Image image = offlineConsole.uploadImage(event.getBot(), event.getGroupId(), externalResource);
+                    Image image = console.uploadImage(event.getBot(), event.getGroupId(), externalResource);
                     chainBuilder.add(image);
                 } else {
-                    log.info("shipDetail no imageFile");
+                    console.getLogger().info("shipDetail no imageFile");
                 }
                 
             } else {
-                log.info("no shipDetail");
+                console.getLogger().info("no shipDetail");
             }
             
             if (!chainBuilder.isEmpty()) {
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), chainBuilder.build());
+                console.sendToGroup(event.getBot(), event.getGroupId(), chainBuilder.build());
                 return true;
             } 
 

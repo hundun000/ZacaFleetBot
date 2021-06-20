@@ -23,13 +23,12 @@ import net.mamoe.mirai.message.data.MessageChain;
  * @author hundun
  * Created on 2021/05/19
  */
-@Slf4j
 public class MiraiCodeFunction implements IFunction {
 
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
@@ -49,12 +48,12 @@ public class MiraiCodeFunction implements IFunction {
             if (subFunctionCallStatement.getSubFunction() == SubFunction.DECODE_MIRAI_CODE) {
                 if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
                     String miraiCode = subFunctionCallStatement.getArgs().get(0);
-                    log.info("build MessageChain by miraiCode = {}", miraiCode);
+                    console.getLogger().info("build MessageChain by miraiCode = " + miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), chain);
+                    console.sendToGroup(event.getBot(), event.getGroupId(), chain);
                     return true;
                 } else {
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+                    console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }     
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.ENCODE_LAST_TO_MIRAI_CODE) {
@@ -64,7 +63,7 @@ public class MiraiCodeFunction implements IFunction {
                     sessionDataMap.put(sessionId.id(), sessionData);
                 } 
                 String miraiCode = sessionDataMap.get(sessionId.id()).messageMiraiCode;
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), miraiCode);
+                console.sendToGroup(event.getBot(), event.getGroupId(), miraiCode);
                 return true;
             }
         } else if (statement instanceof LiteralValueStatement) {

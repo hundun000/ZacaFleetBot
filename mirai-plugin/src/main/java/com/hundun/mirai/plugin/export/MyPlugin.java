@@ -31,29 +31,21 @@ public abstract class MyPlugin extends JavaPlugin {
     
     @Override
     public void onLoad(@NotNull PluginComponentStorage $this$onLoad) {
-
+        
         try {
-            File settingsFile = resolveConfigFile("private-settings.json");
-            AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
+
+            console = new ConsoleAdapter(this);
             
-            File publicSettingsFile = resolveConfigFile("public-settings.json");
-            PublicSettings publicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
-            
-            getLogger().info("appPrivateSettings = " + appPrivateSettings);
-            getLogger().info("publicSettings = " + publicSettings);
-            
-            console = new ConsoleAdapter(appPrivateSettings, publicSettings);
-            
-            console.laterInitBotLogic(getBotLogicImpl(appPrivateSettings, publicSettings, console));
+            console.laterInitBotLogic(getBotLogicImpl(console));
 
         } catch (Exception e) {
-            getLogger().error("RouterPlugin onLoad error:" + e.getMessage());
+            getLogger().error("onLoad error:" + e.getMessage());
         }
 
     }
     
     
-    protected abstract BaseBotLogic getBotLogicImpl(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole console);
+    protected abstract BaseBotLogic getBotLogicImpl(IConsole console) throws Exception;
     
     
     @Override

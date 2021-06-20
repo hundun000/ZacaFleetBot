@@ -38,12 +38,11 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/25
  */
-@Slf4j
 public class WeiboFunction implements IFunction {
     
     WeiboService weiboService;
     
-    IConsole offlineConsole;
+    IConsole console;
     
     CharacterRouter characterRouter;
     
@@ -54,7 +53,7 @@ public class WeiboFunction implements IFunction {
     @Override
     public void manualWired() {
         this.weiboService = CustomBeanFactory.getInstance().weiboService;
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
     
@@ -80,7 +79,7 @@ public class WeiboFunction implements IFunction {
     
     public void putCharacterToData(String characterId, List<String> blogUids) {
         this.characterIdToBlogUids.put(characterId, blogUids);
-        log.info("characterId = {} listening: {}", characterId, blogUids);
+        console.getLogger().info("characterId = " + characterId + " listening: " + blogUids);
     }
     
     private Set<String> getDataByGroupId(List<String> characterIds) {
@@ -109,7 +108,7 @@ public class WeiboFunction implements IFunction {
         
         if (newCardCacheAndImage.getImage() != null) {
             ExternalResource externalResource = ExternalResource.create(newCardCacheAndImage.getImage());
-            Image image = offlineConsole.uploadImage(bot, groupId, externalResource);
+            Image image = console.uploadImage(bot, groupId, externalResource);
             chain = chain.plus(image);
         } else if (newBlog.getPicsLargeUrls() != null && !newBlog.getPicsLargeUrls().isEmpty()) {
             StringBuilder builder = new StringBuilder();
@@ -120,16 +119,16 @@ public class WeiboFunction implements IFunction {
             chain = chain.plus(new PlainText(builder.toString()));       
         }
 
-        offlineConsole.sendToGroup(bot, groupId, chain);
+        console.sendToGroup(bot, groupId, chain);
     }
     
     public void registerSchedule() {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                log.info("checkNewBlog Scheduled arrival");
+                console.getLogger().info("checkNewBlog Scheduled arrival");
                 
-                Collection<Bot> bots = offlineConsole.getBots();
+                Collection<Bot> bots = console.getBots();
                 for (Bot bot: bots) {
                     for (GroupConfig entry : characterRouter.getGroupConfigsOrEmpty(bot.getId())) {
                         Long groupId = entry.getGroupId();
@@ -138,7 +137,7 @@ public class WeiboFunction implements IFunction {
                             groupIdToSessionData.put(groupId, new SessionData());
                         }
                         SessionData sessionData = groupIdToSessionData.get(groupId);
-                        log.info("groupId = {}, LastUpdateTime = {}, checkNewBlog: {}", groupId, sessionData.getLastUpdateTime(), blogUids);
+                        console.getLogger().info("groupId = " + groupId + ", LastUpdateTime = " + sessionData.getLastUpdateTime() + ", checkNewBlog: " + blogUids);
                         
                         for (String blogUid : blogUids) {
                             List<WeiboCardCacheAndImage> cardCacheAndImages = weiboService.updateAndGetTopBlog(blogUid);
@@ -196,12 +195,12 @@ public class WeiboFunction implements IFunction {
                     }
                 }
                 if (builder.length() == 0) {
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "现在还没有饼哦~");
+                    console.sendToGroup(event.getBot(), event.getGroupId(), "现在还没有饼哦~");
                 } else {
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
+                    console.sendToGroup(event.getBot(), event.getGroupId(), builder.toString());
                 }
             } else {
-                offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
+                console.sendToGroup(event.getBot(), event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
             }
             return true;
         }

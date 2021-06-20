@@ -50,9 +50,9 @@ public class RouterPlugin extends MyPlugin {
 
 
     @Override
-    protected BaseBotLogic getBotLogicImpl(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings,
-            IConsole console) {
-        return new BotLogicOfCharacterRouterAsEventHandler(appPrivateSettings, publicSettings, console);
+    protected BaseBotLogic getBotLogicImpl(
+            IConsole console) throws Exception {
+        return new BotLogicOfCharacterRouterAsEventHandler(console);
     }
 
 

@@ -33,7 +33,7 @@ public class ZacaMusume extends BaseCharacter {
 
     WeiboFunction weiboFunction;
 
-    IConsole offlineConsole;
+    IConsole console;
     
     QuizHandler quizHandler;
     
@@ -48,7 +48,7 @@ public class ZacaMusume extends BaseCharacter {
         this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.valueOrDefault(getId());
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
         this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
         this.japaneseFunction = CustomBeanFactory.getInstance().japaneseFunction;
     }

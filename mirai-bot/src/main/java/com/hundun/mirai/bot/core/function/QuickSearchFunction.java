@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author hundun
  * Created on 2021/05/18
  */
-@Slf4j
 public class QuickSearchFunction implements IFunction {
 
     
@@ -32,10 +31,10 @@ public class QuickSearchFunction implements IFunction {
     
     List<QuickSearchNode> nodes = new ArrayList<>();
     
-    IConsole offlineConsole;
+    IConsole console;
     @Override
     public void manualWired() {
-        this.offlineConsole = CustomBeanFactory.getInstance().console;
+        this.console = CustomBeanFactory.getInstance().console;
     }
     
     public QuickSearchFunction() {
@@ -109,7 +108,7 @@ public class QuickSearchFunction implements IFunction {
                                         java.nio.charset.StandardCharsets.UTF_8.toString()
                                       );
                             } catch (UnsupportedEncodingException e) {
-                                log.warn("Urlencolde fail: {}", arg);
+                                console.getLogger().warning("Urlencolde fail: " + arg);
                             }
                         }
                         
@@ -120,7 +119,7 @@ public class QuickSearchFunction implements IFunction {
                     }
                     
                     
-                    offlineConsole.sendToGroup(event.getBot(), event.getGroupId(), answer);
+                    console.sendToGroup(event.getBot(), event.getGroupId(), answer);
                     return true;
                 }
             }   

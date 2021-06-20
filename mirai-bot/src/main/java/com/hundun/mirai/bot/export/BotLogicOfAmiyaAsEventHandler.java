@@ -24,8 +24,8 @@ public class BotLogicOfAmiyaAsEventHandler extends BaseBotLogic {
     
     
     
-    public BotLogicOfAmiyaAsEventHandler(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
-        super(appPrivateSettings, publicSettings, consoleImplement);
+    public BotLogicOfAmiyaAsEventHandler(IConsole console) throws Exception {
+        super(console);
         this.myEventHandler = CustomBeanFactory.getInstance().amiya;
     }
    
