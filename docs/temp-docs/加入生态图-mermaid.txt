@@ -3,7 +3,7 @@ flowchart LR
     classDef highlight fill:#f88,stroke:#333,stroke-width:3px
     classDef mylight fill:#4AF,stroke:#333,stroke-width:3px
 
-    botlogic(纯bot逻辑<br/>处理指令名和指令参数):::mylight
+    botlogic(本项目的<br/>纯bot逻辑<br/>处理指令名和指令参数):::mylight
 
 
     subgraph mirai ["Mirai 框架"]
@@ -11,7 +11,7 @@ flowchart LR
         miraicoreqqandroid("mirai-core<br/>(QQAndroid 协议)")
         miraicoreqqandroid --> |提供协议|miraicoreapi
     end
-    miraiinterface("你编写的<br/>机器人程序"):::mylight
+    miraiinterface("本项目输出的<br/>机器人程序"):::mylight
     botlogic --> |被使用|miraiinterface
     botlogic --> |被使用|yourmiraiplugin
     miraicoreapi --> |封装基础功能|miraiconsolebackend
@@ -24,7 +24,7 @@ flowchart LR
         miraiconsolebackend --> miraiconsolefrontend-android
     end
     subgraph consoleplugins ["Mirai Console 插件"]
-        yourmiraiplugin("你编写的 Console 插件"):::mylight
+        yourmiraiplugin("本项目输出的<br/> Console 插件"):::mylight
         chatcommand("chat-command 插件"):::highlight
     end
     yourmiraiplugin --> miraiconsolebackend
