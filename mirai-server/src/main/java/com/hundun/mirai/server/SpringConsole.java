@@ -44,7 +44,7 @@ import net.mamoe.mirai.utils.ExternalResource;
 @Slf4j
 public class SpringConsole implements IConsole, ListenerHost {
 
-    private static final String MIRAI_CORE_CACHE_FOLDER = "mirai_core_cache/";
+    private static final String MIRAI_CORE_CACHE_FOLDER = "mirai_console_cache/";
     
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 
@@ -92,6 +92,7 @@ public class SpringConsole implements IConsole, ListenerHost {
             miraiBot.login();
             bots.put(botPrivateSettings.getBotAccount(), miraiBot);
             miraiBot.join();
+            bots.remove(botPrivateSettings.getBotAccount());
         }
     }
     
@@ -102,7 +103,9 @@ public class SpringConsole implements IConsole, ListenerHost {
             return"botAccount不存在";
         }
         
+        bots.remove(botAccount);
         bots.get(botAccount).close();
+        
         
         return "OK";
     }

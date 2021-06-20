@@ -11,6 +11,7 @@
         ],
         "node_args":[],
         "exec_interpreter":"",
+        "autorestart" : false,
         "exec_mode":"fork",
         "error_file" : "mirai-server-err.log",
         "out_file"   : "mirai-server-out.log"
