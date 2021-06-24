@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.BaseBotLogic;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.helper.Utils;

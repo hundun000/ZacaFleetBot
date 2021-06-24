@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.core.data.EventInfo;
+import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
 import com.hundun.mirai.bot.core.function.GuideFunction;
 import com.hundun.mirai.bot.core.function.SubFunction;
 import com.hundun.mirai.bot.core.parser.Parser;
@@ -29,6 +30,8 @@ public abstract class BaseCharacter implements IManualWired, IMyEventHandler {
     
     GuideFunction guideFunction;
     
+    protected CharacterPublicSettings characterPublicSettings;
+    
     protected final String id;
     
     public BaseCharacter(String id) {
@@ -46,6 +49,7 @@ public abstract class BaseCharacter implements IManualWired, IMyEventHandler {
     @Override
     public void manualWired() {
         this.guideFunction = CustomBeanFactory.getInstance().guideFunction;
+        this.characterPublicSettings = CustomBeanFactory.getInstance().appPublicSettings.getCharacterIdToPublicSettings().get(getId());
     }
     
     protected abstract void initParser();

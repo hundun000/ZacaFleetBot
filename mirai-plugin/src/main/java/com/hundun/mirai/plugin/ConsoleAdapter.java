@@ -1,6 +1,7 @@
 package com.hundun.mirai.plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +10,7 @@ import org.slf4j.Logger;
 import com.hundun.mirai.bot.core.BaseBotLogic;
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.plugin.export.MyPlugin;
@@ -79,7 +80,13 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     @Override
     public Image uploadImage(Bot bot, long groupId, ExternalResource externalResource) {
         if (bot != null) {
-            return bot.getGroupOrFail(groupId).uploadImage(externalResource);
+            Image image = bot.getGroupOrFail(groupId).uploadImage(externalResource);
+            try {
+                externalResource.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return image;
         } else {
             log.info("[offline mode]uploadImage groupId = {}", groupId);
             return Image.fromId(offLineImageFakeId);
@@ -89,7 +96,13 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     @Override
     public Voice uploadVoice(Bot bot, long groupId, ExternalResource externalResource) {
         if (bot != null) {
-            return bot.getGroupOrFail(groupId).uploadVoice(externalResource);
+            Voice voice = bot.getGroupOrFail(groupId).uploadVoice(externalResource);
+            try {
+                externalResource.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return voice;
         } else {
             log.info("[offline mode]uploadVoice groupId = {}", groupId);
             return new Voice("", new byte[1], 0, 0, "");

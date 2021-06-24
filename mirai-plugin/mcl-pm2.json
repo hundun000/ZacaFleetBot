@@ -6,7 +6,6 @@
         "script":"/usr/bin/java",
         "args":[
             "-jar",
-            "-Xmx512m",
             "mcl.jar"
         ],
         "node_args":[],

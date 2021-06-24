@@ -194,7 +194,7 @@ public class WeiboService implements IFileOperationDelegator, IManualWired {
         File image;
     }
     
-    public List<WeiboCardCacheAndImage> updateAndGetTopBlog(String uid) {
+    public List<WeiboCardCacheAndImage> updateAndGetTopBlog(String uid, File cacheFolder) {
         List<WeiboCardCacheAndImage> newBlogs = new ArrayList<>(0);
         WeiboUserInfoCache userInfoCacahe;
         if (!userInfoCacheRepository.existsById(uid)) {
@@ -253,7 +253,7 @@ public class WeiboService implements IFileOperationDelegator, IManualWired {
                         cardCache = cardCacheRepository.findById(itemid);
                         
                     }
-                    File imageFile = checkSingleImage(cardCache);
+                    File imageFile = checkSingleImage(cardCache, cacheFolder);
                     WeiboCardCacheAndImage cardCacheAndImage = new WeiboCardCacheAndImage(cardCache, imageFile);
                     
                     
@@ -272,11 +272,11 @@ public class WeiboService implements IFileOperationDelegator, IManualWired {
 
 
 
-    private File checkSingleImage(WeiboCardCache cardCache) {
+    private File checkSingleImage(WeiboCardCache cardCache, File cacheFolder) {
         if (cardCache.getPicsLargeUrls() != null && cardCache.getPicsLargeUrls().size() == 1) {
             int lastSlash = cardCache.getPicsLargeUrls().get(0).lastIndexOf("/");
             String id = cardCache.getPicsLargeUrls().get(0).substring(lastSlash + 1);
-            File file = fileOperationDelegate.downloadOrFromCache(id);
+            File file = fileOperationDelegate.downloadOrFromCache(id, cacheFolder, null);
             return file;
         } else {
             return null;
@@ -286,7 +286,7 @@ public class WeiboService implements IFileOperationDelegator, IManualWired {
 
 
     @Override
-    public InputStream download(String fileId) {
+    public InputStream download(String fileId, File cacheFolder) {
         try {
             final Response response = weiboPictureApiFeignClient.pictures(fileId);
             final Response.Body body = response.body();
@@ -308,8 +308,8 @@ public class WeiboService implements IFileOperationDelegator, IManualWired {
 
 
     @Override
-    public File downloadOrFromCache(String fileId) {
-        return fileOperationDelegate.downloadOrFromCache(fileId);
+    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
+        return fileOperationDelegate.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
     }
     
 }

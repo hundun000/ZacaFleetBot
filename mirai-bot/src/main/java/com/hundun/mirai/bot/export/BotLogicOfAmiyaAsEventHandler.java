@@ -5,7 +5,7 @@ import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;

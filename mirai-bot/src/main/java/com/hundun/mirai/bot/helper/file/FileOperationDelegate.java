@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FileOperationDelegate {
     
-    private static final String RESOURCE_DOWNLOAD_FOLDER = "file_cache/";
+    
 
     IFileOperationDelegator provider;
     
@@ -28,23 +28,22 @@ public class FileOperationDelegate {
 
 
     
-    private String getCacheFilePath(String fileId) {
+    private File getCacheFile(String fileId, File cacheFolder) {
         String subFolerName = provider.getCacheSubFolderName();
-        Utils.checkFolder(subFolerName, RESOURCE_DOWNLOAD_FOLDER);
-        String saveFilePathName = RESOURCE_DOWNLOAD_FOLDER + subFolerName + "/" + fileId;
+        Utils.checkFolder(subFolerName, cacheFolder.getAbsolutePath());
+        String saveFilePathName = cacheFolder.getAbsolutePath() + subFolerName + "/" + fileId;
+        File file = new File(saveFilePathName);
         
-        
-        return saveFilePathName;
+        return file;
     }
 
-    public File downloadOrFromCache(String fileId) {
+    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
         String subFolerName = provider.getCacheSubFolderName();
-        String saveFilePathName = getCacheFilePath(fileId);
-        File file = new File(saveFilePathName);
+        File file = getCacheFile(fileId, cacheFolder);
         if (file.exists()) {
             log.debug("image from cache :{}", subFolerName + "---" + fileId);
         } else {
-            InputStream inputStream = provider.download(fileId);
+            InputStream inputStream = provider.download(fileId, rawDataFolder);
             
             if (inputStream == null) {
                 log.info("provider not support download, image null for: {}", subFolerName + "---" + fileId);
@@ -62,11 +61,10 @@ public class FileOperationDelegate {
                 out.close();
                 inputStream.close();
                 byte[] outBytes = out.toByteArray();
-                FileOutputStream fos = new FileOutputStream(saveFilePathName);
+                FileOutputStream fos = new FileOutputStream(file);
                 fos.write(outBytes);
                 fos.close();
                 log.info("FileOutputStream success: {}", fileId);
-                file = new File(saveFilePathName);
             } catch (Exception e) {
                 log.info("FileOutputStream faild {} {}", fileId, e);
                 return null;

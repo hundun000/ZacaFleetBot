@@ -6,7 +6,6 @@
         "script":"/usr/bin/java",
         "args":[
             "-jar",
-            "-Xmx512m",
             "mirai-server-0.0.1-SNAPSHOT.jar"
         ],
         "node_args":[],

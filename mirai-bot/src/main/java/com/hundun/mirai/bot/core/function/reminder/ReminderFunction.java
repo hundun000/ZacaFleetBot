@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -286,6 +287,19 @@ public class ReminderFunction implements IFunction, IManualWired {
         }
         List<ReminderTask> tasks = characterTasks.get(characterId);
         tasks.add(task);
+    }
+
+    public void addAllCharacterTasks(String characterId, Map<String, String> hourlyChats) {
+        for (Entry<String, String> entry : hourlyChats.entrySet()) {
+            try {
+                int hour = Integer.valueOf(entry.getKey());
+                String chat = entry.getValue();
+                this.addCharacterTasks(characterId, this.createCharacterEverydayChatTask(hour, 0, chat));
+            } catch (Exception e) {
+                console.getLogger().warning("addAllCharacterTasks fail: " + entry.toString() + ", e = " + e.getMessage());
+            }
+            
+        }
     }
     
 

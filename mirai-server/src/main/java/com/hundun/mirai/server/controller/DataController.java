@@ -1,5 +1,6 @@
 package com.hundun.mirai.server.controller;
 
+import java.io.File;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import com.hundun.mirai.bot.cp.weibo.WeiboService;
 import com.hundun.mirai.bot.cp.weibo.WeiboService.WeiboCardCacheAndImage;
 import com.hundun.mirai.bot.cp.weibo.db.WeiboCardCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
+import com.hundun.mirai.bot.export.IConsole;
 
 /**
  * @author hundun
@@ -32,11 +34,14 @@ public class DataController {
     WeiboService weiboService = CustomBeanFactory.getInstance().weiboService;
     
     WeiboCardCacheRepository cardCacheRepository = CustomBeanFactory.getInstance().weiboCardCacheRepository;
+
+    private IConsole console = CustomBeanFactory.getInstance().console;;
     
     @RequestMapping(value="/weibo/updateAndGetTopBlog", method=RequestMethod.GET)
     public List<WeiboCardCacheAndImage> updateAndGetTopBlog(
             @RequestParam("uid") String uid) {
-        return weiboService.updateAndGetTopBlog(uid);
+        File cacheFolder = console.resolveDataFileOfFileCache();
+        return weiboService.updateAndGetTopBlog(uid, cacheFolder);
     }
     
     @RequestMapping(value="/weibo/findTop5ByUidOrderByMblogCreatedDateTimeDesc", method=RequestMethod.GET)

@@ -339,7 +339,8 @@ public class QuizHandler implements IFunction {
         QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
         if (questionDTO.getResource().getType() == ResourceType.IMAGE) {
             String imageResourceId = questionDTO.getResource().getData();
-            sessionData.resource = quizService.downloadOrFromCache(imageResourceId);
+            File cacheFolder = console.resolveDataFileOfFileCache();
+            sessionData.resource = quizService.downloadOrFromCache(imageResourceId, cacheFolder, null);
         } else {
             sessionData.resource = null;
         }

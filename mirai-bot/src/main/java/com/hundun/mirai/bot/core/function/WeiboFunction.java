@@ -1,11 +1,13 @@
 package com.hundun.mirai.bot.core.function;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -138,18 +140,24 @@ public class WeiboFunction implements IFunction {
                         }
                         SessionData sessionData = groupIdToSessionData.get(groupId);
                         console.getLogger().info("groupId = " + groupId + ", LastUpdateTime = " + sessionData.getLastUpdateTime() + ", checkNewBlog: " + blogUids);
-                        
+                        File cacheFolder = console.resolveDataFileOfFileCache();
                         for (String blogUid : blogUids) {
-                            List<WeiboCardCacheAndImage> cardCacheAndImages = weiboService.updateAndGetTopBlog(blogUid);
-                            List<WeiboCardCacheAndImage> newCardCacheAndImages = new ArrayList<>(0);
+                            
+                            List<WeiboCardCacheAndImage> cardCacheAndImages = weiboService.updateAndGetTopBlog(blogUid, cacheFolder);
+                            List<WeiboCardCacheAndImage> newCardCacheAndImages = new ArrayList<>();
+                            List<LocalDateTime> oldCardTimes = new ArrayList<>();
                             for (WeiboCardCacheAndImage cardCacheAndImage : cardCacheAndImages) {
                                 boolean isNew = cardCacheAndImage.getWeiboCardCache().getMblogCreatedDateTime().isAfter(sessionData.getLastUpdateTime());
                                 //boolean isNew = true;
                                 if (isNew) {
                                     newCardCacheAndImages.add(cardCacheAndImage);
+                                } else {
+                                    oldCardTimes.add(cardCacheAndImage.getWeiboCardCache().getMblogCreatedDateTime());
                                 }
                             }
-                            
+                            console.getLogger().info("blogUid = " + blogUid
+                                    + "has " + newCardCacheAndImages.size()
+                                    + " newCards, has oldCards: " + oldCardTimes.toString());
                             for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
                                 sendNewBlogByOneBot(newCardCacheAndImage, bot, groupId);
                             }

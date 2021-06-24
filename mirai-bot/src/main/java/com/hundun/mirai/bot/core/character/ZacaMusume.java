@@ -24,8 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ZacaMusume extends BaseCharacter {
 
-    //@Value("${character.zacaMusume.listenWeiboUids:}")
-    public String[] listenWeiboUids = new String[0];
     
     public ZacaMusume() {
         super("CHARACTER_ZACA_MUSUME");
@@ -45,8 +43,6 @@ public class ZacaMusume extends BaseCharacter {
     public void manualWired() {
         super.manualWired();
         
-        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.valueOrDefault(getId());
-        
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.console = CustomBeanFactory.getInstance().console;
         this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
@@ -57,7 +53,7 @@ public class ZacaMusume extends BaseCharacter {
     public void afterManualWired() {
         super.afterManualWired();
         
-        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
+        weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
         
     }
     

@@ -5,7 +5,7 @@ import java.io.File;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.export.IMyEventHandler;
 import com.hundun.mirai.bot.helper.Utils;
@@ -35,14 +35,14 @@ public abstract class BaseBotLogic {
         AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
         
         File publicSettingsFile = console.resolveConfigFile("public-settings.json");
-        PublicSettings publicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
+        AppPublicSettings appPublicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
         
         console.getLogger().info("appPrivateSettings = " + appPrivateSettings);
-        console.getLogger().info("publicSettings = " + publicSettings);
+        console.getLogger().info("publicSettings = " + appPublicSettings);
         
         this.appPrivateSettings = appPrivateSettings;
         
-        CustomBeanFactory.init(appPrivateSettings, publicSettings, console);
+        CustomBeanFactory.init(appPrivateSettings, appPublicSettings, console);
     }
     
 

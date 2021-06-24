@@ -90,7 +90,9 @@ public class KancolleWikiQuickSearchFunction implements IFunction {
                 int firstId = upgradeLink.getUpgradeLinkIds().get(0);
                 ShipInfo firstDetail = upgradeLink.getShipDetails().get(firstId);
                 String fileId = String.valueOf(firstDetail.getId());
-                File imageFile = kancolleWikiService.downloadOrFromCache(fileId);
+                File cacheFolder = console.resolveDataFileOfFileCache();
+                File rawDataFolder = console.resolveDataFile(KancolleWikiService.kancolleGameDataSubFolder);
+                File imageFile = kancolleWikiService.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
                 if (imageFile != null) {
                     ExternalResource externalResource = ExternalResource.create(imageFile);
                     Image image = console.uploadImage(event.getBot(), event.getGroupId(), externalResource);

@@ -15,7 +15,7 @@ import com.hundun.mirai.bot.core.character.Neko;
 import com.hundun.mirai.bot.core.character.PrinzEugen;
 import com.hundun.mirai.bot.core.character.ZacaMusume;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.core.function.AmiyaChatFunction;
 import com.hundun.mirai.bot.core.function.GuideFunction;
 import com.hundun.mirai.bot.core.function.JapaneseFunction;
@@ -95,9 +95,9 @@ public class CustomBeanFactory {
 
 
     
-    static void init(AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
+    static void init(AppPrivateSettings appPrivateSettings, AppPublicSettings appPublicSettings, IConsole consoleImplement) {
         instance = new CustomBeanFactory();
-        instance.initSelf(appPrivateSettings, publicSettings, consoleImplement);
+        instance.initSelf(appPrivateSettings, appPublicSettings, consoleImplement);
         instance.callChildrenInit();
     }
     
@@ -137,9 +137,9 @@ public class CustomBeanFactory {
         }
     }
     
-    private void initSelf (AppPrivateSettings appPrivateSettings, PublicSettings publicSettings, IConsole consoleImplement) {
+    private void initSelf (AppPrivateSettings appPrivateSettings, AppPublicSettings appPublicSettings, IConsole consoleImplement) {
         this.appPrivateSettings = appPrivateSettings;
-        this.publicSettings = publicSettings;
+        this.appPublicSettings = appPublicSettings;
         this.console = consoleImplement;
         
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
@@ -259,7 +259,7 @@ public class CustomBeanFactory {
     }
     
     public AppPrivateSettings appPrivateSettings;
-    public PublicSettings publicSettings;
+    public AppPublicSettings appPublicSettings;
 
     MongoClient mongoClient;
     

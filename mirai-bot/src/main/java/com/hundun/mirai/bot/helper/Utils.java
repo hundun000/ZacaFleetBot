@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.PublicSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 
 /**
  * @author hundun
@@ -39,10 +39,10 @@ public class Utils {
         return appPrivateSettings;
     }
 
-    public static PublicSettings parseAppPublicSettings(File settingsFile) throws Exception {
-        PublicSettings publicSettings;
-        publicSettings = objectMapper.readValue(settingsFile, PublicSettings.class);
-        return publicSettings;
+    public static AppPublicSettings parseAppPublicSettings(File settingsFile) throws Exception {
+        AppPublicSettings appPublicSettings;
+        appPublicSettings = objectMapper.readValue(settingsFile, AppPublicSettings.class);
+        return appPublicSettings;
     }
     
 }

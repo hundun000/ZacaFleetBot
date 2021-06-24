@@ -26,7 +26,7 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
 
     KcwikiApiFeignClient apiFeignClient;
     
-    //String kancolleGameDataFolder =  "./data/images/kancolle_game_data";
+    public static String kancolleGameDataSubFolder =  "images/kancolle_game_data/";
     
     FileOperationDelegate fileOperationDelegate;
     
@@ -73,9 +73,9 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
     }
     
     @Override
-    public InputStream download(String shipId) {
-        
-        File gameDataImage = findGameDataImage(shipId);
+    public InputStream download(String shipId, File rawDataFolder) {
+
+        File gameDataImage = findGameDataImage(shipId, rawDataFolder);
         if (gameDataImage != null) {
             try {
                 return new FileInputStream(gameDataImage);
@@ -89,23 +89,23 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
     }
     
 
-    public File findGameDataImage(String shipId) {
-        // FIXME 为了解耦不依赖mirai，不应直接使用console.resolve
-//        String fourBitId = shipId;
-//        int numAddZero = 4 - shipId.length();
-//        for (int i = 0; i < numAddZero; i++) {
-//            fourBitId = "0" + fourBitId;
-//        }
-//
-//        File folder = new File(kancolleGameDataFolder);
-//        if (folder.exists() && folder.isDirectory()) {
-//            File[] filesInFolder = folder.listFiles();
-//            for (File file : filesInFolder) {
-//                if (file.getName().startsWith(fourBitId + "_")) {
-//                   return file;
-//                }
-//            }
-//        }
+    public File findGameDataImage(String shipId, File folder) {
+        
+        String fourBitId = shipId;
+        int numAddZero = 4 - shipId.length();
+        for (int i = 0; i < numAddZero; i++) {
+            fourBitId = "0" + fourBitId;
+        }
+
+        
+        if (folder.exists() && folder.isDirectory()) {
+            File[] filesInFolder = folder.listFiles();
+            for (File file : filesInFolder) {
+                if (file.getName().startsWith(fourBitId + "_")) {
+                   return file;
+                }
+            }
+        }
         return null;
     }
     
@@ -115,8 +115,8 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
         return "kancolle_wiki";
     }
 
-    public File downloadOrFromCache(String fileId) {
-        return fileOperationDelegate.downloadOrFromCache(fileId);
+    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
+        return fileOperationDelegate.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
     }
 
 }

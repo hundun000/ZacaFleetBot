@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
+import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
 import com.hundun.mirai.bot.core.function.AmiyaChatFunction;
 import com.hundun.mirai.bot.core.function.MiraiCodeFunction;
 import com.hundun.mirai.bot.core.function.PenguinFunction;
@@ -39,8 +40,6 @@ public class Amiya extends BaseCharacter {
 
     public boolean enable = true;
 
-    //@Value("${character.amiya.listenWeiboUids:}")
-    public String[] listenWeiboUids = new String[0];
 
     
     WeiboFunction weiboFunction;
@@ -63,7 +62,6 @@ public class Amiya extends BaseCharacter {
     public void manualWired() {
         super.manualWired();
         
-        this.listenWeiboUids = CustomBeanFactory.getInstance().publicSettings.valueOrDefault(getId());
         
         this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
         this.amiyaChatFunction = CustomBeanFactory.getInstance().amiyaChatFunction;
@@ -79,42 +77,9 @@ public class Amiya extends BaseCharacter {
     public void afterManualWired() {
         super.afterManualWired();
         
-        weiboFunction.putCharacterToData(this.getId(), Arrays.asList(this.listenWeiboUids));
+        weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
 
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                19, 0, "十九点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                20, 0, "二十点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                21, 0, "二十一点。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                22, 0, "完全入夜了呢，二十二点到了。博士，您工作辛苦了。"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                23, 0, "二十三点到了。有什么想喝的吗，博士？"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                0, 0, "呜哇！？正好0点！今天是，由阿米娅来担当助理的工作呢。我不会辜负大家的。"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                1, 0, "凌晨一点到啦！凯尔希医生教导过我，工作的时候一定要保持全神贯注......嗯，全神贯注。"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                9, 0, "九点到了。罗德岛全舰正处于通常航行状态。博士，整理下航程信息吧？"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                10, 0, "十点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                11, 0, "十一点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                12, 0, "十二点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                13, 0, "十三点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                14, 0, "十四点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                15, 0, "十五点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                16, 0, "十六点到了。欸嘿嘿......"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                17, 0, "十七点到了。博士，辛苦了！累了的话请休息一会儿吧。"));
-        reminderFunction.addCharacterTasks(this.getId(), reminderFunction.createCharacterEverydayChatTask(
-                18, 0, "十八点到了。欸嘿嘿......"));
+        reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
     }
     
     @Override

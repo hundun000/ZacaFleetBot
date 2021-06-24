@@ -126,7 +126,7 @@ public class QuizService implements IFileOperationDelegator, IManualWired {
 
 
     @Override
-    public InputStream download(String fileId) {
+    public InputStream download(String fileId, File cacheFolder) {
         try {
             final Response response = stillstandingApiService.pictures(fileId);
             final Response.Body body = response.body();
@@ -156,8 +156,8 @@ public class QuizService implements IFileOperationDelegator, IManualWired {
 
 
     @Override
-    public File downloadOrFromCache(String fileId) {
-        return downloadOrFromCache(fileId);
+    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
+        return fileOperationDelegate.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
     }
     
 }
