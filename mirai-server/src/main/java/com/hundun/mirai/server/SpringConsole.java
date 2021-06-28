@@ -10,7 +10,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.CustomAutowireConfigurer;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
@@ -56,24 +61,18 @@ public class SpringConsole implements IConsole, ListenerHost {
     //private Bot miraiBot;
     
 
-    
-    BaseBotLogic botLogic;
+    public BaseBotLogic botLogic;
     
     
   //设备认证信息文件
     //private final String deviceInfoPath = "device.json";
     
-    
     public SpringConsole() {
-        
-        
         try {
             this.botLogic = new BotLogicOfCharacterRouterAsEventHandler(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        
     }
     
     

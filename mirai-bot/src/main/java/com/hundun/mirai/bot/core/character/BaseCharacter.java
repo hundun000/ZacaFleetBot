@@ -2,10 +2,14 @@ package com.hundun.mirai.bot.core.character;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IManualWired;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
 import com.hundun.mirai.bot.core.function.GuideFunction;
@@ -14,6 +18,7 @@ import com.hundun.mirai.bot.core.parser.Parser;
 import com.hundun.mirai.bot.core.parser.StatementType;
 import com.hundun.mirai.bot.core.parser.TokenType;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
+import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.export.IMyEventHandler;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +31,10 @@ import net.mamoe.mirai.message.data.PlainText;
  * Created on 2021/04/28
  */
 @Slf4j
-public abstract class BaseCharacter implements IManualWired, IMyEventHandler {
+@Component
+public abstract class BaseCharacter implements IMyEventHandler, IPostConsoleBind {
     
+    @Autowired
     GuideFunction guideFunction;
     
     protected CharacterPublicSettings characterPublicSettings;
@@ -42,14 +49,11 @@ public abstract class BaseCharacter implements IManualWired, IMyEventHandler {
     private Parser parser = new Parser();
     
     @Override
-    public void afterManualWired() {
-        initParser();
-    }
+    public void postConsoleBind() {
 
-    @Override
-    public void manualWired() {
-        this.guideFunction = CustomBeanFactory.getInstance().guideFunction;
         this.characterPublicSettings = CustomBeanFactory.getInstance().appPublicSettings.getCharacterIdToPublicSettings().get(getId());
+        
+        initParser();
     }
     
     protected abstract void initParser();

@@ -5,7 +5,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.QuickSearchStatement;
@@ -28,18 +34,18 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/05/19
  */
-public class KancolleWikiQuickSearchFunction implements IFunction {
+@Component
+public class KancolleWikiQuickSearchFunction implements IFunction, IPostConsoleBind {
 
-    IConsole console;
-    
-    KancolleWikiService kancolleWikiService;
-    
-    
-    @Override
-    public void manualWired() {
-        this.console = CustomBeanFactory.getInstance().console;
-        this.kancolleWikiService = CustomBeanFactory.getInstance().kancolleWikiService;
         
+    
+    @Autowired
+    KancolleWikiService kancolleWikiService;
+    IConsole console;
+
+    @Override
+    public void postConsoleBind() {
+        this.console = CustomBeanFactory.getInstance().console;
     }
     
     @Override

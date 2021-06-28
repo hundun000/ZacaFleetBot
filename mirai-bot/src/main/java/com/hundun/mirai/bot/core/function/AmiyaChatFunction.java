@@ -7,8 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
+import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.data.configuration.UserTag;
@@ -30,15 +38,17 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/25
  */
-public class AmiyaChatFunction implements IFunction {
+@Component
+public class AmiyaChatFunction implements IFunction, IPostConsoleBind {
     
-    CharacterRouter characterRouter;
-    
+    @Autowired
+    SettingManager settingManager;
+        
     IConsole console;
+    
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
-        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
         
         initExternalResources();
     }
@@ -121,12 +131,12 @@ public class AmiyaChatFunction implements IFunction {
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
-            if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
+            if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = LocalDateTime.now().getDayOfYear();
                 todayIsWorkday = -1;
                 console.sendToGroup(event.getBot(), event.getGroupId(), "好耶");
                 return true;
-            } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
+            } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = -1;
                 todayIsWorkday = LocalDateTime.now().getDayOfYear();
                 console.sendToGroup(event.getBot(), event.getGroupId(), "哼");
@@ -175,7 +185,7 @@ public class AmiyaChatFunction implements IFunction {
         if (event.getTargetId() == event.getBot().getId()) {
             image = console.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
         } else {
-            List<UserTag> tags = characterRouter.getUserTagsOrEmpty(event.getBot().getId(), event.getTargetId());
+            List<UserTag> tags = settingManager.getUserTagsOrEmpty(event.getBot().getId(), event.getTargetId());
             if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
                 image = console.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
             } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {

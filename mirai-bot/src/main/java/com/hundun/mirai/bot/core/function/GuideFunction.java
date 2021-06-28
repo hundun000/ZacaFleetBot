@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
@@ -24,7 +31,8 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/05/17
  */
 @Slf4j
-public class GuideFunction implements IFunction {
+@Component
+public class GuideFunction implements IFunction, IPostConsoleBind {
 
     
     private Map<String, SessionData> sessionDataMap = new HashMap<>();
@@ -35,11 +43,10 @@ public class GuideFunction implements IFunction {
         Map<SubFunction, SubFunctionDocument> subFunctionDocuments = new LinkedHashMap<>();
         Map<String, SubFunction> identifierToSubFunction = new HashMap<>();
     }
-    
     IConsole console;
-    
+
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
     }
     

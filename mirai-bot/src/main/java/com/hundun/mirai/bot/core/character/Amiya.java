@@ -2,10 +2,14 @@ package com.hundun.mirai.bot.core.character;
 
 import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
@@ -31,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/23
  */
 @Slf4j
+@Component
 public class Amiya extends BaseCharacter {
     
     public Amiya() {
@@ -41,45 +46,33 @@ public class Amiya extends BaseCharacter {
     public boolean enable = true;
 
 
-    
+    @Autowired
     WeiboFunction weiboFunction;
-    
+    @Autowired
     AmiyaChatFunction amiyaChatFunction;
-    
+    @Autowired
     QuizHandler quizHandler;
-
+    @Autowired
     PenguinFunction penguinFunction;
-
+    @Autowired
     RepeatConsumer repeatConsumer;
-    
+    @Autowired
     ReminderFunction reminderFunction;
-
+    @Autowired
     QuickSearchFunction quickSearchFunction;
-    
+    @Autowired
     MiraiCodeFunction miraiCodeFunction;
     
-    @Override
-    public void manualWired() {
-        super.manualWired();
-        
-        
-        this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.amiyaChatFunction = CustomBeanFactory.getInstance().amiyaChatFunction;
-        this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
-        this.penguinFunction = CustomBeanFactory.getInstance().penguinFunction;
-        this.repeatConsumer = CustomBeanFactory.getInstance().repeatConsumer;
-        this.reminderFunction = CustomBeanFactory.getInstance().reminderFunction;
-        this.quickSearchFunction = CustomBeanFactory.getInstance().quickSearchFunction;
-        this.miraiCodeFunction = CustomBeanFactory.getInstance().miraiCodeFunction;
-    }
     
     @Override
-    public void afterManualWired() {
-        super.afterManualWired();
+    public void postConsoleBind() {
+        super.postConsoleBind();
         
         weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
 
         reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
+
+        
     }
     
     @Override

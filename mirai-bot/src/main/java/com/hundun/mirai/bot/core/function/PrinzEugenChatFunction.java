@@ -4,7 +4,13 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.LiteralValueStatement;
@@ -23,11 +29,14 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/28
  */
-public class PrinzEugenChatFunction implements IFunction {
+@Component
+public class PrinzEugenChatFunction implements IFunction, IPostConsoleBind {
+        
 
     IConsole console;
+
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
         initExternalResource();
     }

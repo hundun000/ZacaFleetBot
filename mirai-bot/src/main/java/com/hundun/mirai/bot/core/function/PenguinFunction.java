@@ -3,7 +3,13 @@ package com.hundun.mirai.bot.core.function;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
@@ -22,7 +28,8 @@ import lombok.extern.slf4j.Slf4j;
  * @author hundun
  * Created on 2021/04/25
  */
-public class PenguinFunction implements IFunction {
+@Component
+public class PenguinFunction implements IFunction, IPostConsoleBind {
 
     
     @Override
@@ -34,15 +41,14 @@ public class PenguinFunction implements IFunction {
                 
                 );
     }
-    
+    @Autowired
     PenguinService penguinService;
-    
     IConsole console;
+
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
-        this.penguinService = CustomBeanFactory.getInstance().penguinService;
-    }
+    }  
 
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {

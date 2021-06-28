@@ -5,8 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
+import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.LiteralValueStatement;
@@ -23,15 +30,19 @@ import net.mamoe.mirai.message.data.MessageChain;
  * @author hundun
  * Created on 2021/05/19
  */
-public class MiraiCodeFunction implements IFunction {
+@Component
+public class MiraiCodeFunction implements IFunction, IPostConsoleBind {
+        
+    
+    @Autowired
+    SettingManager settingManager;
 
     IConsole console;
+
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
-        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
-    
     Map<String, SessionData> sessionDataMap = new HashMap<>();
     
     public class SessionData {
@@ -39,14 +50,13 @@ public class MiraiCodeFunction implements IFunction {
         
     }
     
-    CharacterRouter characterRouter;
     
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.DECODE_MIRAI_CODE) {
-                if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
+                if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                     String miraiCode = subFunctionCallStatement.getArgs().get(0);
                     console.getLogger().info("build MessageChain by miraiCode = " + miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);

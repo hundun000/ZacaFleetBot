@@ -25,11 +25,7 @@ public class BotController {
     @Autowired
     SpringConsoleLoader springConsoleLoader;
     
-    
-    WeiboService weiboService = CustomBeanFactory.getInstance().weiboService;
-    
-    QuizService quizService = CustomBeanFactory.getInstance().quizService;
-    
+
     @PostConstruct
     public void postConstruct() {
         

@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 import com.hundun.mirai.bot.helper.file.IFileOperationDelegator;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;
@@ -24,7 +27,8 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/25
  */
 @Slf4j
-public class QuizService implements IFileOperationDelegator, IManualWired {
+@Component
+public class QuizService implements IFileOperationDelegator {
     ObjectMapper mapper = new ObjectMapper();
     
     
@@ -32,7 +36,7 @@ public class QuizService implements IFileOperationDelegator, IManualWired {
     
     StillstandingApiFeignClient stillstandingApiService;
     
-    @Override
+    @PostConstruct
     public void manualWired() {
         this.fileOperationDelegate = new FileOperationDelegate(this);
         this.stillstandingApiService = CustomBeanFactory.getInstance().stillstandingApiFeignClient;

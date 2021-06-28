@@ -1,7 +1,18 @@
 package com.hundun.mirai.bot.core;
 
 import java.io.File;
+import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.stereotype.Component;
+
+import com.hundun.mirai.bot.core.character.Amiya;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
@@ -24,12 +35,21 @@ import net.mamoe.mirai.event.events.NudgeEvent;
  */
 @Slf4j
 public abstract class BaseBotLogic {
-    
-    
+
     protected IMyEventHandler myEventHandler;
-    public final AppPrivateSettings appPrivateSettings;
+    public AppPrivateSettings appPrivateSettings;
     
-    public BaseBotLogic(IConsole console) throws Exception {
+    
+    public BaseBotLogic(IConsole console, Class<? extends IMyEventHandler> myEventHandlerClass) throws Exception {
+        
+        ThreadForSpringContext thread = new ThreadForSpringContext(this.getClass());
+        thread.start();
+        thread.join();
+        AnnotationConfigApplicationContext context = thread.context;
+        
+        console.getLogger().info("ApplicationContext created, has beans = " + Arrays.toString(context.getBeanDefinitionNames()));
+        
+        this.myEventHandler = context.getBean(myEventHandlerClass);
         
         File settingsFile = console.resolveConfigFile("private-settings.json");
         AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
@@ -42,8 +62,30 @@ public abstract class BaseBotLogic {
         
         this.appPrivateSettings = appPrivateSettings;
         
-        CustomBeanFactory.init(appPrivateSettings, appPublicSettings, console);
+        CustomBeanFactory.getInstance().lateInit(appPrivateSettings, appPublicSettings, console, context);
+        
     }
+    
+    class ThreadForSpringContext extends Thread {
+        
+        Class<?> parent;
+        AnnotationConfigApplicationContext context;
+        
+        public ThreadForSpringContext(Class<?> parent) {
+            this.parent = parent;
+        }
+        
+        
+        @Override
+        public void run() {
+            this.setContextClassLoader(parent.getClassLoader());
+            context = new AnnotationConfigApplicationContext();
+            context.scan("com.hundun.mirai.bot");
+            context.refresh();
+        }
+    }
+    
+
     
 
     public ListeningStatus onMessage(NudgeEvent event) throws Exception {

@@ -2,9 +2,14 @@ package com.hundun.mirai.bot.core.character;
 
 import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
+
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.function.KancolleWikiQuickSearchFunction;
@@ -26,45 +31,37 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/28
  */
 @Slf4j
+@Component
 public class PrinzEugen extends BaseCharacter {
 
     
     public PrinzEugen() {
         super("CHARACTER_PRINZ_EUGEN");
     }
-
+    @Autowired
     WeiboFunction weiboFunction;
-
+    @Autowired
     PrinzEugenChatFunction chatFunction;
-    
+    @Autowired
     RepeatConsumer repeatConsumer;
-    
+    @Autowired
     ReminderFunction reminderFunction;
-    
+    @Autowired
     MiraiCodeFunction miraiCodeFunction;
-    
+    @Autowired
     KancolleWikiQuickSearchFunction kancolleWikiQuickSearchFunction;
     
     @Override
-    public void manualWired() {
-        super.manualWired();
+    public void postConsoleBind() {
+        super.postConsoleBind();
 
-        this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.chatFunction = CustomBeanFactory.getInstance().prinzEugenChatFunction;
-        this.repeatConsumer = CustomBeanFactory.getInstance().repeatConsumer;
-        this.reminderFunction = CustomBeanFactory.getInstance().reminderFunction;
-        this.miraiCodeFunction = CustomBeanFactory.getInstance().miraiCodeFunction;
-        this.kancolleWikiQuickSearchFunction = CustomBeanFactory.getInstance().kancolleWikiQuickSearchFunction;
-    }
-    
-    @Override
-    public void afterManualWired() {
-        super.afterManualWired();
-
+        
         weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
         
         reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
-          
+
+
+        
     }
     
     @Override

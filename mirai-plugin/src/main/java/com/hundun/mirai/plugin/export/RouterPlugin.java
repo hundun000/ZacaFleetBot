@@ -1,33 +1,11 @@
 package com.hundun.mirai.plugin.export;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-
-import org.jetbrains.annotations.NotNull;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.BaseBotLogic;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
-import com.hundun.mirai.bot.helper.Utils;
 import com.hundun.mirai.plugin.ConsoleAdapter;
 
-import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.console.extension.PluginComponentStorage;
-import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
-import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescription;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
-import net.mamoe.mirai.event.GlobalEventChannel;
-import net.mamoe.yamlkt.Yaml;
-import net.mamoe.yamlkt.YamlMap;
 
 
 /**
@@ -50,10 +28,10 @@ public class RouterPlugin extends MyPlugin {
 
 
     @Override
-    protected BaseBotLogic getBotLogicImpl(
-            IConsole console) throws Exception {
+    protected BaseBotLogic createBotLogic(IConsole console) throws Exception {
         return new BotLogicOfCharacterRouterAsEventHandler(console);
     }
+
 
 
 

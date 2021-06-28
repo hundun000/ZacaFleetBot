@@ -15,8 +15,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.data.configuration.GroupConfig;
@@ -40,27 +46,28 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/25
  */
+@Component
 public class WeiboFunction implements IFunction {
     
+    @Autowired
     WeiboService weiboService;
-    
-    IConsole console;
-    
-    CharacterRouter characterRouter;
+        
+    @Autowired
+    SettingManager settingManager;
     
     Map<String, List<String>> characterIdToBlogUids = new HashMap<>();
     Map<Long, SessionData> groupIdToSessionData = new HashMap<>();
     
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    IConsole console;
+
     @Override
-    public void manualWired() {
-        this.weiboService = CustomBeanFactory.getInstance().weiboService;
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
-        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
     }
-    
-    @Override
-    public void afterManualWired() {
+    @PostConstruct
+    public void manualWired() {
+
         registerSchedule();
     }
     
@@ -81,7 +88,7 @@ public class WeiboFunction implements IFunction {
     
     public void putCharacterToData(String characterId, List<String> blogUids) {
         this.characterIdToBlogUids.put(characterId, blogUids);
-        console.getLogger().info("characterId = " + characterId + " listening: " + blogUids);
+        //console.getLogger().info("characterId = " + characterId + " listening: " + blogUids);
     }
     
     private Set<String> getDataByGroupId(List<String> characterIds) {
@@ -132,7 +139,7 @@ public class WeiboFunction implements IFunction {
                 
                 Collection<Bot> bots = console.getBots();
                 for (Bot bot: bots) {
-                    for (GroupConfig entry : characterRouter.getGroupConfigsOrEmpty(bot.getId())) {
+                    for (GroupConfig entry : settingManager.getGroupConfigsOrEmpty(bot.getId())) {
                         Long groupId = entry.getGroupId();
                         Set<String> blogUids = getDataByGroupId(entry.getEnableCharacters());
                         if (!groupIdToSessionData.containsKey(groupId)) {

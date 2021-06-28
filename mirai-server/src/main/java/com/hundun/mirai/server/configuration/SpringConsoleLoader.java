@@ -6,9 +6,12 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.hundun.mirai.bot.core.BaseBotLogic;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
@@ -31,7 +34,6 @@ public class SpringConsoleLoader {
 //    PrivateSettingsLoader privateSettingsLoader;
     
 
-    
     public SpringConsole console;
     
     @PostConstruct
@@ -45,8 +47,8 @@ public class SpringConsoleLoader {
     
     private void onLoad() {
         
+        
         try {
-
             console = new SpringConsole();
         } catch (Exception e) {
             e.printStackTrace();

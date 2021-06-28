@@ -12,9 +12,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IManualWired;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
+import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.data.configuration.GroupConfig;
@@ -35,7 +41,8 @@ import net.mamoe.mirai.message.data.MessageChain;
  * Created on 2021/05/07
  */
 @Slf4j
-public class ReminderFunction implements IFunction, IManualWired {
+@Component
+public class ReminderFunction implements IFunction, IPostConsoleBind {
 
     RemiderTaskRepository taskRepository;
 
@@ -51,20 +58,20 @@ public class ReminderFunction implements IFunction, IManualWired {
                 
                 );
     }
-    
+        
+    @Autowired
+    SettingManager settingManager;
     IConsole console;
-    
-    CharacterRouter characterRouter;
-    
+
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
-        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
-        this.taskRepository = CustomBeanFactory.getInstance().reminderTaskRepository;
     }
-    
-    @Override
-    public void afterManualWired() {
+    @PostConstruct
+    public void manualWired() {
+
+        this.taskRepository = CustomBeanFactory.getInstance().reminderTaskRepository;
+
         registerClockSchedule();
     }
     
@@ -143,7 +150,7 @@ public class ReminderFunction implements IFunction, IManualWired {
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
-                if (event.getSenderId() != characterRouter.getAdminAccount(event.getBot().getId())) {
+                if (event.getSenderId() != settingManager.getAdminAccount(event.getBot().getId())) {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
@@ -167,7 +174,7 @@ public class ReminderFunction implements IFunction, IManualWired {
                 
                 return true;
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
-                if (event.getSenderId() != characterRouter.getAdminAccount(event.getBot().getId())) {
+                if (event.getSenderId() != settingManager.getAdminAccount(event.getBot().getId())) {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
                     return true;
                 }
@@ -211,7 +218,7 @@ public class ReminderFunction implements IFunction, IManualWired {
         LocalDateTime now = LocalDateTime.now();
         Collection<Bot> bots = console.getBots();
         for (Bot bot: bots) {
-            for (GroupConfig entry : characterRouter.getGroupConfigsOrEmpty(bot.getId())) {
+            for (GroupConfig entry : settingManager.getGroupConfigsOrEmpty(bot.getId())) {
                 Long groupId = entry.getGroupId();
                 List<String> characterIds = entry.getEnableCharacters();
                 log.info("checkCharacterTasks for groupId = {}", groupId);

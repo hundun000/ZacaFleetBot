@@ -9,11 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.cp.weibo.db.WeiboCardCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.db.WeiboUserInfoCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
@@ -35,7 +37,8 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/23
  */
 @Slf4j
-public class WeiboService implements IFileOperationDelegator, IManualWired {
+@Component
+public class WeiboService implements IFileOperationDelegator {
     ObjectMapper mapper = new ObjectMapper();
     
     
@@ -57,7 +60,7 @@ public class WeiboService implements IFileOperationDelegator, IManualWired {
     
     String API_TYPE_PARAM = "uid"; 
     
-    @Override
+    @PostConstruct
     public void manualWired() {
         this.fileOperationDelegate = new FileOperationDelegate(this);
         this.weiboApiFeignClient = CustomBeanFactory.getInstance().weiboApiFeignClient;

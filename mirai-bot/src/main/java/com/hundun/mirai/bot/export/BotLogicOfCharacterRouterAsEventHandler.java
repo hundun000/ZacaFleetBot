@@ -1,6 +1,12 @@
 package com.hundun.mirai.bot.export;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.BaseBotLogic;
+import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
@@ -22,13 +28,13 @@ import net.mamoe.mirai.event.events.NudgeEvent;
 @Slf4j
 public class BotLogicOfCharacterRouterAsEventHandler extends BaseBotLogic {
     
-    
-    public BotLogicOfCharacterRouterAsEventHandler(IConsole console) throws Exception {
-        super(console);
-        this.myEventHandler = CustomBeanFactory.getInstance().characterRouter;
+    public BotLogicOfCharacterRouterAsEventHandler(
+            IConsole console
+            ) throws Exception {
+        super(console, CharacterRouter.class);
+
     }
-    
-    
+
 
     
 }

@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = {"com.hundun.mirai", "com.zaca.stillstanding"})
+@SpringBootApplication(scanBasePackages = {"com.hundun.mirai.server", "com.zaca.stillstanding"})
 @EnableConfigurationProperties
 public class MiraiServerApplication {
 

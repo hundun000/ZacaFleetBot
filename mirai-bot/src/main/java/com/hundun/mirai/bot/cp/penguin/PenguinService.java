@@ -7,8 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.cp.penguin.db.ItemRepository;
 import com.hundun.mirai.bot.cp.penguin.db.MatrixReportRepository;
 import com.hundun.mirai.bot.cp.penguin.db.StageInfoReportRepository;
@@ -32,7 +35,8 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/26
  */
 @Slf4j
-public class PenguinService implements IManualWired {
+@Component
+public class PenguinService {
     
     StageRepository stageRepository;
     
@@ -44,7 +48,7 @@ public class PenguinService implements IManualWired {
     
     StageInfoReportRepository stageInfoReportRepository; 
     
-    @Override
+    @PostConstruct
     public void manualWired() {
         this.stageRepository = CustomBeanFactory.getInstance().penguinStageRepository;
         this.itemRepository = CustomBeanFactory.getInstance().penguinItemRepository;

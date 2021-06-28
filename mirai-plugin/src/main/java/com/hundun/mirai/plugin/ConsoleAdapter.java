@@ -5,12 +5,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
-import com.hundun.mirai.bot.core.CharacterRouter;
-import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.plugin.export.MyPlugin;
@@ -38,15 +34,14 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
-    
     BaseBotLogic botLogic;
     
-    final JvmPlugin plugin;
+    JvmPlugin plugin;
     
-    public ConsoleAdapter(JvmPlugin plugin) {
+    
+    public ConsoleAdapter(MyPlugin myPlugin) {
+        this.plugin = myPlugin;
         
-        this.plugin = plugin;
-
     }
     
     public void laterInitBotLogic(BaseBotLogic botLogic) {

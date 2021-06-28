@@ -1,7 +1,14 @@
 package com.hundun.mirai.bot.export;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.BaseBotLogic;
+import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.character.Amiya;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
@@ -22,11 +29,12 @@ import net.mamoe.mirai.event.events.NudgeEvent;
 @Slf4j
 public class BotLogicOfAmiyaAsEventHandler extends BaseBotLogic {
     
-    
-    
-    public BotLogicOfAmiyaAsEventHandler(IConsole console) throws Exception {
-        super(console);
-        this.myEventHandler = CustomBeanFactory.getInstance().amiya;
+    public BotLogicOfAmiyaAsEventHandler(
+            IConsole console
+            ) throws Exception {
+        super(console, Amiya.class);
+        
+        
     }
    
 

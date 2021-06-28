@@ -1,7 +1,11 @@
 package com.hundun.mirai.bot.core.character;
 
 
+import javax.annotation.PostConstruct;
+
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.EventInfo;
@@ -19,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/25
  */
 @Slf4j
+@Component
 public class Neko extends BaseCharacter {
 
 
@@ -28,17 +33,9 @@ public class Neko extends BaseCharacter {
     }
 
 
-    IConsole console;
-    
+    @Autowired
     QuizHandler quizHandler;
 
-    @Override
-    public void manualWired() {
-        super.manualWired();
-        
-        this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
-        this.console = CustomBeanFactory.getInstance().console;
-    }
     
     @Override
     protected void initParser() {

@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
+
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.character.Amiya;
 import com.hundun.mirai.bot.core.character.BaseCharacter;
@@ -39,23 +43,22 @@ import net.mamoe.mirai.event.events.NudgeEvent;
  * Created on 2021/04/28
  */
 @Slf4j
-public class CharacterRouter implements IManualWired, IMyEventHandler {
-
-    IConsole console;
+@Component
+public class CharacterRouter implements IMyEventHandler, IPostConsoleBind {
     
+    @Autowired
     Amiya amiya;
-    
+    @Autowired
     ZacaMusume zacaMusume;
     
+    @Autowired
     PrinzEugen prinzEugen;
-    
+    @Autowired
     Neko neko;
-    
-    WeiboFunction weiboFunction;
 
-    Map<Long, Map<Long, GroupConfig>> botIdToGroupConfigs = new HashMap<>();
+    @Autowired
+    SettingManager settingManager;
 
-    Map<Long, Map<Long, UserTagConfig>> botIdToUserTagConfigs = new HashMap<>();
     
 //    @Value("${account.group.arknights}")
 //    public long arknightsGroupId;
@@ -69,103 +72,38 @@ public class CharacterRouter implements IManualWired, IMyEventHandler {
     List<BaseCharacter> characters = new ArrayList<>();
     
     
-    AppPrivateSettings appPrivateSettings;
-    @Override
+    
+    @PostConstruct
     public void manualWired() {
-        this.console = CustomBeanFactory.getInstance().console;
-        this.amiya = CustomBeanFactory.getInstance().amiya;
-        this.zacaMusume = CustomBeanFactory.getInstance().zacaMusume;
-        this.prinzEugen = CustomBeanFactory.getInstance().prinzEugen;
-        this.neko = CustomBeanFactory.getInstance().neko;
-        this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.appPrivateSettings = CustomBeanFactory.getInstance().appPrivateSettings;
-
-    }
-    
-    private void readConfigFile() {
-        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsList()) {
-            
-            Map<Long, GroupConfig> groupConfigs = new HashMap<>();
-            for (GroupConfig config : botPrivateSettings.getGroupConfigs()) {
-                
-                groupConfigs.put(config.getGroupId(), config);
-                
-            }
-            botIdToGroupConfigs.put(botPrivateSettings.getBotAccount(), groupConfigs);
-            
-            Map<Long, UserTagConfig> userTagConfigs = new HashMap<>();
-            for (Entry<String, UserTagConfig> entry : botPrivateSettings.getUserTagConfigs().entrySet()) {
-                UserTagConfig config = entry.getValue();
-                
-                userTagConfigs.put(config.getId(), config);
-                
-            }
-            botIdToUserTagConfigs.put(botPrivateSettings.getBotAccount(), userTagConfigs);
-        }
-        
-        
-    }
-
-    
-    @Override
-    public void afterManualWired() {
+         
 
         characters.add(amiya);
         characters.add(prinzEugen);
         characters.add(zacaMusume);
         characters.add(neko);
         
-        readConfigFile();
 
     }
-    
-    
-    
-
-
-    public Collection<GroupConfig> getGroupConfigsOrEmpty(long botAccountId) {
-        if (!botIdToGroupConfigs.containsKey(botAccountId)) {
-            return new ArrayList<>(0);
-        }
-        return botIdToGroupConfigs.get(botAccountId).values();
-    }
-
-    public List<UserTag> getUserTagsOrEmpty(long botId, Long userId) {
-        if (!botIdToUserTagConfigs.containsKey(botId)) {
-            return new ArrayList<>(0);
-        }
-        Map<Long, UserTagConfig> userTagConfigs = botIdToUserTagConfigs.get(botId);
-        if (!userTagConfigs.containsKey(userId)) {
-            return new ArrayList<>(0);
-        }
-        return userTagConfigs.get(userId).getTags();
-    }
-
-    public List<String> getGroupCharacterIdsOrEmpty(long botId, Long groupId) {
-        if (!botIdToGroupConfigs.containsKey(botId)) {
-            return new ArrayList<>();
-        }
-        Map<Long, GroupConfig> groupConfigs = botIdToGroupConfigs.get(botId);
-        if (!groupConfigs.containsKey(groupId)) {
-            return new ArrayList<>();
-        }
-        return groupConfigs.get(groupId).getEnableCharacters();
-    }
-
-    public long getAdminAccount(long botId) {
-        for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsList()) {
-            if (botPrivateSettings.getBotAccount() == botId) {
-                return botPrivateSettings.getAdminAccount();
-            }
-        }
+    @Override
+    public void postConsoleBind() {
         
-        return -1;
+        
+        
     }
+
+    
+    
+    
+    
+    
+
+
+    
 
     @Override
     public boolean onNudgeEvent(EventInfo eventInfo) throws Exception {
         synchronized (this) {
-            GroupConfig config = botIdToGroupConfigs.get(eventInfo.getBot().getId()).get(eventInfo.getGroupId());
+            GroupConfig config = settingManager.getGroupConfigOrEmpty(eventInfo.getBot().getId(), eventInfo.getGroupId());
             if (config == null) {
                 return false;
             }
@@ -191,14 +129,9 @@ public class CharacterRouter implements IManualWired, IMyEventHandler {
                 return false;
             }
             
-            Map<Long, GroupConfig> groupConfigs = botIdToGroupConfigs.get(eventInfo.getBot().getId());
-            if (groupConfigs == null) {
-                log.info("bot {} no groupConfigs, onMessage do nothing", eventInfo.getBot().getId());
-                return false;
-            }
-            GroupConfig config = groupConfigs.get(eventInfo.getGroupId());
+            GroupConfig config = settingManager.getGroupConfigOrEmpty(eventInfo.getBot().getId(), eventInfo.getGroupId());
             if (config == null) {
-                log.info("grop {} no groupConfig in {}, onMessage do nothing", eventInfo.getGroupId(), groupConfigs);
+                log.info("grop {} no groupConfig, onMessage do nothing", eventInfo.getGroupId());
                 return false;
             }
             

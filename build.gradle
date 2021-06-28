@@ -2,7 +2,8 @@ buildscript {
     ext {
         springBootVersion = '2.1.0.RELEASE'
         springCloudVersion = '2.0.2.RELEASE'
-        
+        springCoreVersion = '5.1.2.RELEASE'
+        javaxAnnotationVersion = '1.3.2'
     }
     repositories {
         mavenCentral()
@@ -103,6 +104,10 @@ project(":mirai-bot") {
         implementation 'io.github.openfeign:feign-core:11.1'
         //implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.1'
         
+        implementation("org.springframework:spring-web:${springCoreVersion}")
+        implementation("org.springframework:spring-context:${springCoreVersion}")
+
+        implementation("javax.annotation:javax.annotation-api:${javaxAnnotationVersion}")
         
         
         compileOnly 'org.projectlombok:lombok:1.18.4'

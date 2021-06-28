@@ -2,9 +2,14 @@ package com.hundun.mirai.bot.core.character;
 
 import java.util.Arrays;
 
+import javax.annotation.PostConstruct;
+
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.function.JapaneseFunction;
@@ -22,38 +27,29 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/25
  */
 @Slf4j
+@Component
 public class ZacaMusume extends BaseCharacter {
 
     
     public ZacaMusume() {
         super("CHARACTER_ZACA_MUSUME");
     }
-
+    @Autowired
     WeiboFunction weiboFunction;
-
-    IConsole console;
-    
+        
+    @Autowired
     QuizHandler quizHandler;
-    
+    @Autowired
     JapaneseFunction japaneseFunction;
     
 //    @Autowired
 //    RepeatConsumer repeatConsumer;
     @Override
-    public void manualWired() {
-        super.manualWired();
-        
-        this.weiboFunction = CustomBeanFactory.getInstance().weiboFunction;
-        this.console = CustomBeanFactory.getInstance().console;
-        this.quizHandler = CustomBeanFactory.getInstance().quizHandler;
-        this.japaneseFunction = CustomBeanFactory.getInstance().japaneseFunction;
-    }
-    
-    @Override
-    public void afterManualWired() {
-        super.afterManualWired();
-        
+    public void postConsoleBind() {
+        super.postConsoleBind();
+
         weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
+
         
     }
     

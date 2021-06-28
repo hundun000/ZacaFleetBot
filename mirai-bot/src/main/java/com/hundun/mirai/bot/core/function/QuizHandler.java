@@ -8,8 +8,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
+import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.LiteralValueStatement;
@@ -49,7 +54,8 @@ import net.mamoe.mirai.utils.ExternalResource;
  * @author hundun
  * Created on 2021/04/25
  */
-public class QuizHandler implements IFunction {
+@Component
+public class QuizHandler implements IFunction, IPostConsoleBind {
 
 
     @Override
@@ -63,23 +69,16 @@ public class QuizHandler implements IFunction {
                 );
     }
     
-    
+    @Autowired
     QuizService quizService;
     
     FileOperationDelegate fileOperationDelegate;
-    
-    IConsole console;
-    
-    CharacterRouter characterRouter;
+        
+    @Autowired
+    SettingManager settingManager;
     
     Map<String, SessionData> sessionDataMap = new HashMap<>();
 
-    @Override
-    public void manualWired() {
-        this.quizService = CustomBeanFactory.getInstance().quizService;
-        this.console = CustomBeanFactory.getInstance().console;
-        this.characterRouter = CustomBeanFactory.getInstance().characterRouter;
-    }
     
     @Data
     private class SessionData {
@@ -90,7 +89,12 @@ public class QuizHandler implements IFunction {
         boolean showCompletedSituation;
     }
     
-    
+    IConsole console;
+
+    @Override
+    public void postConsoleBind() {
+        this.console = CustomBeanFactory.getInstance().console;
+    }
 
     
 
@@ -134,7 +138,7 @@ public class QuizHandler implements IFunction {
                         }
                         break;
                     case QUIZ_EXIT:
-                        if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
+                        if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                             sessionData.matchSituationDTO = null;
                             console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
                             return true;
@@ -161,7 +165,7 @@ public class QuizHandler implements IFunction {
                         }
                         break;
                     case QUIZ_UPDATE_TEAM:
-                        if (event.getSenderId() == characterRouter.getAdminAccount(event.getBot().getId())) {
+                        if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                             String teamName = subFunctionCallStatement.getArgs().get(0);
                             List<String> pickTags = Arrays.asList(subFunctionCallStatement.getArgs().get(1).split("&"));
                             List<String> banTags = Arrays.asList(subFunctionCallStatement.getArgs().get(2).split("&"));

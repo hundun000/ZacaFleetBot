@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.stereotype.Component;
+
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IManualWired;
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiInitEquip;
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
@@ -22,7 +25,8 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/05/20
  */
 @Slf4j
-public class KancolleWikiService implements IFileOperationDelegator, IManualWired {
+@Component
+public class KancolleWikiService implements IFileOperationDelegator {
 
     KcwikiApiFeignClient apiFeignClient;
     
@@ -30,7 +34,7 @@ public class KancolleWikiService implements IFileOperationDelegator, IManualWire
     
     FileOperationDelegate fileOperationDelegate;
     
-    @Override
+    @PostConstruct
     public void manualWired() {
         this.apiFeignClient = CustomBeanFactory.getInstance().kcwikiApiFeignClient;
         this.fileOperationDelegate = new FileOperationDelegate(this);

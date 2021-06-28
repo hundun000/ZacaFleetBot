@@ -1,15 +1,10 @@
 package com.hundun.mirai.plugin.export;
 
-import java.io.File;
-
 import org.jetbrains.annotations.NotNull;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
-import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
-import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
-import com.hundun.mirai.bot.export.BotLogicOfAmiyaAsEventHandler;
+import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;
 import com.hundun.mirai.bot.export.IConsole;
-import com.hundun.mirai.bot.helper.Utils;
 import com.hundun.mirai.plugin.ConsoleAdapter;
 
 import net.mamoe.mirai.console.extension.PluginComponentStorage;
@@ -23,7 +18,9 @@ import net.mamoe.mirai.event.GlobalEventChannel;
  */
 public abstract class MyPlugin extends JavaPlugin {
 
-    ConsoleAdapter console;
+    private ConsoleAdapter console;
+    
+    
     
     public MyPlugin(JvmPluginDescription description) {
         super(description);
@@ -31,22 +28,18 @@ public abstract class MyPlugin extends JavaPlugin {
     
     @Override
     public void onLoad(@NotNull PluginComponentStorage $this$onLoad) {
-        
         try {
-
-            console = new ConsoleAdapter(this);
             
-            console.laterInitBotLogic(getBotLogicImpl(console));
-
+            console = new ConsoleAdapter(this);
+            console.laterInitBotLogic(createBotLogic(console));
+            
         } catch (Exception e) {
-            getLogger().error("onLoad error:" + e.getMessage());
+            getLogger().error("onLoad error:", e);
         }
 
     }
     
-    
-    protected abstract BaseBotLogic getBotLogicImpl(IConsole console) throws Exception;
-    
+    protected abstract BaseBotLogic createBotLogic(IConsole console) throws Exception;
     
     @Override
     public void onEnable() {

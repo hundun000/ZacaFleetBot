@@ -5,9 +5,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
+import com.hundun.mirai.bot.core.IPostConsoleBind;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
@@ -18,16 +24,18 @@ import com.hundun.mirai.bot.export.IConsole;
  * @author hundun
  * Created on 2021/05/25
  */
-public class JapaneseFunction implements IFunction {
+@Component
+public class JapaneseFunction implements IFunction, IPostConsoleBind {
 
     static Tokenizer tokenizer = new Tokenizer();
-    
     IConsole console;
+
     @Override
-    public void manualWired() {
+    public void postConsoleBind() {
         this.console = CustomBeanFactory.getInstance().console;
     }
-    
+        
+
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
         if (statement instanceof SubFunctionCallStatement) {

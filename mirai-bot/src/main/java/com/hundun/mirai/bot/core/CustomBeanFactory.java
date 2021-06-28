@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -85,62 +88,31 @@ import lombok.extern.slf4j.Slf4j;
 public class CustomBeanFactory {
 
     
-    private static CustomBeanFactory instance;
+    private static CustomBeanFactory instance = new CustomBeanFactory();
 
     public static CustomBeanFactory getInstance() {
         return instance;
     }
     
-    private List<IManualWired> beans = new ArrayList<>();
 
 
+
     
-    static void init(AppPrivateSettings appPrivateSettings, AppPublicSettings appPublicSettings, IConsole consoleImplement) {
-        instance = new CustomBeanFactory();
-        instance.initSelf(appPrivateSettings, appPublicSettings, consoleImplement);
-        instance.callChildrenInit();
-    }
-    
-    private void callChildrenInit () {
-        StringBuilder namesBuilder = new StringBuilder();
-        
-        Class<?> clazz = CustomBeanFactory.class;   
-        Field[] fields = clazz.getDeclaredFields();   
-        for (Field field : fields) {
-            if (IManualWired.class.isAssignableFrom(field.getType())) {
-                try {
-                    IManualWired bean = (IManualWired) field.get(instance);
-                    this.beans.add(bean);
-                    namesBuilder.append(field.getClass().getSimpleName()).append(", ");
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }    
-        }
-        
-        log.info("Beans: {}", namesBuilder.toString());
-        
-        for (IManualWired bean : this.beans) {
-            try {
-                bean.manualWired();
-            } catch (Exception e) {
-                log.error("Beans manualWired error: ", e);
-            }
-        }
-        
-        for (IManualWired bean : instance.beans) {
-            try {
-                bean.afterManualWired();
-            } catch (Exception e) {
-                log.error("Beans afterManualWired error: ", e);
-            }
-        }
-    }
-    
-    private void initSelf (AppPrivateSettings appPrivateSettings, AppPublicSettings appPublicSettings, IConsole consoleImplement) {
+    public void lateInit(AppPrivateSettings appPrivateSettings, AppPublicSettings appPublicSettings, IConsole console, ApplicationContext context) {
         this.appPrivateSettings = appPrivateSettings;
         this.appPublicSettings = appPublicSettings;
-        this.console = consoleImplement;
+        this.console = console;
+        
+        
+        context.getBeansOfType(IPostConsoleBind.class).values().forEach(item -> item.postConsoleBind());
+        
+        
+    }
+
+    
+    private CustomBeanFactory() {
+        
+        
         
         CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
@@ -260,7 +232,8 @@ public class CustomBeanFactory {
     
     public AppPrivateSettings appPrivateSettings;
     public AppPublicSettings appPublicSettings;
-
+    public IConsole console;
+    
     MongoClient mongoClient;
     
     // ----- weibo -----
@@ -287,33 +260,7 @@ public class CustomBeanFactory {
     
     public RemiderTaskRepository reminderTaskRepository;
 
-    public Amiya amiya = new Amiya();
-    public ZacaMusume zacaMusume = new ZacaMusume();
-    public PrinzEugen prinzEugen = new PrinzEugen();
-    public Neko neko = new Neko();
-    
-    public WeiboFunction weiboFunction = new WeiboFunction();
-    public AmiyaChatFunction amiyaChatFunction = new AmiyaChatFunction();
-    public QuizHandler quizHandler = new QuizHandler();
-    public PenguinFunction penguinFunction = new PenguinFunction();
-    public RepeatConsumer repeatConsumer = new RepeatConsumer();
-    public ReminderFunction reminderFunction = new ReminderFunction();
-    public QuickSearchFunction quickSearchFunction = new QuickSearchFunction();
-    public MiraiCodeFunction miraiCodeFunction = new MiraiCodeFunction();
-    public PrinzEugenChatFunction prinzEugenChatFunction = new PrinzEugenChatFunction();
-    public KancolleWikiQuickSearchFunction kancolleWikiQuickSearchFunction = new KancolleWikiQuickSearchFunction();
-    public JapaneseFunction japaneseFunction = new JapaneseFunction();
-    public GuideFunction guideFunction = new GuideFunction();
-    
-    public CharacterRouter characterRouter = new CharacterRouter();
-    
-    
-    public WeiboService weiboService = new WeiboService();
-    public QuizService quizService = new QuizService();
-    public PenguinService penguinService = new PenguinService();
-    public KancolleWikiService kancolleWikiService = new KancolleWikiService();
 
-    public IConsole console;
 
 
     
