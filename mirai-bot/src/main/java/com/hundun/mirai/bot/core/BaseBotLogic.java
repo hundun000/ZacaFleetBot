@@ -42,7 +42,7 @@ public abstract class BaseBotLogic {
     
     public BaseBotLogic(IConsole console, Class<? extends IMyEventHandler> myEventHandlerClass) throws Exception {
         
-        ThreadForSpringContext thread = new ThreadForSpringContext(this.getClass());
+        SpringContextLoaderThread thread = new SpringContextLoaderThread(this.getClass());
         thread.start();
         thread.join();
         AnnotationConfigApplicationContext context = thread.context;
@@ -66,23 +66,10 @@ public abstract class BaseBotLogic {
         
     }
     
-    class ThreadForSpringContext extends Thread {
-        
-        Class<?> parent;
-        AnnotationConfigApplicationContext context;
-        
-        public ThreadForSpringContext(Class<?> parent) {
-            this.parent = parent;
-        }
+    public class ThreadForSpringContext extends Thread {
         
         
-        @Override
-        public void run() {
-            this.setContextClassLoader(parent.getClassLoader());
-            context = new AnnotationConfigApplicationContext();
-            context.scan("com.hundun.mirai.bot");
-            context.refresh();
-        }
+
     }
     
 
