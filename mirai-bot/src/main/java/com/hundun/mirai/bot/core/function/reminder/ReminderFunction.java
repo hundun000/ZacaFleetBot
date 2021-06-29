@@ -19,12 +19,12 @@ import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.data.configuration.GroupConfig;
-import com.hundun.mirai.bot.core.function.IFunction;
+import com.hundun.mirai.bot.core.function.BaseFunction;
 import com.hundun.mirai.bot.core.function.SubFunction;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
 import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
@@ -42,7 +42,7 @@ import net.mamoe.mirai.message.data.MessageChain;
  */
 @Slf4j
 @Component
-public class ReminderFunction implements IFunction, IPostConsoleBind {
+public class ReminderFunction extends BaseFunction {
 
     RemiderTaskRepository taskRepository;
 
@@ -61,12 +61,7 @@ public class ReminderFunction implements IFunction, IPostConsoleBind {
         
     @Autowired
     SettingManager settingManager;
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
     @PostConstruct
     public void manualWired() {
 

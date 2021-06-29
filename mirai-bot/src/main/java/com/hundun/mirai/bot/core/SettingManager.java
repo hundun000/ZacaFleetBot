@@ -7,10 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
+import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.core.data.configuration.BotPrivateSettings;
+import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
 import com.hundun.mirai.bot.core.data.configuration.GroupConfig;
 import com.hundun.mirai.bot.core.data.configuration.UserTag;
 import com.hundun.mirai.bot.core.data.configuration.UserTagConfig;
@@ -21,17 +26,21 @@ import com.hundun.mirai.bot.core.data.configuration.UserTagConfig;
  * Created on 2021/06/25
  */
 @Component
-public class SettingManager implements IPostConsoleBind {
+public class SettingManager {
 
     Map<Long, Map<Long, GroupConfig>> botIdToGroupConfigs = new HashMap<>();
 
     Map<Long, Map<Long, UserTagConfig>> botIdToUserTagConfigs = new HashMap<>();
     
+    @Autowired
     private AppPrivateSettings appPrivateSettings;
     
-    @Override
+    @Autowired
+    private AppPublicSettings appPublicSettings;
+    
+    @PostConstruct
     public void postConsoleBind() {
-        this.appPrivateSettings = CustomBeanFactory.getInstance().appPrivateSettings;
+        //this.appPrivateSettings = CustomBeanFactory.getInstance().appPrivateSettings;
         
         for (BotPrivateSettings botPrivateSettings : appPrivateSettings.getBotPrivateSettingsList()) {
             
@@ -98,6 +107,10 @@ public class SettingManager implements IPostConsoleBind {
             return null;
         }
         return botIdToGroupConfigs.get(botId).get(groupId);
+    }
+    
+    public CharacterPublicSettings getCharacterPublicSettings(String characterId) {
+        return appPublicSettings.getCharacterIdToPublicSettings().get(characterId);
     }
     
 }

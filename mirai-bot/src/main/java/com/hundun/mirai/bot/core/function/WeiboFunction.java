@@ -47,7 +47,7 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/04/25
  */
 @Component
-public class WeiboFunction implements IFunction {
+public class WeiboFunction extends BaseFunction {
     
     @Autowired
     WeiboService weiboService;
@@ -59,12 +59,7 @@ public class WeiboFunction implements IFunction {
     Map<Long, SessionData> groupIdToSessionData = new HashMap<>();
     
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
     @PostConstruct
     public void manualWired() {
 

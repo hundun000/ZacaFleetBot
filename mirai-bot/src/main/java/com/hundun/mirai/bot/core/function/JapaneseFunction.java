@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
@@ -25,15 +25,10 @@ import com.hundun.mirai.bot.export.IConsole;
  * Created on 2021/05/25
  */
 @Component
-public class JapaneseFunction implements IFunction, IPostConsoleBind {
+public class JapaneseFunction extends BaseFunction {
 
     static Tokenizer tokenizer = new Tokenizer();
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
         
 
     @Override

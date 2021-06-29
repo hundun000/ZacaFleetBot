@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.LiteralValueStatement;
@@ -30,14 +30,12 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/04/28
  */
 @Component
-public class PrinzEugenChatFunction implements IFunction, IPostConsoleBind {
+public class PrinzEugenChatFunction extends BaseFunction {
         
 
-    IConsole console;
-
-    @Override
+    @PostConstruct
     public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
+
         initExternalResource();
     }
 

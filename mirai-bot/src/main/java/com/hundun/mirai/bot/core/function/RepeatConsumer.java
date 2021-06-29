@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.LiteralValueStatement;
@@ -26,15 +26,9 @@ import net.mamoe.mirai.message.code.MiraiCode;
  * Created on 2021/04/21
  */
 @Component
-public class RepeatConsumer implements IFunction {
+public class RepeatConsumer extends BaseFunction {
         
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
-    
     @Override
     public List<SubFunction> getSubFunctions() {
         return Arrays.asList();

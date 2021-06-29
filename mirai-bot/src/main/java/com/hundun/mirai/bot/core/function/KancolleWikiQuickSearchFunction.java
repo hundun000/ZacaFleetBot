@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.QuickSearchStatement;
@@ -35,18 +35,13 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/05/19
  */
 @Component
-public class KancolleWikiQuickSearchFunction implements IFunction, IPostConsoleBind {
+public class KancolleWikiQuickSearchFunction extends BaseFunction {
 
         
     
     @Autowired
     KancolleWikiService kancolleWikiService;
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
     
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {

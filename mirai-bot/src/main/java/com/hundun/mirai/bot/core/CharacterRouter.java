@@ -44,7 +44,7 @@ import net.mamoe.mirai.event.events.NudgeEvent;
  */
 @Slf4j
 @Component
-public class CharacterRouter implements IMyEventHandler, IPostConsoleBind {
+public class CharacterRouter implements IMyEventHandler {
     
     @Autowired
     Amiya amiya;
@@ -84,12 +84,7 @@ public class CharacterRouter implements IMyEventHandler, IPostConsoleBind {
         
 
     }
-    @Override
-    public void postConsoleBind() {
-        
-        
-        
-    }
+
 
     
     

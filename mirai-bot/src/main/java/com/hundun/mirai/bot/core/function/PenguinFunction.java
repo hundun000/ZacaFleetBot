@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  * Created on 2021/04/25
  */
 @Component
-public class PenguinFunction implements IFunction, IPostConsoleBind {
+public class PenguinFunction extends BaseFunction {
 
     
     @Override
@@ -43,12 +43,7 @@ public class PenguinFunction implements IFunction, IPostConsoleBind {
     }
     @Autowired
     PenguinService penguinService;
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }  
 
     @Override
     public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {

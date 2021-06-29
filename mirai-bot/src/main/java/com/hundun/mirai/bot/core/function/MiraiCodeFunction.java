@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
@@ -31,18 +31,13 @@ import net.mamoe.mirai.message.data.MessageChain;
  * Created on 2021/05/19
  */
 @Component
-public class MiraiCodeFunction implements IFunction, IPostConsoleBind {
+public class MiraiCodeFunction extends BaseFunction {
         
     
     @Autowired
     SettingManager settingManager;
 
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
     Map<String, SessionData> sessionDataMap = new HashMap<>();
     
     public class SessionData {

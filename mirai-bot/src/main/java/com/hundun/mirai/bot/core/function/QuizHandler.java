@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
@@ -55,7 +55,7 @@ import net.mamoe.mirai.utils.ExternalResource;
  * Created on 2021/04/25
  */
 @Component
-public class QuizHandler implements IFunction, IPostConsoleBind {
+public class QuizHandler extends BaseFunction {
 
 
     @Override
@@ -89,12 +89,7 @@ public class QuizHandler implements IFunction, IPostConsoleBind {
         boolean showCompletedSituation;
     }
     
-    IConsole console;
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
 
     
 

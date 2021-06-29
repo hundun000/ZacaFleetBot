@@ -6,6 +6,9 @@ import java.util.Arrays;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -42,35 +45,39 @@ public abstract class BaseBotLogic {
     
     public BaseBotLogic(IConsole console, Class<? extends IMyEventHandler> myEventHandlerClass) throws Exception {
         
-        SpringContextLoaderThread thread = new SpringContextLoaderThread(this.getClass());
-        thread.start();
-        thread.join();
-        AnnotationConfigApplicationContext context = thread.context;
-        
-        console.getLogger().info("ApplicationContext created, has beans = " + Arrays.toString(context.getBeanDefinitionNames()));
-        
-        this.myEventHandler = context.getBean(myEventHandlerClass);
-        
         File settingsFile = console.resolveConfigFile("private-settings.json");
         AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
         
         File publicSettingsFile = console.resolveConfigFile("public-settings.json");
         AppPublicSettings appPublicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
         
-        console.getLogger().info("appPrivateSettings = " + appPrivateSettings);
-        console.getLogger().info("publicSettings = " + appPublicSettings);
         
+        SpringContextLoaderThread thread = new SpringContextLoaderThread(this.getClass());
+        thread.start();
+        thread.join();
+        AnnotationConfigApplicationContext context = thread.context;
+        
+        context.registerBean(AppPrivateSettings.class, () -> appPrivateSettings);
+        context.registerBean(AppPublicSettings.class, () -> appPublicSettings);
+        context.registerBean(IConsole.class, () -> console);
+        context.refresh();
+        
+        console.getLogger().info("ApplicationContext created, has beans = " + Arrays.toString(context.getBeanDefinitionNames()));
+        
+        
+        
+        
+        
+        console.getLogger().info("ApplicationContext has console = " + (context.getBean(IConsole.class) != null));
+        console.getLogger().info("appPrivateSettings = " + context.getBean(AppPrivateSettings.class));
+        console.getLogger().info("publicSettings = " + context.getBean(AppPrivateSettings.class));
+        
+        this.myEventHandler = context.getBean(myEventHandlerClass);
         this.appPrivateSettings = appPrivateSettings;
-        
-        CustomBeanFactory.getInstance().lateInit(appPrivateSettings, appPublicSettings, console, context);
-        
-    }
-    
-    public class ThreadForSpringContext extends Thread {
-        
         
 
     }
+
     
 
     

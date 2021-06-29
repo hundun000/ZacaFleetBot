@@ -19,6 +19,6 @@ public class SpringContextLoaderThread extends Thread {
         this.setContextClassLoader(caller.getClassLoader());
         context = new AnnotationConfigApplicationContext();
         context.scan("com.hundun.mirai.bot");
-        context.refresh();
+        
     }
 }

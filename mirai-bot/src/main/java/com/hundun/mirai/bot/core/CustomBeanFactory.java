@@ -93,21 +93,7 @@ public class CustomBeanFactory {
     public static CustomBeanFactory getInstance() {
         return instance;
     }
-    
 
-
-
-    
-    public void lateInit(AppPrivateSettings appPrivateSettings, AppPublicSettings appPublicSettings, IConsole console, ApplicationContext context) {
-        this.appPrivateSettings = appPrivateSettings;
-        this.appPublicSettings = appPublicSettings;
-        this.console = console;
-        
-        
-        context.getBeansOfType(IPostConsoleBind.class).values().forEach(item -> item.postConsoleBind());
-        
-        
-    }
 
     
     private CustomBeanFactory() {
@@ -230,9 +216,9 @@ public class CustomBeanFactory {
                 ;
     }
     
-    public AppPrivateSettings appPrivateSettings;
-    public AppPublicSettings appPublicSettings;
-    public IConsole console;
+    //public AppPrivateSettings appPrivateSettings;
+    //public AppPublicSettings appPublicSettings;
+    //public IConsole console;
     
     MongoClient mongoClient;
     

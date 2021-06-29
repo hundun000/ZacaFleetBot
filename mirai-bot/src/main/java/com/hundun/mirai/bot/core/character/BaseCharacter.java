@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
+import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
 import com.hundun.mirai.bot.core.function.GuideFunction;
@@ -32,10 +33,13 @@ import net.mamoe.mirai.message.data.PlainText;
  */
 @Slf4j
 @Component
-public abstract class BaseCharacter implements IMyEventHandler, IPostConsoleBind {
+public abstract class BaseCharacter implements IMyEventHandler {
     
     @Autowired
     GuideFunction guideFunction;
+    
+    @Autowired
+    protected SettingManager settingManager;
     
     protected CharacterPublicSettings characterPublicSettings;
     
@@ -48,10 +52,10 @@ public abstract class BaseCharacter implements IMyEventHandler, IPostConsoleBind
     
     private Parser parser = new Parser();
     
-    @Override
+    @PostConstruct
     public void postConsoleBind() {
 
-        this.characterPublicSettings = CustomBeanFactory.getInstance().appPublicSettings.getCharacterIdToPublicSettings().get(getId());
+        this.characterPublicSettings = settingManager.getCharacterPublicSettings(getId());
         
         initParser();
     }

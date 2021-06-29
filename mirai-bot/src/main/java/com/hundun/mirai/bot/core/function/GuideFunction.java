@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
-import com.hundun.mirai.bot.core.IPostConsoleBind;
+
 
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class GuideFunction implements IFunction, IPostConsoleBind {
+public class GuideFunction extends BaseFunction {
 
     
     private Map<String, SessionData> sessionDataMap = new HashMap<>();
@@ -43,12 +43,8 @@ public class GuideFunction implements IFunction, IPostConsoleBind {
         Map<SubFunction, SubFunctionDocument> subFunctionDocuments = new LinkedHashMap<>();
         Map<String, SubFunction> identifierToSubFunction = new HashMap<>();
     }
-    IConsole console;
+    
 
-    @Override
-    public void postConsoleBind() {
-        this.console = CustomBeanFactory.getInstance().console;
-    }
     
 
     
