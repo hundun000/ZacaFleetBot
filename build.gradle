@@ -70,6 +70,7 @@ project(":mirai-server") {
         implementation("net.mamoe:mirai-core-utils-jvm:${MIRAI_VERSION}")
 
         
+        
         //api("net.mamoe:mirai-core-api:${MIRAI_VERSION}")     // 编译代码使用
         //implementation("net.mamoe:mirai-core:${MIRAI_VERSION}") // 运行时使用
         //implementation("net.mamoe:mirai-login-solver-selenium:1.0-dev-17")
@@ -105,6 +106,7 @@ project(":mirai-bot") {
         implementation 'io.github.openfeign:feign-jackson:11.1'
         implementation 'io.github.openfeign:feign-core:11.1'
         //implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.1'
+        
         
         implementation("org.springframework:spring-web:${springCoreVersion}")
         implementation("org.springframework:spring-context:${springCoreVersion}")

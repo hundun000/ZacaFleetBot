@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
 import com.hundun.mirai.bot.export.BotLogicOfCharacterRouterAsEventHandler;

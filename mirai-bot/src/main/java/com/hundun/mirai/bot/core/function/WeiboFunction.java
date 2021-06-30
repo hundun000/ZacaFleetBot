@@ -151,9 +151,9 @@ public class WeiboFunction extends BaseFunction {
                                     oldCardTimes.add(cardCacheAndImage.getWeiboCardCache().getMblogCreatedDateTime());
                                 }
                             }
-                            console.getLogger().info("blogUid = " + blogUid
-                                    + "has " + newCardCacheAndImages.size()
-                                    + " newCards, has oldCards: " + oldCardTimes.toString());
+//                            console.getLogger().info("blogUid = " + blogUid
+//                                    + "has " + newCardCacheAndImages.size()
+//                                    + " newCards, has oldCards: " + oldCardTimes.toString());
                             for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
                                 sendNewBlogByOneBot(newCardCacheAndImage, bot, groupId);
                             }

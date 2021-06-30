@@ -6,11 +6,12 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 import com.hundun.mirai.bot.helper.file.IFileOperationDelegator;
 import com.zaca.stillstanding.api.StillstandingApiFeignClient;
@@ -33,19 +34,12 @@ public class QuizService implements IFileOperationDelegator {
     
     
     FileOperationDelegate fileOperationDelegate;
-    
+    @Autowired
     StillstandingApiFeignClient stillstandingApiService;
     
-    @PostConstruct
-    public void manualWired() {
-        this.fileOperationDelegate = new FileOperationDelegate(this);
-        this.stillstandingApiService = CustomBeanFactory.getInstance().stillstandingApiFeignClient;
-    }
-    
+
     public QuizService() {
-        mapper.configure(Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true) ;
-        
-        
+        this.fileOperationDelegate = new FileOperationDelegate(this);
     }
     
     public enum MatchType {

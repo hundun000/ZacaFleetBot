@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.cp.weibo.db.WeiboCardCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.db.WeiboUserInfoCacheRepository;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
@@ -44,9 +44,9 @@ public class WeiboService implements IFileOperationDelegator {
     
     
     FileOperationDelegate fileOperationDelegate;
-    
+    @Autowired
     WeiboApiFeignClient weiboApiFeignClient;
-    
+    @Autowired
     WeiboPictureApiFeignClient weiboPictureApiFeignClient;
     @Autowired
     WeiboUserInfoCacheRepository userInfoCacheRepository;
@@ -61,12 +61,9 @@ public class WeiboService implements IFileOperationDelegator {
     
     String API_TYPE_PARAM = "uid"; 
     
-    @PostConstruct
-    public void manualWired() {
+    public WeiboService() {
         this.fileOperationDelegate = new FileOperationDelegate(this);
-        this.weiboApiFeignClient = CustomBeanFactory.getInstance().weiboApiFeignClient;
-        this.weiboPictureApiFeignClient = CustomBeanFactory.getInstance().weiboPictureApiFeignClient;
-        
+
     }
     
     
@@ -279,7 +276,7 @@ public class WeiboService implements IFileOperationDelegator {
         if (cardCache.getPicsLargeUrls() != null && cardCache.getPicsLargeUrls().size() == 1) {
             int lastSlash = cardCache.getPicsLargeUrls().get(0).lastIndexOf("/");
             String id = cardCache.getPicsLargeUrls().get(0).substring(lastSlash + 1);
-            File file = fileOperationDelegate.downloadOrFromCache(id, cacheFolder, null);
+            File file = this.downloadOrFromCache(id, cacheFolder, null);
             return file;
         } else {
             return null;

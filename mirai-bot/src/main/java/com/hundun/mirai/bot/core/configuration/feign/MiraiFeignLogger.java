@@ -1,24 +1,27 @@
-package com.hundun.mirai.bot.cp;
+package com.hundun.mirai.bot.core.configuration.feign;
 
 import java.io.IOException;
+
+import com.hundun.mirai.bot.export.IConsole;
 
 import feign.Logger;
 import feign.Request;
 import feign.Response;
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.utils.MiraiLogger;
 
 /**
  * @author hundun
  * Created on 2021/03/31
  */
-@Slf4j
-public class FeignLogger extends Logger {
-
+public class MiraiFeignLogger extends Logger {
+    MiraiLogger miraiLogger;
     String tagName;
     String level;
-    public FeignLogger(String tagName, String level) {
+    public MiraiFeignLogger(String tagName, String level, MiraiLogger miraiLogger) {
         this.tagName = tagName;
         this.level = level;
+        this.miraiLogger = miraiLogger;
     }
     
     @Override
@@ -26,11 +29,11 @@ public class FeignLogger extends Logger {
         String message = "[" + tagName + "] " + String.format(methodTag(configKey) + format, args);
         switch (level) {
             case "info":
-                log.info(message);
+                miraiLogger.info(message);
                 break;
             case "debug":
             default:
-                log.debug(message);
+                miraiLogger.debug(message);
                 break;
             }
         

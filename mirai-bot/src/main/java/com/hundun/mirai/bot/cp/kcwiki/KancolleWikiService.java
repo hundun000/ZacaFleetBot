@@ -7,9 +7,10 @@ import java.io.InputStream;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiInitEquip;
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
@@ -28,15 +29,14 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class KancolleWikiService implements IFileOperationDelegator {
 
+    @Autowired
     KcwikiApiFeignClient apiFeignClient;
     
     public static String kancolleGameDataSubFolder =  "images/kancolle_game_data/";
     
     FileOperationDelegate fileOperationDelegate;
     
-    @PostConstruct
-    public void manualWired() {
-        this.apiFeignClient = CustomBeanFactory.getInstance().kcwikiApiFeignClient;
+    public KancolleWikiService() {
         this.fileOperationDelegate = new FileOperationDelegate(this);
     }
     

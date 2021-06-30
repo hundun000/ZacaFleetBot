@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hundun.mirai.bot.core.CustomBeanFactory;
+
 import com.hundun.mirai.bot.cp.penguin.db.ItemRepository;
 import com.hundun.mirai.bot.cp.penguin.db.StageRepository;
 import com.hundun.mirai.bot.cp.penguin.domain.DropInfo;
@@ -40,19 +40,10 @@ public class PenguinService {
     StageRepository stageRepository;
     @Autowired
     ItemRepository itemRepository;
-    
+    @Autowired
     PenguinApiFeignClient penguinApiFeignClient;
     
-    //MatrixReportRepository matrixReportRepository; 
-    
-    //StageInfoReportRepository stageInfoReportRepository; 
-    
-    @PostConstruct
-    public void manualWired() {
-        this.penguinApiFeignClient = CustomBeanFactory.getInstance().penguinApiFeignClient;
-        //this.matrixReportRepository = CustomBeanFactory.getInstance().matrixReportRepository;
-        //this.stageInfoReportRepository = CustomBeanFactory.getInstance().stageInfoReportRepository;
-    }
+
     
     public synchronized void resetCache() {
         

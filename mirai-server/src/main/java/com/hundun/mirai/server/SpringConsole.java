@@ -18,7 +18,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.BaseBotLogic;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.BotPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
