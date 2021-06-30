@@ -5,12 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.hundun.mirai.bot.core.CustomBeanFactory;
 
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
@@ -21,10 +17,6 @@ import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipDetail;
 import com.hundun.mirai.bot.cp.kcwiki.domain.dto.KcwikiShipStats;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipInfo;
 import com.hundun.mirai.bot.cp.kcwiki.domain.model.ShipUpgradeLink;
-import com.hundun.mirai.bot.export.IConsole;
-import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
-
-import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.message.data.PlainText;

@@ -2,7 +2,8 @@ buildscript {
     ext {
         springBootVersion = '2.1.0.RELEASE'
         springCloudVersion = '2.0.2.RELEASE'
-        springCoreVersion = '5.1.2.RELEASE'
+        springCoreVersion = '5.3.8'
+        springDataVersion = '3.2.2'
         javaxAnnotationVersion = '1.3.2'
     }
     repositories {
@@ -98,7 +99,7 @@ project(":mirai-bot") {
         implementation group: 'com.atilika.kuromoji', name: 'kuromoji-ipadic', version: '0.9.0'
 
         
-        implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '3.8.2'
+        implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.2.3'
 
         implementation 'io.github.openfeign:feign-jackson:11.1'
         implementation 'io.github.openfeign:feign-core:11.1'
@@ -106,6 +107,8 @@ project(":mirai-bot") {
         
         implementation("org.springframework:spring-web:${springCoreVersion}")
         implementation("org.springframework:spring-context:${springCoreVersion}")
+        implementation("org.springframework.data:spring-data-mongodb:${springDataVersion}")
+
 
         implementation("javax.annotation:javax.annotation-api:${javaxAnnotationVersion}")
         

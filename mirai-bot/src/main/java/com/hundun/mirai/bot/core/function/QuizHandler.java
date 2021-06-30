@@ -11,9 +11,6 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hundun.mirai.bot.core.CharacterRouter;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
-
 import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
@@ -22,7 +19,6 @@ import com.hundun.mirai.bot.core.parser.statement.Statement;
 import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
 import com.hundun.mirai.bot.cp.quiz.QuizService;
 import com.hundun.mirai.bot.cp.quiz.QuizService.MatchType;
-import com.hundun.mirai.bot.export.IConsole;
 import com.hundun.mirai.bot.helper.file.FileOperationDelegate;
 import com.zaca.stillstanding.dto.buff.BuffDTO;
 import com.zaca.stillstanding.dto.event.AnswerResultEvent;
@@ -42,7 +38,6 @@ import com.zaca.stillstanding.dto.team.TeamConstInfoDTO;
 import com.zaca.stillstanding.dto.team.TeamRuntimeInfoDTO;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;

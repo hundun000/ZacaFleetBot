@@ -3,19 +3,7 @@ package com.hundun.mirai.bot.core;
 import java.io.File;
 import java.util.Arrays;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.springframework.stereotype.Component;
-
-import com.hundun.mirai.bot.core.character.Amiya;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
@@ -25,10 +13,7 @@ import com.hundun.mirai.bot.export.IMyEventHandler;
 import com.hundun.mirai.bot.helper.Utils;
 
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.ListeningStatus;
-import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.event.events.NudgeEvent;
 

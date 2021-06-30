@@ -6,20 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.hundun.mirai.bot.core.CustomBeanFactory;
 
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.QuickSearchStatement;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
-import com.hundun.mirai.bot.export.IConsole;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author hundun

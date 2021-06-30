@@ -1,6 +1,9 @@
 package com.hundun.mirai.bot.core.function.reminder;
 
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import lombok.Data;
 
 /**
@@ -8,7 +11,9 @@ import lombok.Data;
  * Created on 2021/05/07
  */
 @Data
+@Document(collation = "reminderTask")
 public class ReminderTask {
+    @Id
     String id;
     long botId;
     int count;

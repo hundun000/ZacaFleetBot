@@ -1,7 +1,6 @@
 package com.hundun.mirai.bot.core.data.configuration;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import lombok.Data;

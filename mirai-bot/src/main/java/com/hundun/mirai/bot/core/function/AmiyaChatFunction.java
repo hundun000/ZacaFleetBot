@@ -1,6 +1,5 @@
 package com.hundun.mirai.bot.core.function;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,11 +9,7 @@ import java.util.Random;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-
-import com.hundun.mirai.bot.core.CharacterRouter;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
 
 import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
@@ -23,9 +18,6 @@ import com.hundun.mirai.bot.core.data.configuration.UserTag;
 import com.hundun.mirai.bot.core.parser.statement.AtStatement;
 import com.hundun.mirai.bot.core.parser.statement.LiteralValueStatement;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
-import com.hundun.mirai.bot.export.IConsole;
-
-import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;

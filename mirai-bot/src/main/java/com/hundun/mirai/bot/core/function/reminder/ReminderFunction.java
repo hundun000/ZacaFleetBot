@@ -17,7 +17,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hundun.mirai.bot.core.CharacterRouter;
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 
 import com.hundun.mirai.bot.core.SettingManager;
@@ -28,8 +27,6 @@ import com.hundun.mirai.bot.core.function.BaseFunction;
 import com.hundun.mirai.bot.core.function.SubFunction;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
 import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.export.IConsole;
-
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.message.code.MiraiCode;
@@ -43,7 +40,7 @@ import net.mamoe.mirai.message.data.MessageChain;
 @Slf4j
 @Component
 public class ReminderFunction extends BaseFunction {
-
+    @Autowired
     RemiderTaskRepository taskRepository;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -64,8 +61,6 @@ public class ReminderFunction extends BaseFunction {
 
     @PostConstruct
     public void manualWired() {
-
-        this.taskRepository = CustomBeanFactory.getInstance().reminderTaskRepository;
 
         registerClockSchedule();
     }

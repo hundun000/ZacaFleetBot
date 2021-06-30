@@ -3,6 +3,8 @@ package com.hundun.mirai.bot.cp.penguin.domain;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -13,7 +15,9 @@ import lombok.Data;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@Document(collection = "penguinItem")
 public class Item {
+    @Id
     String itemId;
     String sortId;
     String rarity;

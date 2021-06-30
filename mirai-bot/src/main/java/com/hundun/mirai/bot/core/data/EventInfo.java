@@ -1,12 +1,7 @@
 package com.hundun.mirai.bot.core.data;
 
-import org.jetbrains.annotations.NotNull;
-
 import lombok.Data;
 import net.mamoe.mirai.Bot;
-import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
 import net.mamoe.mirai.message.data.MessageChain;
 
 /**

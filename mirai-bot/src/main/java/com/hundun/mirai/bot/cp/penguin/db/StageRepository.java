@@ -1,7 +1,8 @@
 package com.hundun.mirai.bot.cp.penguin.db;
 
 
-import java.util.List;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 import com.hundun.mirai.bot.cp.penguin.domain.Stage;
 
@@ -9,15 +10,12 @@ import com.hundun.mirai.bot.cp.penguin.domain.Stage;
  * @author hundun
  * Created on 2021/04/26
  */
-public interface StageRepository {
+@Repository
+public interface StageRepository extends MongoRepository<Stage, String> {
 
     Stage findOneByCode(String code);
 
-    void deleteAll();
 
-    void saveAll(List<Stage> stages);
-
-    Stage findById(String stageId);
 
     
 }

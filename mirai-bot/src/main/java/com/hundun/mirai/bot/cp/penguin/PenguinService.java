@@ -9,12 +9,11 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.cp.penguin.db.ItemRepository;
-import com.hundun.mirai.bot.cp.penguin.db.MatrixReportRepository;
-import com.hundun.mirai.bot.cp.penguin.db.StageInfoReportRepository;
 import com.hundun.mirai.bot.cp.penguin.db.StageRepository;
 import com.hundun.mirai.bot.cp.penguin.domain.DropInfo;
 import com.hundun.mirai.bot.cp.penguin.domain.DropType;
@@ -37,24 +36,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class PenguinService {
-    
+    @Autowired
     StageRepository stageRepository;
-    
+    @Autowired
     ItemRepository itemRepository;
     
     PenguinApiFeignClient penguinApiFeignClient;
     
-    MatrixReportRepository matrixReportRepository; 
+    //MatrixReportRepository matrixReportRepository; 
     
-    StageInfoReportRepository stageInfoReportRepository; 
+    //StageInfoReportRepository stageInfoReportRepository; 
     
     @PostConstruct
     public void manualWired() {
-        this.stageRepository = CustomBeanFactory.getInstance().penguinStageRepository;
-        this.itemRepository = CustomBeanFactory.getInstance().penguinItemRepository;
         this.penguinApiFeignClient = CustomBeanFactory.getInstance().penguinApiFeignClient;
-        this.matrixReportRepository = CustomBeanFactory.getInstance().matrixReportRepository;
-        this.stageInfoReportRepository = CustomBeanFactory.getInstance().stageInfoReportRepository;
+        //this.matrixReportRepository = CustomBeanFactory.getInstance().matrixReportRepository;
+        //this.stageInfoReportRepository = CustomBeanFactory.getInstance().stageInfoReportRepository;
     }
     
     public synchronized void resetCache() {
@@ -69,14 +66,14 @@ public class PenguinService {
         itemRepository.saveAll(items);
         log.info("updateItems items size = {}", items.size());
         
-        matrixReportRepository.deleteAll();
-        stageInfoReportRepository.deleteAll();
+        //matrixReportRepository.deleteAll();
+        //stageInfoReportRepository.deleteAll();
     }
     
     private StageInfoReport getStageInfoReport(Stage stage) {
         
         String reportId = stage.getCode();
-        StageInfoReport report = stageInfoReportRepository.findById(reportId);
+        StageInfoReport report = null;//stageInfoReportRepository.findById(reportId);
         if (report == null) {
             report = new StageInfoReport();
             report.setApCost(stage.getApCost());
@@ -87,7 +84,7 @@ public class PenguinService {
                     continue;
                 }
                 StageInfoNode node = new StageInfoNode();
-                Item item = itemRepository.findById(dropInfo.getItemId());
+                Item item = itemRepository.findById(dropInfo.getItemId()).orElse(null);
                 if (item == null) {
                     log.warn("ItemId = {} from dropInfo, but not in itemRepository");
                     return null;
@@ -103,19 +100,19 @@ public class PenguinService {
                 nodes.get(node.getDropType()).add(node);
             }
             report.setNodes(nodes);
-            stageInfoReportRepository.save(report);
+            //stageInfoReportRepository.save(report);
         }
         return report;
     }
     private MatrixReport getResultMatrixReport(Item item) {
         String reportId = item.getItemId();
-        MatrixReport report = matrixReportRepository.findById(reportId);
+        MatrixReport report = null;//matrixReportRepository.findById(reportId);
         if (report == null) {
             ResultMatrixResponse response = penguinApiFeignClient.resultMatrix(item.getItemId());
             if (response != null) {
                 List<MatrixReportNode> reportNodes = new ArrayList<>();
                 for (ResultMatrixNode matrixNode : response.getMatrix()) {
-                    Stage stage = stageRepository.findById(matrixNode.getStageId());
+                    Stage stage = stageRepository.findById(matrixNode.getStageId()).orElse(null);
                     int quantity = matrixNode.getQuantity();
                     int times = matrixNode.getTimes();
                     double gainRate = 1.0 * matrixNode.getQuantity() / matrixNode.getTimes();
@@ -138,7 +135,7 @@ public class PenguinService {
                 report.setId(reportId);
                 report.setItemName(item.getName());
                 report.setNodes(reportNodes);
-                matrixReportRepository.save(report);
+                //matrixReportRepository.save(report);
             }
         }
         return report;

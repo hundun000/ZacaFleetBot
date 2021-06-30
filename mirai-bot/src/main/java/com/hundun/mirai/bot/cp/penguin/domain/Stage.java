@@ -2,6 +2,9 @@ package com.hundun.mirai.bot.cp.penguin.domain;
 
 import java.util.List;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
@@ -12,7 +15,9 @@ import lombok.Data;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
+@Document(collation = "penguinStage")
 public class Stage {
+    @Id
     String stageId;
     String code;
     int apCost;

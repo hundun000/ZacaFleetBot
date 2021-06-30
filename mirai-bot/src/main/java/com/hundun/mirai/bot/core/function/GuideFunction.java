@@ -7,20 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.hundun.mirai.bot.core.CustomBeanFactory;
-
 
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
 import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.export.IConsole;
-
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 

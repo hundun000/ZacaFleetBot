@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,8 +19,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hundun.mirai.bot.core.CharacterRouter;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
 import com.hundun.mirai.bot.core.SettingManager;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
@@ -31,10 +28,7 @@ import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
 import com.hundun.mirai.bot.cp.weibo.WeiboService;
 import com.hundun.mirai.bot.cp.weibo.WeiboService.WeiboCardCacheAndImage;
 import com.hundun.mirai.bot.cp.weibo.domain.WeiboCardCache;
-import com.hundun.mirai.bot.export.IConsole;
-
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;

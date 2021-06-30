@@ -1,8 +1,10 @@
 package com.hundun.mirai.bot.cp.weibo.domain;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
 
@@ -11,8 +13,9 @@ import lombok.Data;
  * Created on 2021/04/23
  */
 @Data
+@Document(collation = "weiboCardCache")
 public class WeiboCardCache {
-
+    @Id
     String itemid;
     
     String uid;

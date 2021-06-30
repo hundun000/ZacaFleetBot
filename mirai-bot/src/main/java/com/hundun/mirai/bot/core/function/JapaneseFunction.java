@@ -5,20 +5,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
-import com.hundun.mirai.bot.core.CustomBeanFactory;
-
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
 import com.hundun.mirai.bot.core.parser.statement.Statement;
 import com.hundun.mirai.bot.core.parser.statement.SubFunctionCallStatement;
-import com.hundun.mirai.bot.export.IConsole;
 
 /**
  * @author hundun

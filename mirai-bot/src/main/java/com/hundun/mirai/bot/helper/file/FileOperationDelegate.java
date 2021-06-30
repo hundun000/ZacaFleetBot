@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import com.hundun.mirai.bot.core.function.KancolleWikiQuickSearchFunction;
 import com.hundun.mirai.bot.helper.Utils;
 
 import lombok.extern.slf4j.Slf4j;

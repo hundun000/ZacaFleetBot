@@ -1,18 +1,11 @@
 package com.hundun.mirai.bot.core.character;
 
-import java.util.Arrays;
-
-import javax.annotation.PostConstruct;
-
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hundun.mirai.bot.core.CustomBeanFactory;
-
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.SessionId;
-import com.hundun.mirai.bot.core.data.configuration.CharacterPublicSettings;
 import com.hundun.mirai.bot.core.function.AmiyaChatFunction;
 import com.hundun.mirai.bot.core.function.MiraiCodeFunction;
 import com.hundun.mirai.bot.core.function.PenguinFunction;

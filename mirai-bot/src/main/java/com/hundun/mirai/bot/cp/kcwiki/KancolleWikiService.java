@@ -119,6 +119,7 @@ public class KancolleWikiService implements IFileOperationDelegator {
         return "kancolle_wiki";
     }
 
+    @Override
     public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
         return fileOperationDelegate.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
     }

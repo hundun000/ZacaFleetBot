@@ -2,21 +2,16 @@ package com.hundun.mirai.bot.core.function.reminder;
 
 import java.util.List;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
 
 /**
  * @author hundun
  * Created on 2021/05/07
  */
-public interface RemiderTaskRepository {
+@Repository
+public interface RemiderTaskRepository extends MongoRepository<ReminderTask, String> {
     List<ReminderTask> findAllByTargetGroup(long targetGroup);
-
-    boolean existsById(String targetId);
-
-    void deleteById(String targetId);
-
-    List<ReminderTask> findAll();
-
-    void delete(ReminderTask task);
-
-    void save(ReminderTask task);
 }

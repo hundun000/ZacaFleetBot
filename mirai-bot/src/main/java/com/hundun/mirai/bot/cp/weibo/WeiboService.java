@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,9 +48,9 @@ public class WeiboService implements IFileOperationDelegator {
     WeiboApiFeignClient weiboApiFeignClient;
     
     WeiboPictureApiFeignClient weiboPictureApiFeignClient;
-    
+    @Autowired
     WeiboUserInfoCacheRepository userInfoCacheRepository;
-    
+    @Autowired
     WeiboCardCacheRepository cardCacheRepository;
 
     
@@ -65,8 +66,7 @@ public class WeiboService implements IFileOperationDelegator {
         this.fileOperationDelegate = new FileOperationDelegate(this);
         this.weiboApiFeignClient = CustomBeanFactory.getInstance().weiboApiFeignClient;
         this.weiboPictureApiFeignClient = CustomBeanFactory.getInstance().weiboPictureApiFeignClient;
-        this.userInfoCacheRepository = CustomBeanFactory.getInstance().weiboUserInfoCacheRepository;
-        this.cardCacheRepository = CustomBeanFactory.getInstance().weiboCardCacheRepository;
+        
     }
     
     
@@ -121,7 +121,7 @@ public class WeiboService implements IFileOperationDelegator {
                 boolean updated = false;
                 WeiboUserInfoCache userInfoCacahe;
                 if (userInfoCacheRepository.existsById(uid)) {
-                    userInfoCacahe = userInfoCacheRepository.findById(uid);
+                    userInfoCacahe = userInfoCacheRepository.findById(uid).get();
                 } else {
                     userInfoCacahe = new WeiboUserInfoCache();
                     userInfoCacahe.setUid(uid);
@@ -206,7 +206,7 @@ public class WeiboService implements IFileOperationDelegator {
                 return newBlogs;
             }
         }
-        userInfoCacahe = userInfoCacheRepository.findById(uid);
+        userInfoCacahe = userInfoCacheRepository.findById(uid).get();
         
         try {
             //String responseString = weiboApiFeignClient.get(uid, API_TYPE_PARAM, uid, userInfoCacahe.getWeibo_containerid());
@@ -253,7 +253,7 @@ public class WeiboService implements IFileOperationDelegator {
                         
                         log.info("update cardCache: {}", itemid);
                     } else {
-                        cardCache = cardCacheRepository.findById(itemid);
+                        cardCache = cardCacheRepository.findById(itemid).get();
                         
                     }
                     File imageFile = checkSingleImage(cardCache, cacheFolder);

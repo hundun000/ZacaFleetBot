@@ -1,11 +1,6 @@
 package com.hundun.mirai.bot.helper;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
 import com.hundun.mirai.bot.core.data.configuration.AppPublicSettings;
