@@ -4,6 +4,7 @@ buildscript {
         springCloudVersion = '2.0.2.RELEASE'
         springCoreVersion = '5.3.8'
         springDataVersion = '3.2.2'
+        springDataJpaVersion = '2.5.2'
         javaxAnnotationVersion = '1.3.2'
     }
     repositories {
@@ -108,7 +109,7 @@ project(":mirai-bot") {
         implementation("org.springframework:spring-web:${springCoreVersion}")
         implementation("org.springframework:spring-context:${springCoreVersion}")
         implementation("org.springframework.data:spring-data-mongodb:${springDataVersion}")
-
+        implementation("org.springframework.data:spring-data-jpa:${springDataJpaVersion}")
 
         implementation("javax.annotation:javax.annotation-api:${javaxAnnotationVersion}")
         

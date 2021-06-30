@@ -15,7 +15,7 @@ import lombok.Data;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-@Document(collation = "penguinStage")
+@Document(collection = "penguinStage")
 public class Stage {
     @Id
     String stageId;

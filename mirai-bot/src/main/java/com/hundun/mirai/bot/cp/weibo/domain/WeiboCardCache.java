@@ -13,7 +13,7 @@ import lombok.Data;
  * Created on 2021/04/23
  */
 @Data
-@Document(collation = "weiboCardCache")
+@Document(collection = "weiboCardCache")
 public class WeiboCardCache {
     @Id
     String itemid;

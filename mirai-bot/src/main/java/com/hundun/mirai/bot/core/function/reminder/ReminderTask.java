@@ -11,7 +11,7 @@ import lombok.Data;
  * Created on 2021/05/07
  */
 @Data
-@Document(collation = "reminderTask")
+@Document(collection = "reminderTask")
 public class ReminderTask {
     @Id
     String id;

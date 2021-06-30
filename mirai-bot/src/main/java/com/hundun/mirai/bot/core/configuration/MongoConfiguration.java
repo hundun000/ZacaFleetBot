@@ -1,24 +1,24 @@
-package com.hundun.mirai.bot.core;
+package com.hundun.mirai.bot.core.configuration;
 
-import org.springframework.context.annotation.ComponentScan;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+
+
 /**
  * @author hundun
- * Created on 2021/06/30
+ * Created on 2021/07/01
  */
 @Configuration
-@ComponentScan(basePackages={"com.hundun.mirai.bot"})
-@EnableMongoRepositories(basePackages = {"com.hundun.mirai.bot"})
-public class SpringConfig extends AbstractMongoClientConfiguration {
+@EnableMongoRepositories(basePackages = "com.hundun.mirai.bot")
+public class MongoConfiguration extends AbstractMongoClientConfiguration {
 
     @Override
     protected String getDatabaseName() {
         return "mirai";
     }
-
-
+    
     
 }

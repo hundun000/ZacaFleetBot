@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import com.hundun.mirai.bot.core.configuration.MiraiAdaptedApplicationContext;
 import com.hundun.mirai.bot.core.data.EventInfo;
 import com.hundun.mirai.bot.core.data.EventInfoFactory;
 import com.hundun.mirai.bot.core.data.configuration.AppPrivateSettings;
@@ -37,10 +39,8 @@ public abstract class BaseBotLogic {
         AppPublicSettings appPublicSettings = Utils.parseAppPublicSettings(publicSettingsFile);
         
         
-        SpringContextLoaderThread thread = new SpringContextLoaderThread(this.getClass());
-        thread.start();
-        thread.join();
-        AnnotationConfigApplicationContext context = thread.context;
+        @SuppressWarnings("resource")
+        AnnotationConfigApplicationContext context = new MiraiAdaptedApplicationContext(true);
         
         context.registerBean(AppPrivateSettings.class, () -> appPrivateSettings);
         context.registerBean(AppPublicSettings.class, () -> appPublicSettings);
@@ -48,10 +48,6 @@ public abstract class BaseBotLogic {
         context.refresh();
         
         console.getLogger().info("ApplicationContext created, has beans = " + Arrays.toString(context.getBeanDefinitionNames()));
-        
-        
-        
-        
         
         console.getLogger().info("ApplicationContext has console = " + (context.getBean(IConsole.class) != null));
         console.getLogger().info("appPrivateSettings = " + context.getBean(AppPrivateSettings.class));
