@@ -1,0 +1,2 @@
+data\ZacaFleetBot.Router\images\kancolle_game_data
+config\ZacaFleetBot.Router\private-settings.json

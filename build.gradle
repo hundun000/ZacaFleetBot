@@ -58,7 +58,7 @@ project(":mirai-server") {
     apply plugin: 'io.spring.dependency-management'
     
     dependencies {
-        implementation project(":mirai-bot")
+        implementation project(":mirai-botlogic")
 
         implementation("net.mamoe:mirai-core-jvm:${MIRAI_VERSION}") {
           exclude group: 'net.mamoe', module: 'mirai-core-api'
@@ -88,7 +88,7 @@ project(":mirai-server") {
     
 }
 
-project(":mirai-bot") {
+project(":mirai-botlogic") {
     dependencies {
 
         
@@ -125,7 +125,7 @@ project(":mirai-bot") {
 
 project(":mirai-plugin") {
     dependencies {
-        implementation project(":mirai-bot")
+        implementation project(":mirai-botlogic")
     
         implementation("net.mamoe.yamlkt:yamlkt:0.9.0")
         //implementation("net.mamoe:mirai-console:${MIRAI_VERSION}") // 后端

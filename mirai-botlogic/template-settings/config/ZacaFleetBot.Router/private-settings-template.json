@@ -1,0 +1,30 @@
+{
+    "botPrivateSettingsList":[
+        {
+            "adminAccount": 11111111,
+            "botAccount": 22222222,
+            "botPwd": null,
+            
+            
+            "userTagConfigs":{
+            },
+            "groupConfigs":[
+                {
+                    "groupId": 33333333,
+                    "groupDescription": "这是群A",
+                    "enableCharacters":[
+                        "CHARACTER_AMIYA"
+                    ]
+                },
+                {
+                    "groupId": 44444444,
+                    "groupDescription": "这是群B",
+                    "enableCharacters":[
+                        "CHARACTER_PRINZ_EUGEN"  
+                    ]
+                }
+            ]
+        }
+    ]
+}
+
