@@ -29,7 +29,7 @@ allprojects {
     
     
     group = 'hundun'
-    version = '0.2.0-mirai27'
+    version = '0.2.0'
     sourceCompatibility = '11'
     
     repositories {
