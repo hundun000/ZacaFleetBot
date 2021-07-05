@@ -8,33 +8,37 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Map.Entry;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import hundun.stillstanding.dto.buff.BuffDTO;
-import hundun.stillstanding.dto.event.AnswerResultEvent;
-import hundun.stillstanding.dto.event.EventType;
-import hundun.stillstanding.dto.event.FinishEvent;
-import hundun.stillstanding.dto.event.SkillResultEvent;
-import hundun.stillstanding.dto.event.StartMatchEvent;
-import hundun.stillstanding.dto.event.SwitchQuestionEvent;
-import hundun.stillstanding.dto.event.SwitchTeamEvent;
-import hundun.stillstanding.dto.match.AnswerType;
-import hundun.stillstanding.dto.match.MatchSituationDTO;
-import hundun.stillstanding.dto.match.MatchState;
-import hundun.stillstanding.dto.question.QuestionDTO;
-import hundun.stillstanding.dto.question.ResourceType;
-import hundun.stillstanding.dto.role.RoleConstInfoDTO;
-import hundun.stillstanding.dto.team.TeamConstInfoDTO;
-import hundun.stillstanding.dto.team.TeamRuntimeInfoDTO;
+import hundun.quizgame.core.dto.buff.BuffRuntimeDTO;
+import hundun.quizgame.core.dto.event.AnswerResultEvent;
+import hundun.quizgame.core.dto.event.FinishEvent;
+import hundun.quizgame.core.dto.event.StartMatchEvent;
+import hundun.quizgame.core.dto.event.SwitchQuestionEvent;
+import hundun.quizgame.core.dto.event.SwitchTeamEvent;
+import hundun.quizgame.core.dto.match.AnswerType;
+import hundun.quizgame.core.dto.match.MatchConfigDTO;
+import hundun.quizgame.core.dto.match.MatchSituationDTO;
+import hundun.quizgame.core.dto.match.MatchState;
+import hundun.quizgame.core.dto.match.MatchStrategyType;
+import hundun.quizgame.core.dto.question.QuestionDTO;
+import hundun.quizgame.core.dto.question.ResourceType;
+import hundun.quizgame.core.dto.role.RoleConstInfoDTO;
+import hundun.quizgame.core.dto.team.TeamConstInfoDTO;
+import hundun.quizgame.core.dto.team.TeamRuntimeInfoDTO;
+import hundun.quizgame.core.exception.QuizgameException;
+import hundun.quizgame.core.service.GameService;
+import hundun.quizgame.core.service.QuestionLoaderService;
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.LiteralValueStatement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.SubFunctionCallStatement;
-import hundun.zacafleetbot.mirai.botlogic.cp.quiz.QuizService;
-import hundun.zacafleetbot.mirai.botlogic.cp.quiz.QuizService.MatchType;
+import hundun.zacafleetbot.mirai.botlogic.cp.kcwiki.KancolleWikiService;
 import hundun.zacafleetbot.mirai.botlogic.helper.file.FileOperationDelegate;
 import lombok.Data;
 import net.mamoe.mirai.message.data.At;
@@ -64,9 +68,10 @@ public class QuizHandler extends BaseFunction {
     }
     
     @Autowired
-    QuizService quizService;
+    GameService quizService;
     
-    FileOperationDelegate fileOperationDelegate;
+    @Autowired
+    QuestionLoaderService questionLoaderService;
         
     @Autowired
     SettingManager settingManager;
@@ -84,6 +89,30 @@ public class QuizHandler extends BaseFunction {
     }
     
 
+    @PostConstruct
+    public void postConstruct() {
+        File DATA_FOLDER = console.resolveDataFile("quiz/question_packages/");
+        File RESOURCE_ICON_FOLDER = console.resolveDataFile("quiz/pictures/");
+        questionLoaderService.lateInitFolder(DATA_FOLDER, RESOURCE_ICON_FOLDER);
+        
+        // test
+        
+        
+//        MatchSituationDTO newSituationDTO;
+//        MatchConfigDTO matchConfigDTO = new MatchConfigDTO();
+//        matchConfigDTO.setMatchStrategyType(MatchStrategyType.ENDLESS);
+//        String teamName = "游客";
+//        String questionPackageName = "questions_small";
+//        matchConfigDTO.setTeamNames(Arrays.asList(teamName));
+//        matchConfigDTO.setQuestionPackageName(questionPackageName);
+//        try {
+//            String sessionId = quizService.createMatch(matchConfigDTO).getId();   
+//            newSituationDTO = quizService.startMatch(sessionId);
+//        } catch (Exception e) {
+//            newSituationDTO = null;
+//            console.getLogger().error("quizService error: ", e);
+//        }
+    }
 
     
 
@@ -114,18 +143,18 @@ public class QuizHandler extends BaseFunction {
                             result = true;
                         }
                         break;
-                    case QUIZ_USE_SKILL:
-                        if (sessionData.matchSituationDTO == null) {
-                            console.sendToGroup(event.getBot(), event.getGroupId(), "没有进行中的比赛");
-                            result = true;
-                        } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
-                            String skillName = subFunctionCallStatement.getArgs().get(0);
-                            result = handleUseSkill(sessionData, event, skillName);
-                        } else {
-                            console.sendToGroup(event.getBot(), event.getGroupId(), "当前不能使用技能");
-                            result = true;
-                        }
-                        break;
+//                    case QUIZ_USE_SKILL:
+//                        if (sessionData.matchSituationDTO == null) {
+//                            console.sendToGroup(event.getBot(), event.getGroupId(), "没有进行中的比赛");
+//                            result = true;
+//                        } else if (sessionData.matchSituationDTO.getState() == MatchState.WAIT_ANSWER) {
+//                            String skillName = subFunctionCallStatement.getArgs().get(0);
+//                            result = handleUseSkill(sessionData, event, skillName);
+//                        } else {
+//                            console.sendToGroup(event.getBot(), event.getGroupId(), "当前不能使用技能");
+//                            result = true;
+//                        }
+//                        break;
                     case QUIZ_EXIT:
                         if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                             sessionData.matchSituationDTO = null;
@@ -153,23 +182,23 @@ public class QuizHandler extends BaseFunction {
                             result = true;
                         }
                         break;
-                    case QUIZ_UPDATE_TEAM:
-                        if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
-                            String teamName = subFunctionCallStatement.getArgs().get(0);
-                            List<String> pickTags = Arrays.asList(subFunctionCallStatement.getArgs().get(1).split("&"));
-                            List<String> banTags = Arrays.asList(subFunctionCallStatement.getArgs().get(2).split("&"));
-                            String roleName = subFunctionCallStatement.getArgs().get(3);
-                            TeamConstInfoDTO teamConstInfoDTO = new TeamConstInfoDTO();
-                            teamConstInfoDTO.setName(teamName);
-                            teamConstInfoDTO.setPickTags(pickTags);
-                            teamConstInfoDTO.setBanTags(banTags);
-                            teamConstInfoDTO.setRoleName(roleName);
-                            result = handleUpdateTeam(sessionData, event, teamConstInfoDTO);
-                        } else {
-                            console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                            return true;
-                        }
-                        break;
+//                    case QUIZ_UPDATE_TEAM:
+//                        if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
+//                            String teamName = subFunctionCallStatement.getArgs().get(0);
+//                            List<String> pickTags = Arrays.asList(subFunctionCallStatement.getArgs().get(1).split("&"));
+//                            List<String> banTags = Arrays.asList(subFunctionCallStatement.getArgs().get(2).split("&"));
+//                            String roleName = subFunctionCallStatement.getArgs().get(3);
+//                            TeamConstInfoDTO teamConstInfoDTO = new TeamConstInfoDTO();
+//                            teamConstInfoDTO.setName(teamName);
+//                            teamConstInfoDTO.setPickTags(pickTags);
+//                            teamConstInfoDTO.setBanTags(banTags);
+//                            teamConstInfoDTO.setRoleName(roleName);
+//                            result = handleUpdateTeam(sessionData, event, teamConstInfoDTO);
+//                        } else {
+//                            console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
+//                            return true;
+//                        }
+//                        break;
                     default:
                         break;
                 }
@@ -187,111 +216,112 @@ public class QuizHandler extends BaseFunction {
         
     }
 
-    private boolean handleUpdateTeam(SessionData sessionData, EventInfo event, TeamConstInfoDTO teamConstInfoDTO) {
-        List<TeamConstInfoDTO> payload = quizService.updateTeam(sessionData.getMatchSituationDTO().getId(), teamConstInfoDTO);
-        if (payload != null)  {
-            console.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍成功。");
-            return true;
-        } else {
-            console.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍失败。");
-            return true;
-        }
-    }
+//    private boolean handleUpdateTeam(SessionData sessionData, EventInfo event, TeamConstInfoDTO teamConstInfoDTO) {
+//        List<TeamConstInfoDTO> payload = quizService.updateTeam(sessionData.getMatchSituationDTO().getId(), teamConstInfoDTO);
+//        if (payload != null)  {
+//            console.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍成功。");
+//            return true;
+//        } else {
+//            console.sendToGroup(event.getBot(), event.getGroupId(), "配置队伍失败。");
+//            return true;
+//        }
+//    }
 
 
-    private boolean handleUseSkill(SessionData sessionData, EventInfo event, String skillName) {
-        MatchSituationDTO newSituationDTO = quizService.useSkill(sessionData.getMatchSituationDTO().getId(), skillName);
-        if (newSituationDTO != null)  {
-            sessionData.matchSituationDTO = newSituationDTO;
-        } else {
-            console.sendToGroup(event.getBot(), event.getGroupId(), "使用技能失败。");
-            return true;
-        }
-        
-        SkillResultEvent skillResultEvent = sessionData.matchSituationDTO.getSkillResultEvent();
-        if (skillResultEvent != null) {
-            MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
-            messageChainBuilder.add(new At(event.getSenderId()));
-            
-            if (skillResultEvent.getType() == EventType.SKILL_SUCCESS) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("使用技能成功，效果:").append(skillResultEvent.getSkillDesc()).append("\n");
-                try {
-                    switch (skillResultEvent.getSkillName()) {
-                        case "跳过":
-                            String fakeAnswerChar = skillResultEvent.getArgs().get(0);
-                            return handleAnswer(sessionData, event, fakeAnswerChar);
-                        case "5050":
-                            Random random = new Random();
-                            QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
-                            int rand = random.nextInt(3);
-                            if (questionDTO.getAnswer() == 0) { 
-                                if (rand == 0) {
-                                    stringBuilder.append("揭示的错误选项：B、C");
-                                } else if (rand == 1) {
-                                    stringBuilder.append("揭示的错误选项：B、D");
-                                } else {
-                                    stringBuilder.append("揭示的错误选项：C、D");
-                                } 
-                            } else if (questionDTO.getAnswer() == 1) {
-                                if (rand == 0) {
-                                    stringBuilder.append("揭示的错误选项：A、C");
-                                } else if (rand == 1) {
-                                    stringBuilder.append("揭示的错误选项：A、D");
-                                } else {
-                                    stringBuilder.append("揭示的错误选项：C、D");
-                                } 
-                            } else if (questionDTO.getAnswer() == 2) {
-                                if (rand == 0) {
-                                    stringBuilder.append("揭示的错误选项：A、B");
-                                } else if (rand == 1) {
-                                    stringBuilder.append("揭示的错误选项：A、D");
-                                } else {
-                                    stringBuilder.append("揭示的错误选项：B、D");
-                                } 
-                            } else if (questionDTO.getAnswer() == 3) {
-                                if (rand == 0) {
-                                    stringBuilder.append("揭示的错误选项：A、B");
-                                } else if (rand == 1) {
-                                    stringBuilder.append("揭示的错误选项：A、C");
-                                } else {
-                                    stringBuilder.append("揭示的错误选项：B、C");
-                                } 
-                            }
-                            break;
-                        default:
-                            console.getLogger().info("do nothing for " + skillResultEvent.getSkillName() + " as default");
-                            break;
-                    }
-                } catch (Exception e) {
-                    stringBuilder.append("エラー発生。处理这个技能的结果时出错：" + e.getMessage());
-                }
-                
-                
-                messageChainBuilder.add(new PlainText(stringBuilder.toString()));
-            } else {
-                messageChainBuilder.add(new PlainText("使用技能失败，技能点已耗尽。"));
-            }
-            console.sendToGroup(event.getBot(), event.getGroupId(), messageChainBuilder.build());
-            return true;
-        }
-        
-        return false;
-    }
+//    private boolean handleUseSkill(SessionData sessionData, EventInfo event, String skillName) {
+//        MatchSituationDTO newSituationDTO = quizService.useSkill(sessionData.getMatchSituationDTO().getId(), skillName);
+//        if (newSituationDTO != null)  {
+//            sessionData.matchSituationDTO = newSituationDTO;
+//        } else {
+//            console.sendToGroup(event.getBot(), event.getGroupId(), "使用技能失败。");
+//            return true;
+//        }
+//        
+//        SkillResultEvent skillResultEvent = sessionData.matchSituationDTO.getSkillResultEvent();
+//        if (skillResultEvent != null) {
+//            MessageChainBuilder messageChainBuilder = new MessageChainBuilder();
+//            messageChainBuilder.add(new At(event.getSenderId()));
+//            
+//            if (skillResultEvent.getType() == EventType.SKILL_SUCCESS) {
+//                StringBuilder stringBuilder = new StringBuilder();
+//                stringBuilder.append("使用技能成功，效果:").append(skillResultEvent.getSkillDesc()).append("\n");
+//                try {
+//                    switch (skillResultEvent.getSkillName()) {
+//                        case "跳过":
+//                            String fakeAnswerChar = skillResultEvent.getArgs().get(0);
+//                            return handleAnswer(sessionData, event, fakeAnswerChar);
+//                        case "5050":
+//                            Random random = new Random();
+//                            QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
+//                            int rand = random.nextInt(3);
+//                            if (questionDTO.getAnswer() == 0) { 
+//                                if (rand == 0) {
+//                                    stringBuilder.append("揭示的错误选项：B、C");
+//                                } else if (rand == 1) {
+//                                    stringBuilder.append("揭示的错误选项：B、D");
+//                                } else {
+//                                    stringBuilder.append("揭示的错误选项：C、D");
+//                                } 
+//                            } else if (questionDTO.getAnswer() == 1) {
+//                                if (rand == 0) {
+//                                    stringBuilder.append("揭示的错误选项：A、C");
+//                                } else if (rand == 1) {
+//                                    stringBuilder.append("揭示的错误选项：A、D");
+//                                } else {
+//                                    stringBuilder.append("揭示的错误选项：C、D");
+//                                } 
+//                            } else if (questionDTO.getAnswer() == 2) {
+//                                if (rand == 0) {
+//                                    stringBuilder.append("揭示的错误选项：A、B");
+//                                } else if (rand == 1) {
+//                                    stringBuilder.append("揭示的错误选项：A、D");
+//                                } else {
+//                                    stringBuilder.append("揭示的错误选项：B、D");
+//                                } 
+//                            } else if (questionDTO.getAnswer() == 3) {
+//                                if (rand == 0) {
+//                                    stringBuilder.append("揭示的错误选项：A、B");
+//                                } else if (rand == 1) {
+//                                    stringBuilder.append("揭示的错误选项：A、C");
+//                                } else {
+//                                    stringBuilder.append("揭示的错误选项：B、C");
+//                                } 
+//                            }
+//                            break;
+//                        default:
+//                            console.getLogger().info("do nothing for " + skillResultEvent.getSkillName() + " as default");
+//                            break;
+//                    }
+//                } catch (Exception e) {
+//                    stringBuilder.append("エラー発生。处理这个技能的结果时出错：" + e.getMessage());
+//                }
+//                
+//                
+//                messageChainBuilder.add(new PlainText(stringBuilder.toString()));
+//            } else {
+//                messageChainBuilder.add(new PlainText("使用技能失败，技能点已耗尽。"));
+//            }
+//            console.sendToGroup(event.getBot(), event.getGroupId(), messageChainBuilder.build());
+//            return true;
+//        }
+//        
+//        return false;
+//    }
 
     private boolean handleCreateAndStartMatch(SessionData sessionData, EventInfo event, String matchMode, String questionPackageName, String teamName, boolean showTeamSituation) {
         
         
         MatchSituationDTO newSituationDTO;
-        if (matchMode.equals("无尽模式")) {
-            newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName), MatchType.ENDLESS);
-        } else if (matchMode.equals("预赛模式")) {
-            newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName), MatchType.PRE);
-        } else if (matchMode.equals("复赛模式")) {
-            newSituationDTO = quizService.createAndStartMatch(questionPackageName, Arrays.asList(teamName.split("&")), MatchType.MAIN);
-        } else {
-            console.getLogger().warning("unkown functionName: " + matchMode);
+        MatchConfigDTO matchConfigDTO = new MatchConfigDTO();
+        matchConfigDTO.setMatchStrategyType(MatchStrategyType.ENDLESS);
+        matchConfigDTO.setTeamNames(Arrays.asList(teamName));
+        matchConfigDTO.setQuestionPackageName(questionPackageName);
+        try {
+            String sessionId = quizService.createMatch(matchConfigDTO).getId();   
+            newSituationDTO = quizService.startMatch(sessionId);
+        } catch (Exception e) {
             newSituationDTO = null;
+            console.getLogger().error("quizService error: ", e);
         }
         
         
@@ -321,7 +351,13 @@ public class QuizHandler extends BaseFunction {
     }
     
     private boolean handleNextQustion(SessionData sessionData, EventInfo event) {
-        MatchSituationDTO newSituationDTO = quizService.nextQustion(sessionData.matchSituationDTO.getId());
+        MatchSituationDTO newSituationDTO;
+        try {
+            newSituationDTO = quizService.nextQustion(sessionData.matchSituationDTO.getId());
+        } catch (QuizgameException e) {
+            newSituationDTO = null;
+            console.getLogger().error("quizService error: ", e);
+        }
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
         } else {
@@ -332,8 +368,7 @@ public class QuizHandler extends BaseFunction {
         QuestionDTO questionDTO = sessionData.matchSituationDTO.getQuestion();
         if (questionDTO.getResource().getType() == ResourceType.IMAGE) {
             String imageResourceId = questionDTO.getResource().getData();
-            File cacheFolder = console.resolveDataFileOfFileCache();
-            sessionData.resource = quizService.downloadOrFromCache(imageResourceId, cacheFolder, null);
+            sessionData.resource = console.resolveDataFile(questionLoaderService.RESOURCE_ICON_FOLDER + File.separator + imageResourceId);
         } else {
             sessionData.resource = null;
         }
@@ -371,7 +406,13 @@ public class QuizHandler extends BaseFunction {
     
     private boolean handleAnswer(SessionData sessionData, EventInfo event, String answerChar) {
         String correctAnser = QuestionDTO.intToAnswerText(sessionData.matchSituationDTO.getQuestion().getAnswer());
-        MatchSituationDTO newSituationDTO = quizService.answer(sessionData.matchSituationDTO.getId(), answerChar);
+        MatchSituationDTO newSituationDTO;
+        try {
+            newSituationDTO = quizService.teamAnswer(sessionData.matchSituationDTO.getId(), answerChar);
+        } catch (QuizgameException e) {
+            newSituationDTO = null;
+            console.getLogger().error("quizService error: ", e);
+        }
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
         } else {
@@ -437,15 +478,17 @@ public class QuizHandler extends BaseFunction {
             stringBuilder.append(dto.getName()).append(" ");
             stringBuilder.append("得分:").append(dto.getMatchScore()).append(" ");
             stringBuilder.append("生命:").append(dto.getHealth()).append(" ");
-            if (dto.getBuffs().size() > 0) {
+            if (dto.getRuntimeBuffs().size() > 0) {
                 stringBuilder.append("Buff:\n");
-                for (BuffDTO buffDTO : dto.getBuffs()) {
+                for (BuffRuntimeDTO buffDTO : dto.getRuntimeBuffs()) {
                     stringBuilder.append(buffDTO.getName()).append("x").append(buffDTO.getDuration()).append(" ").append(buffDTO.getDescription()).append("\n");
                 }
             }
-            stringBuilder.append("英雄:").append(dto.getRoleName()).append(" 技能:\n");
-            for (Entry<String, Integer> entry : dto.getSkillRemainTimes().entrySet()) {
-                stringBuilder.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+            if (dto.getRoleRuntimeInfo() != null) {
+                stringBuilder.append("英雄:").append(dto.getRoleRuntimeInfo().getName()).append(" 技能:\n");
+                for (Entry<String, Integer> entry : dto.getRoleRuntimeInfo().getSkillRemainTimes().entrySet()) {
+                    stringBuilder.append(entry.getKey()).append(":").append(entry.getValue()).append(" ");
+                }
             }
             stringBuilder.append("\n");
         }

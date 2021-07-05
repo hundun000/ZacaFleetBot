@@ -29,7 +29,7 @@ allprojects {
     
     
     group = 'hundun'
-    version = '0.1.0-mirai27'
+    version = '0.2.0-mirai27'
     sourceCompatibility = '11'
     
     repositories {
@@ -107,6 +107,7 @@ project(":mirai-botlogic") {
         implementation 'io.github.openfeign:feign-core:11.1'
         //implementation group: 'io.github.openfeign', name: 'feign-gson', version: '11.1'
         
+        implementation 'com.github.hundun000.quizgame:quizgame-core:76099d5bee'
         
         implementation("org.springframework:spring-web:${springCoreVersion}")
         implementation("org.springframework:spring-context:${springCoreVersion}")

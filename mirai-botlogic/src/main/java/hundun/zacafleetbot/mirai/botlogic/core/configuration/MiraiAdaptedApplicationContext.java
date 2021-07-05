@@ -11,7 +11,9 @@ public class MiraiAdaptedApplicationContext extends AnnotationConfigApplicationC
     public MiraiAdaptedApplicationContext(boolean lateRefresh) {
         super();
         this.setClassLoader(this.getClass().getClassLoader());
-        this.scan("hundun.zacafleetbot.mirai.botlogic");
+        this.scan("hundun.zacafleetbot.mirai.botlogic",
+                "hundun.quizgame.core"
+                );
         if (!lateRefresh) {
             this.refresh();
         }

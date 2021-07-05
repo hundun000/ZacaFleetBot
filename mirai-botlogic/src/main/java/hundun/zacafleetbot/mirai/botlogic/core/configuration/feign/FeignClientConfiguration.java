@@ -10,7 +10,6 @@ import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
-import hundun.stillstanding.api.StillstandingApiFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.cp.kcwiki.feign.KcwikiApiFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.cp.penguin.feign.PenguinApiFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.cp.weibo.feign.WeiboApiFeignClient;
@@ -65,10 +64,5 @@ public class FeignClientConfiguration {
                 ;
     }
     
-    @Bean
-    public StillstandingApiFeignClient stillstandingApiFeignClient() {
-        return get(StillstandingApiFeignClient.class, "http://localhost:10100/api/game")
-                ;
-    }
 
 }

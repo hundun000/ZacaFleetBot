@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import hundun.zacafleetbot.mirai.botlogic.cp.quiz.QuizService;
 import hundun.zacafleetbot.mirai.botlogic.cp.weibo.WeiboService;
 import hundun.zacafleetbot.mirai.server.SpringConsole;
 import hundun.zacafleetbot.mirai.server.configuration.SpringConsoleLoader;
