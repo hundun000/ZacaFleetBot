@@ -5,13 +5,14 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BaseBTNode;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
 import hundun.zacafleetbot.mirai.botlogic.core.configuration.MiraiAdaptedApplicationContext;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfoFactory;
 import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.AppPrivateSettings;
 import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.AppPublicSettings;
 import hundun.zacafleetbot.mirai.botlogic.export.IConsole;
-import hundun.zacafleetbot.mirai.botlogic.export.IMyEventHandler;
 import hundun.zacafleetbot.mirai.botlogic.helper.Utils;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.ListeningStatus;
@@ -25,11 +26,11 @@ import net.mamoe.mirai.event.events.NudgeEvent;
 @Slf4j
 public abstract class BaseBotLogic {
 
-    protected IMyEventHandler myEventHandler;
+    protected BaseBTNode rootBTNode;
     public AppPrivateSettings appPrivateSettings;
     
     
-    public BaseBotLogic(IConsole console, Class<? extends IMyEventHandler> myEventHandlerClass) throws Exception {
+    public BaseBotLogic(IConsole console, Class<? extends BaseBTNode> rootBTNodeClass) throws Exception {
         
         File settingsFile = console.resolveConfigFile("private-settings.json");
         AppPrivateSettings appPrivateSettings = Utils.parseAppPrivateSettings(settingsFile);
@@ -52,7 +53,7 @@ public abstract class BaseBotLogic {
         console.getLogger().info("appPrivateSettings = " + context.getBean(AppPrivateSettings.class));
         console.getLogger().info("publicSettings = " + context.getBean(AppPrivateSettings.class));
         
-        this.myEventHandler = context.getBean(myEventHandlerClass);
+        this.rootBTNode = context.getBean(rootBTNodeClass);
         this.appPrivateSettings = appPrivateSettings;
         
 
@@ -64,13 +65,21 @@ public abstract class BaseBotLogic {
 
     public ListeningStatus onMessage(NudgeEvent event) throws Exception {
         EventInfo eventInfo = EventInfoFactory.get(event);
-        boolean done = myEventHandler.onNudgeEvent(eventInfo);
+        
+        BlackBoard blackBoard = new BlackBoard();
+        blackBoard.setEvent(eventInfo);
+        
+        rootBTNode.process(blackBoard);
         return ListeningStatus.LISTENING;
     }
 
     public ListeningStatus onMessage(GroupMessageEvent event) throws Exception {
         EventInfo eventInfo = EventInfoFactory.get(event);
-        boolean done = myEventHandler.onGroupMessageEvent(eventInfo);
+        
+        BlackBoard blackBoard = new BlackBoard();
+        blackBoard.setEvent(eventInfo);
+        
+        rootBTNode.process(blackBoard);
         return ListeningStatus.LISTENING;
     }
     

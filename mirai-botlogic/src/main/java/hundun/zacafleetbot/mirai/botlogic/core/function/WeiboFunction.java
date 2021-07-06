@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.GroupConfig;
@@ -175,11 +177,14 @@ public class WeiboFunction extends BaseFunction {
 
 
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() != SubFunction.WEIBO_SHOW_LATEST) {
-                return false;
+                return new ProcessResult(this, false);
             }
 
             long now = System.currentTimeMillis();
@@ -189,7 +194,7 @@ public class WeiboFunction extends BaseFunction {
                 
                 List<String> blogUids = characterIdToBlogUids.get(sessionId.getCharacterId());
                 if (blogUids == null) {
-                    return false;
+                    return new ProcessResult(this, false);
                 }
                 StringBuilder builder = new StringBuilder();
                 for (String blogUid : blogUids) {
@@ -206,9 +211,9 @@ public class WeiboFunction extends BaseFunction {
             } else {
                 console.sendToGroup(event.getBot(), event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
             }
-            return true;
+            return new ProcessResult(this, true);
         }
-        return false;
+        return new ProcessResult(this, false);
     }
 
     @Override

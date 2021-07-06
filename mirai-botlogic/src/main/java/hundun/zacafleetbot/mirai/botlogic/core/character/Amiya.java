@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.function.AmiyaChatFunction;
@@ -34,27 +35,6 @@ public class Amiya extends BaseCharacter {
         super("CHARACTER_AMIYA");
     }
 
-
-    public boolean enable = true;
-
-
-    @Autowired
-    WeiboFunction weiboFunction;
-    @Autowired
-    AmiyaChatFunction amiyaChatFunction;
-    @Autowired
-    QuizHandler quizHandler;
-    @Autowired
-    PenguinFunction penguinFunction;
-    @Autowired
-    RepeatConsumer repeatConsumer;
-    @Autowired
-    ReminderFunction reminderFunction;
-    @Autowired
-    QuickSearchFunction quickSearchFunction;
-    @Autowired
-    MiraiCodeFunction miraiCodeFunction;
-    
     
     @Override
     public void postConsoleBind() {
@@ -65,6 +45,15 @@ public class Amiya extends BaseCharacter {
         reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
 
         
+        
+        addChild(weiboFunction);
+        addChild(quizHandler);
+        addChild(penguinFunction);
+        addChild(repeatConsumer);
+        addChild(reminderFunction);
+        addChild(quickSearchFunction);
+        addChild(miraiCodeFunction);
+        addChild(amiyaChatFunction);
     }
     
     @Override
@@ -77,7 +66,6 @@ public class Amiya extends BaseCharacter {
         registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(penguinFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(reminderFunction.getSubFunctions());
-        registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
@@ -89,92 +77,8 @@ public class Amiya extends BaseCharacter {
     
     
 
-    
 
     
-
-    @Override
-    public boolean onNudgeEvent(@NotNull EventInfo eventInfo) throws Exception {
-        boolean done = amiyaChatFunction.acceptNudged(eventInfo);
-        return done; 
-    }
-
-    @Override
-    public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception { // 可以抛出任何异常, 将在 handleException 处理
-
-
-        if (!enable) {
-            return false;
-        }
-        
-        Statement statement;
-        try {
-            statement = parserSimpleParse(eventInfo.getMessage());
-        } catch (Exception e) {
-            log.error("Parse error: ", e);
-            return false;
-        }
-        
-        SessionId sessionId = new SessionId(this.getId(), eventInfo.getGroupId());
- 
-        
-        boolean done = false;
-        if (!done) {
-            done = weiboFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by weiboFunction");
-            }
-        }
-        if (!done) {
-            done = reminderFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by reminderFunction");
-            }
-        }
-        if (!done) {
-            done = quizHandler.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by quizHandler");
-            }
-        }
-        if (!done) {
-            done = penguinFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by penguinHandler");
-            }
-        }
-        if (!done) {
-            done = repeatConsumer.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by repeatConsumer");
-            }
-        }
-        if (!done) {
-            done = quickSearchFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by quickSearchFunction");
-            }
-        }
-        if (!done) {
-            done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by guideFunction");
-            }
-        }
-        if (!done) {
-            done = miraiCodeFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by decodeFunction");
-            }
-        }
-        if (!done) {
-            done = amiyaChatFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by amiyaTalkHandler");
-            }
-        }
-        return done;
-    }
 
     
 

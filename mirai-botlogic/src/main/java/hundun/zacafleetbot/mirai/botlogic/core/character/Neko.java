@@ -28,9 +28,12 @@ public class Neko extends BaseCharacter {
     }
 
 
-    @Autowired
-    QuizHandler quizHandler;
-
+    @Override
+    public void postConsoleBind() {
+        super.postConsoleBind();
+        
+        addChild(quizHandler);
+    }
     
     @Override
     protected void initParser() {
@@ -45,39 +48,7 @@ public class Neko extends BaseCharacter {
     }
 
 
-    @Override
-    public boolean onNudgeEvent(@NotNull EventInfo eventInfo) throws Exception {
-        return false;
-    }
-
-
-    @Override
-    public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception {
-
-        
-        Statement statement;
-        try {
-            statement = parserSimpleParse(eventInfo.getMessage());
-        } catch (Exception e) {
-            log.error("Parse error: ", e);
-            return false;
-        }
-        
-        SessionId sessionId = new SessionId(this.getId(), eventInfo.getGroupId());
-
-        boolean done = false;
-
-        if (!done) {
-            done = quizHandler.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by quizHandler");
-            }
-        }
-
-        
-        return done;
-    }
-
+    
 
     
     

@@ -7,6 +7,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.PreHandleablePrioritySelectorBTNode;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
 import hundun.zacafleetbot.mirai.botlogic.core.character.Amiya;
 import hundun.zacafleetbot.mirai.botlogic.core.character.BaseCharacter;
 import hundun.zacafleetbot.mirai.botlogic.core.character.Neko;
@@ -14,7 +16,7 @@ import hundun.zacafleetbot.mirai.botlogic.core.character.PrinzEugen;
 import hundun.zacafleetbot.mirai.botlogic.core.character.ZacaMusume;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.GroupConfig;
-import hundun.zacafleetbot.mirai.botlogic.export.IMyEventHandler;
+import hundun.zacafleetbot.mirai.botlogic.export.IConsole;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class CharacterRouter implements IMyEventHandler {
+public class CharacterRouter extends PreHandleablePrioritySelectorBTNode {
     
     @Autowired
     Amiya amiya;
@@ -37,89 +39,44 @@ public class CharacterRouter implements IMyEventHandler {
 
     @Autowired
     SettingManager settingManager;
+    
+    @Autowired
+    IConsole console;
 
-    
-//    @Value("${account.group.arknights}")
-//    public long arknightsGroupId;
-//    
-//    @Value("${account.group.kancolle}")
-//    public long kancolleGroupId;
-//    
-//    @Value("${account.group.neko}")
-//    public long nekoGroupId;
-    
-    List<BaseCharacter> characters = new ArrayList<>();
-    
-    
     
     @PostConstruct
     public void manualWired() {
          
 
-        characters.add(amiya);
-        characters.add(prinzEugen);
-        characters.add(zacaMusume);
-        characters.add(neko);
+        addChild(amiya);
+        addChild(prinzEugen);
+        addChild(zacaMusume);
+        addChild(neko);
         
 
     }
 
 
     
-    
-    
-    
-    
-
-
-    
-
     @Override
-    public boolean onNudgeEvent(EventInfo eventInfo) throws Exception {
-        synchronized (this) {
-            GroupConfig config = settingManager.getGroupConfigOrEmpty(eventInfo.getBot().getId(), eventInfo.getGroupId());
-            if (config == null) {
-                return false;
-            }
-            
-            
-            boolean done = false;
-            for (BaseCharacter character : characters) {
-                if (config.getEnableCharacters().contains(character.getId())) {
-                    done = character.onNudgeEvent(eventInfo);
-                }   
-                if (done) {
-                    break;
-                }
-            }
-            return done;
-        }
-    }
+    public boolean selfEnable(BlackBoard blackBoard) {
 
-    @Override
-    public boolean onGroupMessageEvent(EventInfo eventInfo) throws Exception {
-        synchronized (this) {
-            if (eventInfo.getSenderId() == eventInfo.getBot().getId()) {
-                return false;
-            }
-            
-            GroupConfig config = settingManager.getGroupConfigOrEmpty(eventInfo.getBot().getId(), eventInfo.getGroupId());
-            if (config == null) {
-                log.info("grop {} no groupConfig, onMessage do nothing", eventInfo.getGroupId());
-                return false;
-            }
-            
-            
-            boolean done = false;
-            for (BaseCharacter character : characters) {
-                if (config.getEnableCharacters().contains(character.getId())) {
-                    done = character.onGroupMessageEvent(eventInfo);
-                }   
-                if (done) {
-                    break;
-                }
-            }
-            return done;
+        EventInfo eventInfo = blackBoard.getEvent();
+        
+        GroupConfig config = settingManager.getGroupConfigOrEmpty(eventInfo.getBot().getId(), eventInfo.getGroupId());
+        if (config == null) {
+            console.getLogger().debug("grop " + eventInfo.getGroupId() +" no groupConfig, onMessage do nothing");
+            return false;
         }
+        
+        return true;
     }
+    
+
+
+    
+
+    
+
+    
 }

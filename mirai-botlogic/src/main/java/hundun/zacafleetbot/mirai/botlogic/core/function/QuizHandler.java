@@ -33,6 +33,8 @@ import hundun.quizgame.core.exception.QuizgameException;
 import hundun.quizgame.core.service.GameService;
 import hundun.quizgame.core.service.QuestionLoaderService;
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.LiteralValueStatement;
@@ -117,7 +119,10 @@ public class QuizHandler extends BaseFunction {
     
 
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         
         synchronized (this) {
             
@@ -159,10 +164,10 @@ public class QuizHandler extends BaseFunction {
                         if (event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                             sessionData.matchSituationDTO = null;
                             console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("比赛已退出！"));
-                            return true;
+                            return new ProcessResult(this, true);
                         } else {
                             console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                            return true;
+                            return new ProcessResult(this, true);
                         }
                     case QUIZ_START_MATCH:   
                         if (sessionData.matchSituationDTO == null) {
@@ -211,7 +216,7 @@ public class QuizHandler extends BaseFunction {
                     }
                 }
             }
-            return result;
+            return new ProcessResult(this, result);
         }
         
     }

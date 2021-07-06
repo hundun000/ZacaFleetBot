@@ -31,18 +31,7 @@ public class PrinzEugen extends BaseCharacter {
     public PrinzEugen() {
         super("CHARACTER_PRINZ_EUGEN");
     }
-    @Autowired
-    WeiboFunction weiboFunction;
-    @Autowired
-    PrinzEugenChatFunction chatFunction;
-    @Autowired
-    RepeatConsumer repeatConsumer;
-    @Autowired
-    ReminderFunction reminderFunction;
-    @Autowired
-    MiraiCodeFunction miraiCodeFunction;
-    @Autowired
-    KancolleWikiQuickSearchFunction kancolleWikiQuickSearchFunction;
+
     
     @Override
     public void postConsoleBind() {
@@ -53,8 +42,12 @@ public class PrinzEugen extends BaseCharacter {
         
         reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
 
-
-        
+        addChild(weiboFunction);
+        addChild(reminderFunction);
+        addChild(miraiCodeFunction);
+        addChild(kancolleWikiQuickSearchFunction);
+        addChild(prinzEugenChatFunction);
+        addChild(repeatConsumer);
     }
     
     @Override
@@ -62,79 +55,11 @@ public class PrinzEugen extends BaseCharacter {
         registerWakeUpKeyword("欧根");
         registerQuickQueryKeyword(".");
         registerSubFunctionByCustomSetting(SubFunction.WEIBO_SHOW_LATEST, "查看镇守府情报");
-        registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         registerSyntaxs(QuickSearchStatement.syntaxs, StatementType.QUICK_SEARCH);
     }
 
-    @Override
-    public boolean onNudgeEvent(@NotNull EventInfo eventInfo) throws Exception {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception {
-        Statement statement;
-        try {
-            statement = parserSimpleParse(eventInfo.getMessage());
-        } catch (Exception e) {
-            log.error("Parse error: ", e);
-            return false;
-        }
-        
-        SessionId sessionId = new SessionId(this.getId(), eventInfo.getGroupId());
-
-        boolean done = false;
-
-        if (!done) {
-            done = reminderFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by reminderFunction");
-            }
-        }
-        if (!done) {
-            done = weiboFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by weiboFunction");
-            }
-        }
-        if (!done) {
-            done = miraiCodeFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by decodeFunction");
-            }
-        }
-        if (!done) {
-            done = chatFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by chatFunction");
-            }
-        }
-        
-        if (!done) {
-            done = repeatConsumer.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by repeatConsumer");
-            }
-        }
-        if (!done) {
-            done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by guideFunction");
-            }
-        }
-        if (!done) {
-            done = kancolleWikiQuickSearchFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by kancolleWikiQuickSearchFunction");
-            }
-        }
-        return done;
-    }
-
-    
 
 }

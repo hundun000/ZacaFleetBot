@@ -12,11 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.UserTag;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.AtStatement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.LiteralValueStatement;
+import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.NudegeStatement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
 import net.mamoe.mirai.message.data.At;
 import net.mamoe.mirai.message.data.Image;
@@ -119,19 +122,22 @@ public class AmiyaChatFunction extends BaseFunction {
     }
 
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof LiteralValueStatement) {
             String newMessage = ((LiteralValueStatement)statement).getValue();
             if (newMessage.replace(" ", "").equals("阿米娅今天放假") && event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = LocalDateTime.now().getDayOfYear();
                 todayIsWorkday = -1;
                 console.sendToGroup(event.getBot(), event.getGroupId(), "好耶");
-                return true;
+                return new ProcessResult(this, true);
             } else if (newMessage.replace(" ", "").equals("阿米娅今天上班") && event.getSenderId() == settingManager.getAdminAccount(event.getBot().getId())) {
                 todayIsHoliday = -1;
                 todayIsWorkday = LocalDateTime.now().getDayOfYear();
                 console.sendToGroup(event.getBot(), event.getGroupId(), "哼");
-                return true;
+                return new ProcessResult(this, true);
             } else if (newMessage.contains("下班")) {
                 boolean canRelax = canRelax();
                 if (canRelax) {
@@ -147,7 +153,7 @@ public class AmiyaChatFunction extends BaseFunction {
                             .plus(image)
                             );
                 }
-                return true;
+                return new ProcessResult(this, true);
             } else if (newMessage.contains("damedane")) {
                 Voice voice = console.uploadVoice(event.getBot(), event.getGroupId(), damedaneVoiceExternalResource);
                 MessageChainBuilder builder = new MessageChainBuilder();
@@ -157,7 +163,7 @@ public class AmiyaChatFunction extends BaseFunction {
                 console.sendToGroup(event.getBot(), event.getGroupId(), 
                         messageChain
                         );
-                return true;
+                return new ProcessResult(this, true);
             }
         } else if (statement instanceof AtStatement) {
             if (((AtStatement)statement).getTarget() == event.getBot().getId()) {
@@ -166,38 +172,34 @@ public class AmiyaChatFunction extends BaseFunction {
                         //.plus(event.getGroup().uploadImage(cannotRelaxExternalResource))
                         );
             }
-            return true;
+            return new ProcessResult(this, true);
+        } else if (statement instanceof NudegeStatement) {
+            long senderId = ((NudegeStatement)statement).senderId;
+            long targetId = ((NudegeStatement)statement).targetId;
+            Image image = null;
+            if (event.getBot().getId() == targetId) {
+                image = console.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
+            } else {
+                List<UserTag> tags = settingManager.getUserTagsOrEmpty(event.getBot().getId(), targetId);
+                if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
+                    image = console.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
+                } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {
+                    image = console.uploadImage(event.getBot(), event.getGroupId(), angelinaNodgeResource);
+                } 
+
+            }
+            
+            if (image != null) {
+                console.sendToGroup(event.getBot(), event.getGroupId(), 
+                        new At(senderId)
+                        .plus(image)
+                        );
+                return new ProcessResult(this, true);
+            }
+            return new ProcessResult(this, false);
         }
-        return false;
+        return new ProcessResult(this, false);
     }
-
-    public boolean acceptNudged(EventInfo event) {
-        Image image = null;
-        if (event.getTargetId() == event.getBot().getId()) {
-            image = console.uploadImage(event.getBot(), event.getGroupId(), faces.get(rand.nextInt(faces.size())));
-        } else {
-            List<UserTag> tags = settingManager.getUserTagsOrEmpty(event.getBot().getId(), event.getTargetId());
-            if (tags.contains(UserTag.CEOBE) && ceoboNodgeResource != null) {
-                image = console.uploadImage(event.getBot(), event.getGroupId(), ceoboNodgeResource);
-            } else if (tags.contains(UserTag.ANGELINA) && angelinaNodgeResource != null) {
-                image = console.uploadImage(event.getBot(), event.getGroupId(), angelinaNodgeResource);
-            } 
-
-        }
-            
-            
-            
-        
-        if (image != null) {
-            console.sendToGroup(event.getBot(), event.getGroupId(), 
-                    new At(event.getSenderId())
-                    .plus(image)
-                    );
-            return true;
-        }
-        return false;
-    }
-
 
     
 }

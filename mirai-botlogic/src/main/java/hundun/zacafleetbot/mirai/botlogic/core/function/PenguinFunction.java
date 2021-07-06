@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
@@ -39,7 +41,10 @@ public class PenguinFunction extends BaseFunction {
 
 
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_ITEM_DROP_RATE) {
@@ -60,7 +65,7 @@ public class PenguinFunction extends BaseFunction {
                 } else {
                     console.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + itemFuzzyName + "”的掉率QAQ");
                 }
-                return true;
+                return new ProcessResult(this, true);
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_QUERY_STAGE_INFO) {
                 String stageCode = subFunctionCallStatement.getArgs().get(0);
                 console.getLogger().info(subFunctionCallStatement.getSubFunction() + " by " + stageCode);
@@ -98,14 +103,14 @@ public class PenguinFunction extends BaseFunction {
                 } else {
                     console.sendToGroup(event.getBot(), event.getGroupId(), "没找到“" + stageCode + "”的作战信息QAQ");
                 }
-                return true;
+                return new ProcessResult(this, true);
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.PENGUIN_UPDATE) {
                 penguinService.resetCache();
                 console.sendToGroup(event.getBot(), event.getGroupId(), "好的");
-                return true;
+                return new ProcessResult(this, true);
             }
         }
-        return false;
+        return new ProcessResult(this, false);
     }
 
 }

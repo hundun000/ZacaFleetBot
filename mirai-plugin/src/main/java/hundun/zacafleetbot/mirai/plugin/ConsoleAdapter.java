@@ -77,7 +77,7 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
             try {
                 externalResource.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().error("Image externalResource.close error" + e.getMessage());
             }
             return image;
         } else {
@@ -93,7 +93,7 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
             try {
                 externalResource.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                getLogger().error("Voice externalResource.close error" + e.getMessage());
             }
             return voice;
         } else {

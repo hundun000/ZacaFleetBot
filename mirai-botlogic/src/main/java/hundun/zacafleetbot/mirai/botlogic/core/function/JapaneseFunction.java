@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import com.atilika.kuromoji.ipadic.Token;
 import com.atilika.kuromoji.ipadic.Tokenizer;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
@@ -27,7 +29,10 @@ public class JapaneseFunction extends BaseFunction {
         
 
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.JAPANESE_TOOL) {
@@ -35,11 +40,11 @@ public class JapaneseFunction extends BaseFunction {
                 subFunctionCallStatement.getArgs().forEach(item -> allArg.append(item).append(" "));
                 String result = funAllLines(allArg.toString(), "\n");
                 console.sendToGroup(event.getBot(), event.getGroupId(), result);
-                return true;
+                return new ProcessResult(this, true);
             }
             
         }
-        return false;
+        return new ProcessResult(this, false);
     }
 
     @Override

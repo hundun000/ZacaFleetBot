@@ -26,13 +26,7 @@ public class ZacaMusume extends BaseCharacter {
     public ZacaMusume() {
         super("CHARACTER_ZACA_MUSUME");
     }
-    @Autowired
-    WeiboFunction weiboFunction;
-        
-    @Autowired
-    QuizHandler quizHandler;
-    @Autowired
-    JapaneseFunction japaneseFunction;
+    
     
 //    @Autowired
 //    RepeatConsumer repeatConsumer;
@@ -42,7 +36,9 @@ public class ZacaMusume extends BaseCharacter {
 
         weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
 
-        
+        addChild(weiboFunction);
+        addChild(japaneseFunction);
+        addChild(quizHandler);
     }
     
     
@@ -53,65 +49,11 @@ public class ZacaMusume extends BaseCharacter {
         registerWakeUpKeyword("ZACA娘");
         registerSubFunctionsByDefaultIdentifier(weiboFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
-        registerSubFunctionsByDefaultIdentifier(guideFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(japaneseFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         
     }
 
-
-    @Override
-    public boolean onNudgeEvent(@NotNull EventInfo eventInfo) throws Exception {
-        return false;
-    }
-
-
-    @Override
-    public boolean onGroupMessageEvent(@NotNull EventInfo eventInfo) throws Exception {
-
-        
-        Statement statement;
-        try {
-            statement = parserSimpleParse(eventInfo.getMessage());
-        } catch (Exception e) {
-            log.error("Parse error: ", e);
-            return false;
-        }
-        
-        SessionId sessionId = new SessionId(this.getId(), eventInfo.getGroupId());
-
-        boolean done = false;
-
-        if (!done) {
-            done = quizHandler.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by quizHandler");
-            }
-        }
-//        if (!done) {
-//            done = repeatConsumer.acceptStatement(sessionId, event, statement);
-//            if (done) {
-//                log.info("done by repeatConsumer");
-//            }
-//        }
-        if (!done) {
-            done = japaneseFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by japaneseFunction");
-            }
-        }
-        if (!done) {
-            done = guideFunction.acceptStatement(sessionId, eventInfo, statement);
-            if (done) {
-                log.info("done by guideFunction");
-            }
-        }
-        return done;
-    }
-
-    
-    
-    
 
 }

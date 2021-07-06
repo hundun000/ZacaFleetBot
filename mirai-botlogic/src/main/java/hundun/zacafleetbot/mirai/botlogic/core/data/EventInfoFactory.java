@@ -17,7 +17,7 @@ public class EventInfoFactory {
         eventInfo.senderId = event.getSender().getId();
         eventInfo.targetId = -1;
         eventInfo.message = event.getMessage();
-        
+        eventInfo.miraiEventClass = GroupMessageEvent.class;
         eventInfo.bot = event.getBot();
         return eventInfo;
     }
@@ -27,12 +27,12 @@ public class EventInfoFactory {
         eventInfo.senderId = event.getFrom().getId();
         eventInfo.targetId = event.getTarget().getId();
         eventInfo.message = null;
-        
+        eventInfo.miraiEventClass = NudgeEvent.class;
         eventInfo.bot = event.getBot();
         return eventInfo;
     }
     
-    public static EventInfo get(
+    public static EventInfo fakeGroupMessageEvent(
             long groupId,
             long senderId,
             long targetId,
@@ -43,6 +43,7 @@ public class EventInfoFactory {
         eventInfo.senderId = senderId;
         eventInfo.targetId = targetId;
         eventInfo.message = MessageUtils.newChain(new PlainText(message));
+        eventInfo.miraiEventClass = GroupMessageEvent.class;
         eventInfo.bot = null;
         return eventInfo;
     }

@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.GroupConfig;
@@ -132,15 +134,18 @@ public class ReminderFunction extends BaseFunction {
         return task;
     }
     
-    
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
+        
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_CREATE_TASK) {
                 if (event.getSenderId() != settingManager.getAdminAccount(event.getBot().getId())) {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                    return true;
+                    return new ProcessResult(this, true);
                 }
                 ReminderTask task = createTask(
                         Integer.valueOf(subFunctionCallStatement.getArgs().get(0)), 
@@ -160,20 +165,20 @@ public class ReminderFunction extends BaseFunction {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("创建失败"));
                 }
                 
-                return true;
+                return new ProcessResult(this, true);
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_REMOVE_TASK) {
                 if (event.getSenderId() != settingManager.getAdminAccount(event.getBot().getId())) {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                    return true;
+                    return new ProcessResult(this, true);
                 }
                 String targetId = subFunctionCallStatement.getArgs().get(0);
                 if (taskRepository.existsById(targetId)) {
                     taskRepository.deleteById(targetId);
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("删除成功！"));
-                    return true;
+                    return new ProcessResult(this, true);
                 } else {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("删除失败，不存在该数据！"));
-                    return true;
+                    return new ProcessResult(this, true);
                 }
                 
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.REMINDER_LIST_TASK) {
@@ -182,10 +187,10 @@ public class ReminderFunction extends BaseFunction {
                 stringBuilder.append("提醒任务列表：\n");
                 tasks.forEach(task -> stringBuilder.append(reminderTaskDescroption(task)).append("\n------\n"));
                 console.sendToGroup(event.getBot(), event.getGroupId(), stringBuilder.toString());
-                return true;
+                return new ProcessResult(this, true);
             }
         }
-        return false;
+        return new ProcessResult(this, false);
     }
     
     public void registerClockSchedule() {

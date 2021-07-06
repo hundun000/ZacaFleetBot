@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.LiteralValueStatement;
@@ -41,7 +43,10 @@ public class RepeatConsumer extends BaseFunction {
     
 
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof LiteralValueStatement) {
             String newMessageMiraiCode = ((LiteralValueStatement)statement).getOriginMiraiCode();
 
@@ -63,10 +68,10 @@ public class RepeatConsumer extends BaseFunction {
             
             if (sessionData.count == 3) {
                 console.sendToGroup(event.getBot(), event.getGroupId(), MiraiCode.deserializeMiraiCode(sessionData.messageMiraiCode));
-                return true;
+                return new ProcessResult(this, true);
             }
         }
-        return false;
+        return new ProcessResult(this, false);
     }
 
 }

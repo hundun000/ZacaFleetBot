@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.LiteralValueStatement;
@@ -39,7 +41,10 @@ public class MiraiCodeFunction extends BaseFunction {
     
     
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
             if (subFunctionCallStatement.getSubFunction() == SubFunction.DECODE_MIRAI_CODE) {
@@ -48,10 +53,10 @@ public class MiraiCodeFunction extends BaseFunction {
                     console.getLogger().info("build MessageChain by miraiCode = " + miraiCode);
                     MessageChain chain = MiraiCode.deserializeMiraiCode(miraiCode);
                     console.sendToGroup(event.getBot(), event.getGroupId(), chain);
-                    return true;
+                    return new ProcessResult(this, true);
                 } else {
                     console.sendToGroup(event.getBot(), event.getGroupId(), (new At(event.getSenderId())).plus("你没有该操作的权限！"));
-                    return true;
+                    return new ProcessResult(this, true);
                 }     
             } else if (subFunctionCallStatement.getSubFunction() == SubFunction.ENCODE_LAST_TO_MIRAI_CODE) {
                 SessionData sessionData = sessionDataMap.get(sessionId.id());
@@ -61,7 +66,7 @@ public class MiraiCodeFunction extends BaseFunction {
                 } 
                 String miraiCode = sessionDataMap.get(sessionId.id()).messageMiraiCode;
                 console.sendToGroup(event.getBot(), event.getGroupId(), miraiCode);
-                return true;
+                return new ProcessResult(this, true);
             }
         } else if (statement instanceof LiteralValueStatement) {
             SessionData sessionData = sessionDataMap.get(sessionId.id());
@@ -71,7 +76,7 @@ public class MiraiCodeFunction extends BaseFunction {
             } 
             sessionDataMap.get(sessionId.id()).messageMiraiCode = statement.getOriginMiraiCode();
         }
-        return false;
+        return new ProcessResult(this, false);
     }
 
     @Override

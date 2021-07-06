@@ -8,6 +8,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
+import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.QuickSearchStatement;
@@ -74,7 +76,10 @@ public class QuickSearchFunction extends BaseFunction {
     
     
     @Override
-    public boolean acceptStatement(SessionId sessionId, EventInfo event, Statement statement) {
+    public ProcessResult process(BlackBoard blackBoard) {
+        SessionId sessionId = blackBoard.getSessionId(); 
+        EventInfo event = blackBoard.getEvent(); 
+        Statement statement = blackBoard.getStatement();
         if (statement instanceof QuickSearchStatement) {
             QuickSearchStatement quickSearchStatement = (QuickSearchStatement)statement;
             for (QuickSearchNode node : nodes) {
@@ -114,11 +119,11 @@ public class QuickSearchFunction extends BaseFunction {
                     
                     
                     console.sendToGroup(event.getBot(), event.getGroupId(), answer);
-                    return true;
+                    return new ProcessResult(this, true);
                 }
             }   
         }
-        return false;
+        return new ProcessResult(this, false);
     }
 
     @Override
