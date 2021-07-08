@@ -16,7 +16,7 @@ public class RouterPlugin extends MyPlugin {
     
     public RouterPlugin() {
         super(new JvmPluginDescriptionBuilder(
-                "ZacaFleetBot.Router", // name
+                "hundun.zacafleetbot.router", // name
                 "0.1.0" // version
             )
             // .author("...")

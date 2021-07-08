@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Data;
@@ -21,10 +22,11 @@ public class WeiboCardCache {
     String uid;
     String screenName;
     
-    String mblog_id;
-    LocalDateTime mblogCreatedDateTime;
-    String mblog_text;
-    String mblog_textDetail;
+    String blogId;
+    @Indexed
+    LocalDateTime blogCreatedDateTime;
+    String blogText;
+    String blogTextDetail;
     
     
     List<String> picsLargeUrls;

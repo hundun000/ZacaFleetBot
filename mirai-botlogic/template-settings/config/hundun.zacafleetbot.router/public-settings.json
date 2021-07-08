@@ -1,7 +1,11 @@
 {
     "characterIdToPublicSettings": {
         "CHARACTER_AMIYA": {
-            "listenWeiboUids": ["6279793937","6441489862","7499841383"],
+            "weibo": {
+                "6279793937": "FIRST_IMAGE",
+                "6441489862": "NO_IMAGE",
+                "7499841383": "ALL_IMAGE"
+            },
             "hourlyChats": {
                 "0": "呜哇！？正好0点！今天是，由阿米娅来担当助理的工作呢。我不会辜负大家的。",
                 "1": "凌晨一点到啦！凯尔希医生教导过我，工作的时候一定要保持全神贯注......嗯，全神贯注。",
@@ -23,7 +27,9 @@
             }
         },
         "CHARACTER_PRINZ_EUGEN": {
-            "listenWeiboUids": ["3837704366"],
+            "weibo": {
+                "3837704366": "FIRST_IMAGE"
+            },
             "hourlyChats": {
                 "0": "呜哇！？正好0点！今天是，由本欧根·亲王来担当时报的工作呢。好的，知道啦！交给我吧！",
                 "1": "凌晨一点到啦！这种感觉可以，吗？啊，是吗！太好啦！",
@@ -45,7 +51,9 @@
             }
         },
         "CHARACTER_ZACA_MUSUME": {
-            "listenWeiboUids":["1833959560"]
+            "weibo":{
+                "1833959560": "FIRST_IMAGE"
+            }
         }
     }
 }

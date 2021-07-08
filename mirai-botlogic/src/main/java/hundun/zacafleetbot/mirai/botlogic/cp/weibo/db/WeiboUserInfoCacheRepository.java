@@ -13,5 +13,5 @@ import hundun.zacafleetbot.mirai.botlogic.cp.weibo.domain.WeiboUserInfoCache;
  */
 @Repository
 public interface WeiboUserInfoCacheRepository extends MongoRepository<WeiboUserInfoCache, String> {
-
+    WeiboUserInfoCache findOneByScreenName(String screenName);
 }

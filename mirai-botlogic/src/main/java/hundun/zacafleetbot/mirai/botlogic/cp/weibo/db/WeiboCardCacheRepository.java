@@ -18,7 +18,7 @@ import hundun.zacafleetbot.mirai.botlogic.cp.weibo.domain.WeiboCardCache;
 public interface WeiboCardCacheRepository extends MongoRepository<WeiboCardCache, String> {
 
     //WeiboCardCache findFirstByUid(String uid);
-    List<WeiboCardCache> findTop5ByUidOrderByMblogCreatedDateTimeDesc(String uid);
+    List<WeiboCardCache> findTop5ByUidOrderByBlogCreatedDateTimeDesc(String uid);
 
 
 }

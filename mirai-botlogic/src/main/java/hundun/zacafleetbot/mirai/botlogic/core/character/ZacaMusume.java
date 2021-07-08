@@ -34,7 +34,7 @@ public class ZacaMusume extends BaseCharacter {
     public void postConsoleBind() {
         super.postConsoleBind();
 
-        weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
+        //weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
 
         addChild(weiboFunction);
         addChild(japaneseFunction);

@@ -49,9 +49,9 @@ import net.mamoe.mirai.utils.MiraiLoggerPlatformBase;
  */
 @Slf4j
 public class SpringConsole implements IConsole, ListenerHost {
-    public static final String MIRAI_CONSOLE_CONFIG_FOLDER = "config/ZacaFleetBot.Router/";
-    public static final String MIRAI_CONSOLE_DATA_FOLDER = "data/ZacaFleetBot.Router/";
-    public static final String MIRAI_CONSOLE_BOTS_FOLDER = "bots/ZacaFleetBot.Router/";
+    public static final String MIRAI_CONSOLE_CONFIG_FOLDER = "config/hundun.zacafleetbot.router/";
+    public static final String MIRAI_CONSOLE_DATA_FOLDER = "data/hundun.zacafleetbot.router/";
+    public static final String MIRAI_CONSOLE_BOTS_FOLDER = "bots/hundun.zacafleetbot.router/";
     
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
 

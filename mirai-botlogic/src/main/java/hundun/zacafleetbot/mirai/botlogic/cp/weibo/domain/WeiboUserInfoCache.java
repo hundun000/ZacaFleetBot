@@ -15,6 +15,6 @@ import lombok.Data;
 public class WeiboUserInfoCache {
     @Id
     String uid;
-    String screen_name;
-    String weibo_containerid;
+    String screenName;
+    String weiboContainerid;
 }

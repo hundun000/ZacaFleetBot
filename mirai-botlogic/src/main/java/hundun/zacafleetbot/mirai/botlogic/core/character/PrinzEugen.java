@@ -38,7 +38,7 @@ public class PrinzEugen extends BaseCharacter {
         super.postConsoleBind();
 
         
-        weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
+        //weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
         
         reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
 

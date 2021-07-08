@@ -9,10 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import hundun.zacafleetbot.mirai.botlogic.cp.weibo.domain.WeiboViewFormat;
 import lombok.Data;
 
 @Data
 public class CharacterPublicSettings {
-    List<String> listenWeiboUids = new ArrayList<>(0);
+    Map<String, WeiboViewFormat> weibo = new HashMap<>(0);
     Map<String, String> hourlyChats = new HashMap<>(0);
 }

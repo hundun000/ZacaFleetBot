@@ -8,20 +8,20 @@
 
 解压后得到：
 ```
-+-- ZacaFleetBot.Router-XXX.mirai.jar
++-- hundun.zacafleetbot.router-XXX.mirai.jar
 +-- config
-|   +-- ZacaFleetBot.Router
+|   +-- hundun.zacafleetbot.router
 |   |   +-- private-settings-template.json
 |   |   +-- public-settings.json
 +-- data
-|   +-- ZacaFleetBot.Router
+|   +-- hundun.zacafleetbot.router
 |   |   +-- images
 |   |   +-- voices
 |   |   +-- quiz
 |   |   |   +-- 略
 ```
 
-config、data合并至mirai-console的同名文件夹。ZacaFleetBot.Router-XXX.mirai.jar是插件本体，放入plugins。
+config、data合并至mirai-console的同名文件夹。hundun.zacafleetbot.router-XXX.mirai.jar是插件本体，放入plugins。
 
 ### 3. 配置账号和群
 

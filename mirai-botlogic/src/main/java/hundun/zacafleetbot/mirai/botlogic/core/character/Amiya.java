@@ -40,7 +40,7 @@ public class Amiya extends BaseCharacter {
     public void postConsoleBind() {
         super.postConsoleBind();
         
-        weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
+        //weiboFunction.putCharacterToData(this.getId(), characterPublicSettings.getListenWeiboUids());
 
         reminderFunction.addAllCharacterTasks(this.getId(), characterPublicSettings.getHourlyChats());
 
