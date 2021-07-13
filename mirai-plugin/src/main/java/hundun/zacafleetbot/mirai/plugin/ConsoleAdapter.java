@@ -3,8 +3,11 @@ package hundun.zacafleetbot.mirai.plugin;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import hundun.zacafleetbot.mirai.botlogic.core.BaseBotLogic;
 import hundun.zacafleetbot.mirai.botlogic.export.IConsole;
@@ -32,6 +35,10 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
 
     private static final String offLineImageFakeId = "{01E9451B-70ED-EAE3-B37C-101F1EEBF5B5}.jpg";
     
+    /**
+     * 为null表示插件未启用
+     */
+    @Nullable
     BaseBotLogic botLogic;
     
     JvmPlugin plugin;
@@ -42,20 +49,33 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
         
     }
     
-    public void laterInitBotLogic(BaseBotLogic botLogic) {
+    public void enablePluginAndSetBotLogic(BaseBotLogic botLogic) {
         this.botLogic = botLogic;
+    }
+    
+    public void disablePluginAndClearBotLogic() {
+        if (botLogic != null) {
+            botLogic.onDisable();
+            botLogic = null;
+        }
     }
     
 
     @NotNull
     @EventHandler
     public ListeningStatus onMessage(@NotNull NudgeEvent event) throws Exception { 
+        if (botLogic == null) {
+            return ListeningStatus.LISTENING;
+        }
         return botLogic.onMessage(event);
     }
     
     @NotNull
     @EventHandler
     public ListeningStatus onMessage(@NotNull GroupMessageEvent event) throws Exception { 
+        if (botLogic == null) {
+            return ListeningStatus.LISTENING;
+        }
         return botLogic.onMessage(event);
     }
     
@@ -126,5 +146,7 @@ public class ConsoleAdapter implements IConsole, ListenerHost {
     public MiraiLogger getLogger() {
         return plugin.getLogger();
     }
+
+
 
 }

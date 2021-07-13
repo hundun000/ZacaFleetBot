@@ -73,13 +73,13 @@ public class KancolleWikiQuickSearchFunction extends BaseFunction {
                 
 
                 StringBuilder nameLink = new StringBuilder();
-                for (int id : upgradeLink.getUpgradeLinkIds()) {
+                for (int i = 0; i < upgradeLink.getUpgradeLinkIds().size(); i++) {
+                    int id = upgradeLink.getUpgradeLinkIds().get(i);
                     ShipInfo detail = upgradeLink.getShipDetails().get(id);
-                    if (detail.getAfterLv() > 0) {
-                        nameLink.append(detail.toSimpleText()).append("\n");
+                    nameLink.append(detail.toSimpleText()).append("\n");
+                    boolean hasNext = detail.getAfterLv() > 0 && i != upgradeLink.getUpgradeLinkIds().size() - 1;
+                    if (hasNext) {
                         nameLink.append("-").append(detail.getAfterLv()).append("级->");
-                    } else {
-                        nameLink.append(detail.toSimpleText());
                     }
                 }
                 nameLink.append("\n");

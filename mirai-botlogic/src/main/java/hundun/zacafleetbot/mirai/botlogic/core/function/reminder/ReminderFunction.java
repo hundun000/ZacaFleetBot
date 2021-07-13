@@ -1,5 +1,6 @@
 package hundun.zacafleetbot.mirai.botlogic.core.function.reminder;
 
+import java.lang.ref.WeakReference;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +28,7 @@ import hundun.zacafleetbot.mirai.botlogic.core.function.BaseFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.SubFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.SubFunctionCallStatement;
+import hundun.zacafleetbot.mirai.botlogic.export.IConsole;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.message.code.MiraiCode;
@@ -43,7 +45,14 @@ public class ReminderFunction extends BaseFunction {
     @Autowired
     RemiderTaskRepository taskRepository;
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    @Autowired
+    ScheduledExecutorService scheduler;
+    
+    @Autowired
+    SettingManager settingManager;
+    
+    Map<String, List<ReminderTask>> characterTasks = new HashMap<>();
+    
     
     
     @Override
@@ -55,9 +64,7 @@ public class ReminderFunction extends BaseFunction {
                 
                 );
     }
-        
-    @Autowired
-    SettingManager settingManager;
+
 
     @PostConstruct
     public void manualWired() {
@@ -65,7 +72,6 @@ public class ReminderFunction extends BaseFunction {
         registerClockSchedule();
     }
     
-    Map<String, List<ReminderTask>> characterTasks = new HashMap<>();
     
     private String reminderTaskDescroption(ReminderTask task) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -194,16 +200,14 @@ public class ReminderFunction extends BaseFunction {
     }
     
     public void registerClockSchedule() {
-        scheduler.scheduleAtFixedRate(new Runnable() {
-            
-            @Override
-            public void run() {
-                
-                checkCharacterTasks();
-                checkUserTasks();
-            }
-        }, 1, 1, TimeUnit.MINUTES);
+        scheduler.scheduleAtFixedRate(new WeakReferenceRunner(this)
+                , 1, 1, TimeUnit.MINUTES);
+        
+//        scheduler.scheduleAtFixedRate(new WeakReferenceRunner(this)
+//                , 1, 1, TimeUnit.SECONDS);
     }
+    
+   
     
     
     public void checkCharacterTasks() {
@@ -300,6 +304,10 @@ public class ReminderFunction extends BaseFunction {
             }
             
         }
+    }
+    
+    public IConsole testGetConsole() {
+        return console;
     }
     
 

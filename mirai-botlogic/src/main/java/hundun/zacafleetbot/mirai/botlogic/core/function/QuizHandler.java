@@ -30,13 +30,16 @@ import hundun.quizgame.core.dto.role.RoleConstInfoDTO;
 import hundun.quizgame.core.dto.team.TeamConstInfoDTO;
 import hundun.quizgame.core.dto.team.TeamRuntimeInfoDTO;
 import hundun.quizgame.core.exception.QuizgameException;
+import hundun.quizgame.core.model.team.TeamPrototype;
 import hundun.quizgame.core.service.GameService;
 import hundun.quizgame.core.service.QuestionLoaderService;
+import hundun.quizgame.core.service.TeamService;
 import hundun.zacafleetbot.mirai.botlogic.core.SettingManager;
 import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.BlackBoard;
 import hundun.zacafleetbot.mirai.botlogic.core.behaviourtree.ProcessResult;
 import hundun.zacafleetbot.mirai.botlogic.core.data.EventInfo;
 import hundun.zacafleetbot.mirai.botlogic.core.data.SessionId;
+import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.AppPublicSettings;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.LiteralValueStatement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.SubFunctionCallStatement;
@@ -73,6 +76,9 @@ public class QuizHandler extends BaseFunction {
     GameService quizService;
     
     @Autowired
+    TeamService teamService;
+    
+    @Autowired
     QuestionLoaderService questionLoaderService;
         
     @Autowired
@@ -80,6 +86,8 @@ public class QuizHandler extends BaseFunction {
     
     Map<String, SessionData> sessionDataMap = new HashMap<>();
 
+    @Autowired
+    private AppPublicSettings appPublicSettings;
     
     @Data
     private class SessionData {
@@ -87,15 +95,35 @@ public class QuizHandler extends BaseFunction {
         MatchSituationDTO matchSituationDTO;
         File resource;
         long createTime;
-        boolean showCompletedSituation;
+        TeamInfoLevel teamInfoLevel;
     }
     
+    private enum TeamInfoLevel {
+        NAME,
+        NAME_SCORE,
+        ;
+    }
 
     @PostConstruct
     public void postConstruct() {
         File DATA_FOLDER = console.resolveDataFile("quiz/question_packages/");
         File RESOURCE_ICON_FOLDER = console.resolveDataFile("quiz/pictures/");
         questionLoaderService.lateInitFolder(DATA_FOLDER, RESOURCE_ICON_FOLDER);
+        
+        if (appPublicSettings.getQuizConfig() != null) {
+            List<String> builtInTeamNames = appPublicSettings.getQuizConfig().getBuiltInTeamNames();
+            for (String builtInTeamName : builtInTeamNames) {
+                if (!teamService.existTeam(builtInTeamName)) {
+                    try {
+                        teamService.quickRegisterTeam(builtInTeamName, Arrays.asList(), Arrays.asList(), null);
+                    } catch (QuizgameException e) {
+                        console.getLogger().error(e);
+                    }
+                }
+            }
+        }
+        
+        
         
         // test
         
@@ -174,14 +202,9 @@ public class QuizHandler extends BaseFunction {
                             String matchMode = subFunctionCallStatement.getArgs().get(0);
                             String questionPackageName = subFunctionCallStatement.getArgs().get(1);
                             String teamName = subFunctionCallStatement.getArgs().get(2);
-                            boolean showCompletedSituation = false;
-                            if (subFunctionCallStatement.getArgs().size() >= 4) {
-                                String show = subFunctionCallStatement.getArgs().get(3);
-                                if (show.contains("完整")) {
-                                    showCompletedSituation = true;
-                                }
-                            }
-                            result = handleCreateAndStartMatch(sessionData, event, matchMode, questionPackageName, teamName, showCompletedSituation);
+                            
+                            
+                            result = handleCreateAndStartMatch(sessionData, event, matchMode, questionPackageName, teamName);
                         } else {
                             console.sendToGroup(event.getBot(), event.getGroupId(), "目前已在比赛中");
                             result = true;
@@ -312,16 +335,46 @@ public class QuizHandler extends BaseFunction {
 //        
 //        return false;
 //    }
+    
+    
+    
+    private MatchStrategyType chineseToMatchStrategyType(String matchMode) throws Exception {
+        switch (matchMode) {
+            case "无尽模式":
+                return MatchStrategyType.ENDLESS;
+            case "单人模式":
+                return MatchStrategyType.PRE;
+            case "双人模式":
+                return MatchStrategyType.MAIN;
+            default:
+                throw new Exception("不合法的MatchStrategyType：" + matchMode);
+        }
+    }
 
-    private boolean handleCreateAndStartMatch(SessionData sessionData, EventInfo event, String matchMode, String questionPackageName, String teamName, boolean showTeamSituation) {
+
+    private boolean handleCreateAndStartMatch(SessionData sessionData, EventInfo event, String matchMode, String questionPackageName, String teamName) {
         
         
         MatchSituationDTO newSituationDTO;
-        MatchConfigDTO matchConfigDTO = new MatchConfigDTO();
-        matchConfigDTO.setMatchStrategyType(MatchStrategyType.ENDLESS);
-        matchConfigDTO.setTeamNames(Arrays.asList(teamName));
-        matchConfigDTO.setQuestionPackageName(questionPackageName);
+        TeamInfoLevel teamInfoLevel = null;
         try {
+            MatchStrategyType matchStrategyType = chineseToMatchStrategyType(matchMode);
+            
+            switch (matchStrategyType) {
+                case ENDLESS:
+                    teamInfoLevel = TeamInfoLevel.NAME;
+                    break;
+                default:
+                    teamInfoLevel = TeamInfoLevel.NAME_SCORE;
+            }
+            
+            
+            MatchConfigDTO matchConfigDTO = new MatchConfigDTO();
+            matchConfigDTO.setMatchStrategyType(matchStrategyType);
+            matchConfigDTO.setTeamNames(Arrays.asList(teamName.split("&")));
+            matchConfigDTO.setQuestionPackageName(questionPackageName);
+            
+            
             String sessionId = quizService.createMatch(matchConfigDTO).getId();   
             newSituationDTO = quizService.startMatch(sessionId);
         } catch (Exception e) {
@@ -332,11 +385,11 @@ public class QuizHandler extends BaseFunction {
         
         if (newSituationDTO != null)  {
             sessionData.matchSituationDTO = newSituationDTO;
-            sessionData.showCompletedSituation = showTeamSituation;
+            sessionData.teamInfoLevel = teamInfoLevel;
             
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("开始比赛成功");
-            if (sessionData.showCompletedSituation) {
+            if (sessionData.teamInfoLevel == TeamInfoLevel.NAME_SCORE) {
                 
                 StartMatchEvent startMatchEvent = newSituationDTO.getStartMatchEvent();
                 
@@ -380,11 +433,11 @@ public class QuizHandler extends BaseFunction {
         sessionData.createTime = System.currentTimeMillis();
         StringBuilder builder = new StringBuilder();
         
-        if (sessionData.showCompletedSituation) {
+        if (sessionData.teamInfoLevel == TeamInfoLevel.NAME_SCORE) {
             SwitchQuestionEvent switchQuestionEvent = newSituationDTO.getSwitchQuestionEvent();
             TeamRuntimeInfoDTO currentTeam = newSituationDTO.getTeamRuntimeInfos().get(newSituationDTO.getCurrentTeamIndex());
             builder.append("当前队伍:").append(currentTeam.getName()).append(" ");
-            builder.append("时间:").append(switchQuestionEvent.getTime()).append("秒\n\n");
+            //builder.append("时间:").append(switchQuestionEvent.getTime()).append("秒\n\n");
         }
         
         builder.append(questionDTO.getStem()).append("\n")
@@ -445,7 +498,7 @@ public class QuizHandler extends BaseFunction {
             }
             
             
-            if (sessionData.showCompletedSituation) {
+            if (sessionData.teamInfoLevel == TeamInfoLevel.NAME_SCORE) {
                 String text = teamsNormalText(sessionData.matchSituationDTO.getTeamRuntimeInfos());
                 messageChainBuilder.add(new PlainText(text));
             }
@@ -507,7 +560,7 @@ public class QuizHandler extends BaseFunction {
         for (int i = 0; i < teamRuntimeDTOs.size(); i++) {
             TeamRuntimeInfoDTO teamRuntimeInfoDTO = teamRuntimeDTOs.get(i);
             TeamConstInfoDTO team = teamDTOs.get(i);
-            RoleConstInfoDTO role = roleDTOs.get(i);
+            
             
             stringBuilder.append(team.getName()).append(" 生命:").append(teamRuntimeInfoDTO.getHealth()).append("\n");
             if (team.getPickTags().size() > 0) {
@@ -522,13 +575,17 @@ public class QuizHandler extends BaseFunction {
                 stringBuilder.setLength(stringBuilder.length() - 1);
                 stringBuilder.append("\n");
             }
-            stringBuilder.append("英雄:").append(role.getName()).append(" 介绍:").append(role.getDescription()).append("\n");
-            for (int j = 0; j < role.getSkillNames().size(); j++) {
-                stringBuilder.append("技能").append(j + 1).append(":").append(role.getSkillNames().get(j)).append(" ");
-                stringBuilder.append("次数:").append(role.getSkillFullCounts().get(j)).append(" ");
-                stringBuilder.append("效果:").append(role.getSkillDescriptions().get(j)).append("\n");
+            if (false) {
+                RoleConstInfoDTO role = roleDTOs.get(i);
+                stringBuilder.append("英雄:").append(role.getName()).append(" 介绍:").append(role.getDescription()).append("\n");
+                for (int j = 0; j < role.getSkillNames().size(); j++) {
+                    stringBuilder.append("技能").append(j + 1).append(":").append(role.getSkillNames().get(j)).append(" ");
+                    stringBuilder.append("次数:").append(role.getSkillFullCounts().get(j)).append(" ");
+                    stringBuilder.append("效果:").append(role.getSkillDescriptions().get(j)).append("\n");
+                }
+                stringBuilder.append("\n");
             }
-            stringBuilder.append("\n");
+            
         }
         return stringBuilder.toString();
     }

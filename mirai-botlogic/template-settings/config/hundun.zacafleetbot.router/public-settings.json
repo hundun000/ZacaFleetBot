@@ -55,5 +55,8 @@
                 "1833959560": "FIRST_IMAGE"
             }
         }
+    },
+    "quizConfig": {
+        "builtInTeamNames": ["红方", "白方"]
     }
 }

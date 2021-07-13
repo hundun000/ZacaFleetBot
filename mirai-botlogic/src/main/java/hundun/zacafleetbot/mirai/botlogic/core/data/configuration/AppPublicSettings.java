@@ -3,6 +3,7 @@ package hundun.zacafleetbot.mirai.botlogic.core.data.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
+import hundun.zacafleetbot.mirai.botlogic.core.data.configuration.quiz.QuizConfig;
 import lombok.Data;
 
 /**
@@ -12,4 +13,5 @@ import lombok.Data;
 @Data
 public class AppPublicSettings {
     Map<String, CharacterPublicSettings> characterIdToPublicSettings = new HashMap<>(0);
+    QuizConfig quizConfig;
 }

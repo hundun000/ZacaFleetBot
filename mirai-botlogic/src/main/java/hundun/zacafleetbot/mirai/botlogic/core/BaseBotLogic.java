@@ -2,6 +2,8 @@ package hundun.zacafleetbot.mirai.botlogic.core;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -28,7 +30,7 @@ public abstract class BaseBotLogic {
 
     protected BaseBTNode rootBTNode;
     public AppPrivateSettings appPrivateSettings;
-    
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     
     public BaseBotLogic(IConsole console, Class<? extends BaseBTNode> rootBTNodeClass) throws Exception {
         
@@ -45,6 +47,7 @@ public abstract class BaseBotLogic {
         context.registerBean(AppPrivateSettings.class, () -> appPrivateSettings);
         context.registerBean(AppPublicSettings.class, () -> appPublicSettings);
         context.registerBean(IConsole.class, () -> console);
+        context.registerBean(ScheduledExecutorService.class, () -> scheduler);
         context.refresh();
         
         console.getLogger().info("ApplicationContext created, has beans = " + Arrays.toString(context.getBeanDefinitionNames()));
@@ -81,6 +84,10 @@ public abstract class BaseBotLogic {
         
         rootBTNode.process(blackBoard);
         return ListeningStatus.LISTENING;
+    }
+    
+    public void onDisable() {
+        scheduler.shutdown();
     }
     
 

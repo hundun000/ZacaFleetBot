@@ -1,2 +1,1 @@
-data\hundun.zacafleetbot.router\images\kancolle_game_data
 config\hundun.zacafleetbot.router\private-settings.json

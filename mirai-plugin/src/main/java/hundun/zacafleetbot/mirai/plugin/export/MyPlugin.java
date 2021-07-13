@@ -18,36 +18,45 @@ public abstract class MyPlugin extends JavaPlugin {
 
     private ConsoleAdapter console;
     
-    
+    boolean needRegisterListenerHost = true;
     
     public MyPlugin(JvmPluginDescription description) {
         super(description);
     }
     
     @Override
-    public void onLoad(@NotNull PluginComponentStorage $this$onLoad) {
-        try {
-            
-            console = new ConsoleAdapter(this);
-            console.laterInitBotLogic(createBotLogic(console));
-            
-        } catch (Exception e) {
-            getLogger().error("onLoad error:", e);
-        }
-
+    public void onLoad(@NotNull PluginComponentStorage $this$onLoad) { 
+        console = new ConsoleAdapter(this);
+        getLogger().info("onLoad success");
     }
     
     protected abstract BaseBotLogic createBotLogic(IConsole console) throws Exception;
     
     @Override
     public void onEnable() {
-        if (console != null) {
-            GlobalEventChannel.INSTANCE.registerListenerHost(console);
-        } else {
-            getLogger().warning("cannot enable");
+        getLogger().info("onEnable called");
+        try {
+            BaseBotLogic botLogicImpl = createBotLogic(console);
+            console.enablePluginAndSetBotLogic(botLogicImpl);
+            if (needRegisterListenerHost) {
+                GlobalEventChannel.INSTANCE.registerListenerHost(console);
+                needRegisterListenerHost = false;
+            }
+        } catch (Exception e) {
+            getLogger().error("onEnable error:", e);
         }
         
         
+    }
+    
+    @Override
+    public void onDisable() {
+        getLogger().info("onDisable called");
+        try {
+            console.disablePluginAndClearBotLogic();
+        } catch (Exception e) {
+            getLogger().error("onDisable error:", e);
+        }
     }
     
 }

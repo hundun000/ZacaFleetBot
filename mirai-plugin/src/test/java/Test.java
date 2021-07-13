@@ -18,7 +18,16 @@ public class Test {
         MiraiConsoleTerminalLoader.INSTANCE.startAsDaemon(new MiraiConsoleImplementationTerminal());
         
         PluginManager.INSTANCE.loadPlugin(RouterPlugin.INSTANCE);
+        
         PluginManager.INSTANCE.enablePlugin(RouterPlugin.INSTANCE);
- 
+//        Thread.sleep(3000);
+//        PluginManager.INSTANCE.disablePlugin(RouterPlugin.INSTANCE);
+//        
+//        // enable again
+//        Thread.sleep(3000);
+//        PluginManager.INSTANCE.enablePlugin(RouterPlugin.INSTANCE);
+//        Thread.sleep(3000);
+//        PluginManager.INSTANCE.disablePlugin(RouterPlugin.INSTANCE);
+        
     }
 }
