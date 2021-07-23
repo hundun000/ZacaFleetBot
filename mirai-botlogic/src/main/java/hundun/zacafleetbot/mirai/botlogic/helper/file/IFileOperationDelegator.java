@@ -9,9 +9,9 @@ import java.io.InputStream;
  */
 public interface IFileOperationDelegator {
     
-    InputStream download(String fileId, File rawDataFolder);
+    InputStream downloadOrFromLocal(String fileId, File localDataFolder);
 
     String getCacheSubFolderName();
     
-    File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder);
+    File fromCacheOrDownloadOrFromLocal(String fileId, File rootCacheFolder, File localDataFolder);
 }

@@ -48,6 +48,7 @@ public class PrinzEugen extends BaseCharacter {
         addChild(kancolleWikiQuickSearchFunction);
         addChild(prinzEugenChatFunction);
         addChild(repeatConsumer);
+        addChild(pixivFunction);
     }
     
     @Override
@@ -56,6 +57,7 @@ public class PrinzEugen extends BaseCharacter {
         registerQuickQueryKeyword(".");
         registerSubFunctionByCustomSetting(SubFunction.WEIBO_SHOW_LATEST, "查看镇守府情报");
         registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(pixivFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         registerSyntaxs(QuickSearchStatement.syntaxs, StatementType.QUICK_SEARCH);

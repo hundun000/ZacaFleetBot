@@ -27,6 +27,9 @@ public enum SubFunction {
     REMINDER_CREATE_TASK("创建提醒"),
     REMINDER_LIST_TASK("查看提醒"),
     REMINDER_REMOVE_TASK("移除提醒"),
+    
+    
+    PIXIV_RANDOM_IMAGE("来张图"),
     ;
     
     

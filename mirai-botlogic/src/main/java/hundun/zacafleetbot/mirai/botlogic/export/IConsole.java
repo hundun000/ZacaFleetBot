@@ -16,7 +16,7 @@ import net.mamoe.mirai.utils.MiraiLogger;
  */
 public interface IConsole {
     
-    public static final String RESOURCE_DOWNLOAD_FOLDER = "ZacaFleetBot_file_cache/";
+    public static final String RESOURCE_DOWNLOAD_FOLDER = "file_cache";
     
     default void sendToGroup(Bot bot, long groupId, String message) {
         sendToGroup(bot, groupId, new MessageChainBuilder().append(message).asMessageChain());

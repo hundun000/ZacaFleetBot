@@ -90,7 +90,7 @@ public class KancolleWikiQuickSearchFunction extends BaseFunction {
                 String fileId = String.valueOf(firstDetail.getId());
                 File cacheFolder = console.resolveDataFileOfFileCache();
                 File rawDataFolder = console.resolveDataFile(KancolleWikiService.kancolleGameDataSubFolder);
-                File imageFile = kancolleWikiService.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
+                File imageFile = kancolleWikiService.fromCacheOrDownloadOrFromLocal(fileId, cacheFolder, rawDataFolder);
                 if (imageFile != null) {
                     ExternalResource externalResource = ExternalResource.create(imageFile);
                     Image image = console.uploadImage(event.getBot(), event.getGroupId(), externalResource);

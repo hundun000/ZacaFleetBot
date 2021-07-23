@@ -20,6 +20,7 @@ import hundun.zacafleetbot.mirai.botlogic.core.function.JapaneseFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.KancolleWikiQuickSearchFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.MiraiCodeFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.PenguinFunction;
+import hundun.zacafleetbot.mirai.botlogic.core.function.PixivFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.PrinzEugenChatFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.QuickSearchFunction;
 import hundun.zacafleetbot.mirai.botlogic.core.function.QuizHandler;
@@ -32,6 +33,7 @@ import hundun.zacafleetbot.mirai.botlogic.core.parser.StatementType;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.TokenType;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.NudegeStatement;
 import hundun.zacafleetbot.mirai.botlogic.core.parser.statement.Statement;
+import hundun.zacafleetbot.mirai.botlogic.cp.pixiv.PixivService;
 import hundun.zacafleetbot.mirai.botlogic.export.IConsole;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.event.events.GroupEvent;
@@ -72,6 +74,8 @@ public abstract class BaseCharacter extends PreHandleablePrioritySelectorBTNode 
     protected KancolleWikiQuickSearchFunction kancolleWikiQuickSearchFunction;
     @Autowired
     protected PrinzEugenChatFunction prinzEugenChatFunction;
+    @Autowired
+    protected PixivFunction pixivFunction;
     
     @Autowired
     protected SettingManager settingManager;

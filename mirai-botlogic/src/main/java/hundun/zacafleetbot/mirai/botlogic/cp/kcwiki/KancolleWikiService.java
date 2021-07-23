@@ -73,7 +73,7 @@ public class KancolleWikiService implements IFileOperationDelegator {
     }
     
     @Override
-    public InputStream download(String shipId, File rawDataFolder) {
+    public InputStream downloadOrFromLocal(String shipId, File rawDataFolder) {
 
         File gameDataImage = findGameDataImage(shipId, rawDataFolder);
         if (gameDataImage != null) {
@@ -116,8 +116,8 @@ public class KancolleWikiService implements IFileOperationDelegator {
     }
 
     @Override
-    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
-        return fileOperationDelegate.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
+    public File fromCacheOrDownloadOrFromLocal(String fileId, File cacheFolder, File rawDataFolder) {
+        return fileOperationDelegate.fromCacheOrDownloadOrFromLocal(fileId, cacheFolder, rawDataFolder);
     }
 
 }

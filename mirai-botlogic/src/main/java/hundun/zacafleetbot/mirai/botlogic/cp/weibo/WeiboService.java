@@ -339,7 +339,7 @@ public class WeiboService implements IFileOperationDelegator {
         if (urls.size() > index) {
             int lastSlash = urls.get(index).lastIndexOf("/");
             String id = urls.get(index).substring(lastSlash + 1);
-            File file = this.downloadOrFromCache(id, cacheFolder, null);
+            File file = this.fromCacheOrDownloadOrFromLocal(id, cacheFolder, null);
             urls.remove(index);
             return file;
         } else {
@@ -350,7 +350,7 @@ public class WeiboService implements IFileOperationDelegator {
 
 
     @Override
-    public InputStream download(String fileId, File cacheFolder) {
+    public InputStream downloadOrFromLocal(String fileId, File localDataFolder) {
         try {
             final Response response = weiboPictureApiFeignClient.pictures(fileId);
             final Response.Body body = response.body();
@@ -372,8 +372,8 @@ public class WeiboService implements IFileOperationDelegator {
 
 
     @Override
-    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
-        return fileOperationDelegate.downloadOrFromCache(fileId, cacheFolder, rawDataFolder);
+    public File fromCacheOrDownloadOrFromLocal(String fileId, File cacheFolder, File rawDataFolder) {
+        return fileOperationDelegate.fromCacheOrDownloadOrFromLocal(fileId, cacheFolder, rawDataFolder);
     }
     
 }

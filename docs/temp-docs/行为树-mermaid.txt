@@ -2,29 +2,35 @@ flowchart TD
     classDef corehighlight fill:#f96,stroke:#333,stroke-width:3px;
 
     root("root")
-    router{"Router<br>as PrioritySelector"}
+    subgraph exportLayer
+        router{"Router<br>as Sequence"}
+        characterRoute{"PrioritySelector<br>(select character)"}
+		routerPrepare["Action<br>(prepare blackboard)"]
+        router --> |1st|routerPrepare
+		router --> |2rd|characterRoute
+    end
     root --> router
 
     subgraph characterLayer
-    amiyaRoot{"Amiya<br>as Sequence"}
-    amiyaFunRoute{"FunRoute<br>as PrioritySelector"}
-    amiyaParser[("Parser<br>as Action<br>write blackboard")]
-    amiyaRoot --> |1st|amiyaParser
-    amiyaRoot --> |2rd|amiyaFunRoute
-    eugenRoot{"Eugen<br>as Sequence"}
-    eugenFunRoute{"FunRoute<br>as PrioritySelector"}
-    eugenParser[("Parser<br>as Action<br>write blackboard")]
-    eugenRoot --> |1st|eugenParser
-    eugenRoot --> |2rd|eugenFunRoute
+		amiyaRoot{"Amiya<br>as Sequence"}
+		amiyaFunRoute{"PrioritySelector<br>(select fuinction)"}
+		amiyaParser["Parser<br>as Action<br>(write blackboard)"]
+		amiyaRoot --> |1st|amiyaParser
+		amiyaRoot --> |2rd|amiyaFunRoute
+		eugenRoot{"Eugen<br>as Sequence"}
+		eugenFunRoute{"PrioritySelector<br>(select fuinction)"}
+		eugenParser["Parser<br>as Action<br>(write blackboard)"]
+		eugenRoot --> |1st|eugenParser
+		eugenRoot --> |2rd|eugenFunRoute
     end
-    router --> amiyaRoot
-    router --> eugenRoot
+    characterRoute --> amiyaRoot
+    characterRoute --> eugenRoot
 
     subgraph functionLayer
-    weibo1["weibo<br>as Action"]
-    weibo2["weibo<br>as Action"]
-    amiyaChat["amiyaChat<br>as Action"]
-    eugenChat["eugenChat<br>as Action"]
+		weibo1["weibo<br>as Action<br>(sendMessage)"]
+		weibo2["weibo<br>as Action<br>(sendMessage)"]
+		amiyaChat["amiyaChat<br>as Action<br>(sendMessage)"]
+		eugenChat["eugenChat<br>as Action<br>(sendMessage)"]
     end
     amiyaFunRoute --> weibo1
     amiyaFunRoute --> amiyaChat

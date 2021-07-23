@@ -12,6 +12,7 @@ import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import hundun.zacafleetbot.mirai.botlogic.cp.kcwiki.feign.KcwikiApiFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.cp.penguin.feign.PenguinApiFeignClient;
+import hundun.zacafleetbot.mirai.botlogic.cp.pixiv.feign.RainchanPixivFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.cp.weibo.feign.WeiboApiFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.cp.weibo.feign.WeiboPictureApiFeignClient;
 import hundun.zacafleetbot.mirai.botlogic.export.IConsole;
@@ -64,5 +65,10 @@ public class FeignClientConfiguration {
                 ;
     }
     
+    @Bean
+    public RainchanPixivFeignClient rainchanPixivFeignClient() {
+        return get(RainchanPixivFeignClient.class, "https://pximg.rainchan.win")
+                ;
+    }
 
 }

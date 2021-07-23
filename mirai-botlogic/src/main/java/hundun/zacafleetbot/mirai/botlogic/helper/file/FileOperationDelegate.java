@@ -25,22 +25,22 @@ public class FileOperationDelegate {
 
 
     
-    private File getCacheFile(String fileId, File cacheFolder) {
+    private File fromCache(String fileId, File rootCacheFolder) {
         String subFolerName = provider.getCacheSubFolderName();
-        Utils.checkFolder(subFolerName, cacheFolder.getAbsolutePath());
-        String saveFilePathName = cacheFolder.getAbsolutePath() + subFolerName + "/" + fileId;
+        String subFolerPathName = Utils.checkFolder(subFolerName, rootCacheFolder.getAbsolutePath());
+        String saveFilePathName = subFolerPathName + File.separator + fileId;
         File file = new File(saveFilePathName);
         
         return file;
     }
 
-    public File downloadOrFromCache(String fileId, File cacheFolder, File rawDataFolder) {
+    public File fromCacheOrDownloadOrFromLocal(String fileId, File rootCacheFolder, File localDataFolder) {
         String subFolerName = provider.getCacheSubFolderName();
-        File file = getCacheFile(fileId, cacheFolder);
+        File file = fromCache(fileId, rootCacheFolder);
         if (file.exists()) {
             log.debug("image from cache :{}", subFolerName + "---" + fileId);
         } else {
-            InputStream inputStream = provider.download(fileId, rawDataFolder);
+            InputStream inputStream = provider.downloadOrFromLocal(fileId, localDataFolder);
             
             if (inputStream == null) {
                 log.info("provider not support download, image null for: {}", subFolerName + "---" + fileId);

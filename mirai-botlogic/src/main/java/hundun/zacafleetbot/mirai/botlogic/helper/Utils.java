@@ -17,12 +17,13 @@ public class Utils {
             directory.mkdir();
         }
         
-        File subFoler = new File(parentFoler + subFolerName);
-        if (! subFoler.exists()){
+        String subFolerPathName = parentFoler + File.separator + subFolerName;
+        File subFoler = new File(subFolerPathName);
+        if (!subFoler.exists()){
             subFoler.mkdir();
         }
         
-        return parentFoler + subFolerName + File.separator;
+        return subFolerPathName;
     }
     
     static ObjectMapper objectMapper = new ObjectMapper();

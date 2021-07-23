@@ -54,6 +54,9 @@ public class Amiya extends BaseCharacter {
         addChild(quickSearchFunction);
         addChild(miraiCodeFunction);
         addChild(amiyaChatFunction);
+        addChild(pixivFunction);
+        
+        
     }
     
     @Override
@@ -67,6 +70,7 @@ public class Amiya extends BaseCharacter {
         registerSubFunctionsByDefaultIdentifier(penguinFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(reminderFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
+        registerSubFunctionsByDefaultIdentifier(pixivFunction.getSubFunctions());
         
         registerSyntaxs(SubFunctionCallStatement.syntaxs, StatementType.SUB_FUNCTION_CALL);
         registerSyntaxs(QuickSearchStatement.syntaxs, StatementType.QUICK_SEARCH);
