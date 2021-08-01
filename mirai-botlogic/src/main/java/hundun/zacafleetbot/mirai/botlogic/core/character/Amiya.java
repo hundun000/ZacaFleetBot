@@ -65,6 +65,7 @@ public class Amiya extends BaseCharacter {
         
         registerWakeUpKeyword("阿米娅");
         registerQuickQueryKeyword(".");
+        registerSubFunctionsByDefaultIdentifier(weiboFunction.getSubFunctions());
         registerSubFunctionByCustomSetting(SubFunction.WEIBO_SHOW_LATEST, "看看饼");
         registerSubFunctionsByDefaultIdentifier(quizHandler.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(penguinFunction.getSubFunctions());

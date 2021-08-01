@@ -230,47 +230,59 @@ public class WeiboFunction extends BaseFunction {
         Statement statement = blackBoard.getStatement();
         if (statement instanceof SubFunctionCallStatement) {
             SubFunctionCallStatement subFunctionCallStatement = (SubFunctionCallStatement)statement;
-            if (subFunctionCallStatement.getSubFunction() != SubFunction.WEIBO_SHOW_LATEST) {
-                return new ProcessResult(this, false);
+            if (subFunctionCallStatement.getSubFunction() == SubFunction.WEIBO_SHOW_LATEST) {
+                long now = System.currentTimeMillis();
+                long time = now - lastAsk;
+                long limit = 10 * 1000;
+                if (time > limit) {
+                    lastAsk = now;
+                    Map<String, WeiboViewFormat> listenDataMap = getWeiboSettingByGroupId(Collections.singletonList(sessionId.getCharacterId()));
+                    //List<String> blogUids = characterIdToBlogUids.get(sessionId.getCharacterId());
+//                    if (blogUids == null) {
+//                        return new ProcessResult(this, false);
+//                    }
+                    if (subFunctionCallStatement.getArgs().size() > 0) {
+                        String targetUserName = subFunctionCallStatement.getArgs().get(0);
+                        String targetUid = weiboService.getUidByUserName(targetUserName);
+                        if (targetUid == null || !listenDataMap.containsKey(targetUid)) {
+                            console.sendToGroup(event.getBot(), event.getGroupId(), "你还没有订阅：" + targetUserName);
+                        } else {
+                            File cacheFolder = console.resolveDataFileOfFileCache();
+                            WeiboViewFormat format = listenDataMap.get(targetUid);
+                            
+                            WeiboCardCacheAndImage cardCacheAndImage = weiboService.getFirstBlogByUserName(targetUserName, 0, cacheFolder, format);
+                            sendBlogToBot(cardCacheAndImage, event.getBot(), event.getGroupId());
+                        }
+                        
+                    } else {
+                        sendSumaryToBot(listenDataMap.keySet(), event.getBot(), event.getGroupId());
+                    }
+                } else {
+                    console.sendToGroup(event.getBot(), event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
+                }
+                return new ProcessResult(this, true);
+                
+                
+                
+                
+            } else if (subFunctionCallStatement.getSubFunction() == SubFunction.WEIBO_RESET_CHECK_TIME_FOR_DEBUG) {
+                long hourOffset = Integer.valueOf(subFunctionCallStatement.getArgs().get(0));
+                SessionData sessionData = sessionDataMap.get(event.getGroupId());
+                for (Entry<String, LocalDateTime> entry : sessionData.getLastCheckTimes().entrySet()) {
+                    entry.setValue(entry.getValue().plusHours(hourOffset));
+                }
+                console.sendToGroup(event.getBot(), event.getGroupId(), "已修改");
+                return new ProcessResult(this, true);
             }
 
-            long now = System.currentTimeMillis();
-            long time = now - lastAsk;
-            long limit = 10 * 1000;
-            if (time > limit) {
-                lastAsk = now;
-                Map<String, WeiboViewFormat> listenDataMap = getWeiboSettingByGroupId(Collections.singletonList(sessionId.getCharacterId()));
-                //List<String> blogUids = characterIdToBlogUids.get(sessionId.getCharacterId());
-//                if (blogUids == null) {
-//                    return new ProcessResult(this, false);
-//                }
-                if (subFunctionCallStatement.getArgs().size() > 0) {
-                    String targetUserName = subFunctionCallStatement.getArgs().get(0);
-                    String targetUid = weiboService.getUidByUserName(targetUserName);
-                    if (targetUid == null || !listenDataMap.containsKey(targetUid)) {
-                        console.sendToGroup(event.getBot(), event.getGroupId(), "你还没有订阅：" + targetUserName);
-                    } else {
-                        File cacheFolder = console.resolveDataFileOfFileCache();
-                        WeiboViewFormat format = listenDataMap.get(targetUid);
-                        
-                        WeiboCardCacheAndImage cardCacheAndImage = weiboService.getFirstBlogByUserName(targetUserName, 0, cacheFolder, format);
-                        sendBlogToBot(cardCacheAndImage, event.getBot(), event.getGroupId());
-                    }
-                    
-                } else {
-                    sendSumaryToBot(listenDataMap.keySet(), event.getBot(), event.getGroupId());
-                }
-            } else {
-                console.sendToGroup(event.getBot(), event.getGroupId(), "刚刚已经看过了，晚点再来吧~");
-            }
-            return new ProcessResult(this, true);
+
         }
         return new ProcessResult(this, false);
     }
 
     @Override
     public List<SubFunction> getSubFunctions() {
-        return Arrays.asList(SubFunction.WEIBO_SHOW_LATEST);
+        return Arrays.asList(SubFunction.WEIBO_SHOW_LATEST, SubFunction.WEIBO_RESET_CHECK_TIME_FOR_DEBUG);
     }
     
 }

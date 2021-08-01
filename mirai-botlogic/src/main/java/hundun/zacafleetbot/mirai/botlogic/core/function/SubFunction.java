@@ -12,6 +12,7 @@ public enum SubFunction {
     GUIDE_QUERY_FUNCTION_DOCUMENT("help"),
     
     WEIBO_SHOW_LATEST("查看最新微博"),
+    WEIBO_RESET_CHECK_TIME_FOR_DEBUG("设置检查时间"),
     
     QUIZ_EXIT("结束比赛"),
     QUIZ_UPDATE_TEAM("配置队伍"),

@@ -55,6 +55,7 @@ public class PrinzEugen extends BaseCharacter {
     protected void initParser() {
         registerWakeUpKeyword("欧根");
         registerQuickQueryKeyword(".");
+        registerSubFunctionsByDefaultIdentifier(weiboFunction.getSubFunctions());
         registerSubFunctionByCustomSetting(SubFunction.WEIBO_SHOW_LATEST, "查看镇守府情报");
         registerSubFunctionsByDefaultIdentifier(miraiCodeFunction.getSubFunctions());
         registerSubFunctionsByDefaultIdentifier(pixivFunction.getSubFunctions());
