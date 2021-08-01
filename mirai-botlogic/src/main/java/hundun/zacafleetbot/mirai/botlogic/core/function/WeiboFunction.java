@@ -56,7 +56,8 @@ public class WeiboFunction extends BaseFunction {
     SettingManager settingManager;
     
     //Map<String, List<String>> characterIdToBlogUids = new HashMap<>();
-    Map<Long, SessionData> groupIdToSessionData = new HashMap<>();
+    Map<Long, SessionData> sessionDataMap = new HashMap<>();
+    
     
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
@@ -68,11 +69,8 @@ public class WeiboFunction extends BaseFunction {
     
     @Data
     private class SessionData {
-        LocalDateTime lastUpdateTime;
-        
-        public SessionData() {
-            this.lastUpdateTime = LocalDateTime.now();
-        }
+        Map<String, LocalDateTime> lastCheckTimes = new HashMap<>();
+          
     }
     
     
@@ -83,7 +81,7 @@ public class WeiboFunction extends BaseFunction {
     
 
     
-    private Map<String, WeiboViewFormat> getWeiboDataByGroupId(List<String> characterIds) {
+    private Map<String, WeiboViewFormat> getWeiboSettingByGroupId(List<String> characterIds) {
         Map<String, WeiboViewFormat> allData = new HashMap<>();
         
         for (String characterId : characterIds) {
@@ -162,15 +160,19 @@ public class WeiboFunction extends BaseFunction {
                     for (Bot bot: bots) {
                         for (GroupConfig entry : settingManager.getGroupConfigsOrEmpty(bot.getId())) {
                             Long groupId = entry.getGroupId();
-                            Map<String, WeiboViewFormat> listenDataMap = getWeiboDataByGroupId(entry.getEnableCharacters());
-                            if (!groupIdToSessionData.containsKey(groupId)) {
-                                groupIdToSessionData.put(groupId, new SessionData());
+                            Map<String, WeiboViewFormat> listenDataMap = getWeiboSettingByGroupId(entry.getEnableCharacters());
+                            if (!sessionDataMap.containsKey(groupId)) {
+                                sessionDataMap.put(groupId, new SessionData());
                             }
-                            SessionData sessionData = groupIdToSessionData.get(groupId);
-                            console.getLogger().info("groupId = " + groupId + ", LastUpdateTime = " + sessionData.getLastUpdateTime() + ", listen: " + listenDataMap.keySet());
+                            SessionData sessionData = sessionDataMap.get(groupId);
+                            
                             File cacheFolder = console.resolveDataFileOfFileCache();
                             for (Entry<String, WeiboViewFormat> listenDataEntry : listenDataMap.entrySet()) {
                                 String blogUid = listenDataEntry.getKey();
+                                LocalDateTime lastCheckTimeOfThisBlogUid = sessionData.getLastCheckTimes().get(blogUid);
+                                if (lastCheckTimeOfThisBlogUid == null) {
+                                    lastCheckTimeOfThisBlogUid = LocalDateTime.now();
+                                }
                                 WeiboViewFormat format = listenDataEntry.getValue();
                                 
                                 forceUpdateUserCacheCount++;
@@ -182,7 +184,7 @@ public class WeiboFunction extends BaseFunction {
                                 List<WeiboCardCacheAndImage> newCardCacheAndImages = new ArrayList<>();
                                 List<LocalDateTime> oldCardTimes = new ArrayList<>();
                                 for (WeiboCardCacheAndImage cardCacheAndImage : cardCacheAndImages) {
-                                    boolean isNew = cardCacheAndImage.getWeiboCardCache().getBlogCreatedDateTime().isAfter(sessionData.getLastUpdateTime());
+                                    boolean isNew = cardCacheAndImage.getWeiboCardCache().getBlogCreatedDateTime().isAfter(lastCheckTimeOfThisBlogUid);
                                     //boolean isNew = true;
                                     if (isNew) {
                                         newCardCacheAndImages.add(cardCacheAndImage);
@@ -193,13 +195,18 @@ public class WeiboFunction extends BaseFunction {
 //                                console.getLogger().info("blogUid = " + blogUid
 //                                        + "has " + newCardCacheAndImages.size()
 //                                        + " newCards, has oldCards: " + oldCardTimes.toString());
+                                console.getLogger().debug("groupId = " + groupId 
+                                        + ", checkingBlogUid = " + blogUid 
+                                        + ", lastCheckTimeOfThisBlogUid = " + lastCheckTimeOfThisBlogUid
+                                        + ", newCard.size = " + newCardCacheAndImages.size() 
+                                        );
+                                sessionData.getLastCheckTimes().put(blogUid, LocalDateTime.now());
                                 for (WeiboCardCacheAndImage newCardCacheAndImage : newCardCacheAndImages) {
                                     sendBlogToBot(newCardCacheAndImage, bot, groupId);
                                 }
-        
+                                
+                                
                             }
-                            
-                            sessionData.setLastUpdateTime(LocalDateTime.now());
                             
                         }
                     }
@@ -232,7 +239,7 @@ public class WeiboFunction extends BaseFunction {
             long limit = 10 * 1000;
             if (time > limit) {
                 lastAsk = now;
-                Map<String, WeiboViewFormat> listenDataMap = getWeiboDataByGroupId(Collections.singletonList(sessionId.getCharacterId()));
+                Map<String, WeiboViewFormat> listenDataMap = getWeiboSettingByGroupId(Collections.singletonList(sessionId.getCharacterId()));
                 //List<String> blogUids = characterIdToBlogUids.get(sessionId.getCharacterId());
 //                if (blogUids == null) {
 //                    return new ProcessResult(this, false);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
@@ -109,6 +110,7 @@ public class QuizHandler extends BaseFunction {
         
         if (appPublicSettings.getQuizConfig() != null) {
             List<String> builtInTeamNames = appPublicSettings.getQuizConfig().getBuiltInTeamNames();
+            console.getLogger().info("builtInTeamNames = " + builtInTeamNames);
             for (String builtInTeamName : builtInTeamNames) {
                 if (!teamService.existTeam(builtInTeamName)) {
                     try {
@@ -118,8 +120,14 @@ public class QuizHandler extends BaseFunction {
                     }
                 }
             }
+        } else {
+            console.getLogger().warning("no QuizConfig");
         }
         
+        String teamNames = teamService.listTeams().stream()
+                .map(item -> item.getName())
+                .collect(Collectors.joining(","));
+        console.getLogger().info("teamService has teamNames = " + teamNames);
         
         
         // test
