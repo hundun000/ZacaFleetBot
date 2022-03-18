@@ -11,6 +11,15 @@ bot功能：该bot在可在不同Q群扮演不同角色，只提供指定范围�
 
 依赖服务：mirai框架、微博api、企鹅物流api、舰娘百科api、一站到底答题项目、[P站api](https://pximg.rainchan.win/)
 
+### 停止维护说明
+
+本项目将数种角色扮演功能集中在一个插件里，具有局限性。基于本项目，提炼出名为[fleet框架](https://github.com/hundun000/mirai-fleet-framework)的项目。各角色扮演功能分散至不同相互独立、可单独或搭配使用的插件项目中：
+
+- [欧根插件(砍口垒助手)](https://github.com/hundun000/mirai-fleet-prinzeugen)
+- [阿米娅插件(明日方舟助手)](https://github.com/hundun000/mirai-fleet-amiya)
+
+后续功能迭代在新项目进行，本项目停止维护。
+
 ## 声明
 
 ### 一切开发旨在学习，请勿用于非法用途
